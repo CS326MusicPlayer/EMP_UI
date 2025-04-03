@@ -1,0 +1,34 @@
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  font-family: 'Varela Round', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --emerald0: #d9f9ee;
+  --emerald: #8ae9c9;
+  --emerald2: #52c597;
+  --lightgray0: #f3f3f3;
+  --lightgray1: #eeeeee;
+  --lightgray2: #e0e0e0;
+  --black: #616161;
+  --red: #FF8080;
+  --blue: #279EFF;
+}
+
+
+
+/* For the default cursor */
+/* Cursor from: https://custom-cursor.com/en/collection/cute-cursors/cute-frog-mushroom */
+body {
+  cursor: url(https://cdn.custom-cursor.com/db/12618/32/cute-frog-and-mushroom-cursor.png), default !important;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  display: flex;
+}
+
+/* For pointer cursor (when hovering clickable elements) */
+button, a, [role="button"], .clickable {
+  cursor: url(https://cdn.custom-cursor.com/db/12617/32/cute-frog-and-mushroom-pointer.png), pointer !important
+}

@@ -1,0 +1,40 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  border-radius: 2rem;
+  padding: 1rem;
+  width: 100%;
+  background-color: #ffffff;
+}
+
+.status {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.statusIconContainer {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--lightgray1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.piName {
+  font-size: 1rem;
+  color: var(--black);
+  margin: 0 0.6rem;
+}

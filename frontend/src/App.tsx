@@ -1,5 +1,6 @@
 import { ConfigProvider } from 'antd';
 import React from 'react';
+import PiStatus from './components/PiStatus';
 import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
 import './App.css';
@@ -16,6 +17,7 @@ function App(): React.ReactElement {
       }}
     >
       <div className="App">
+        <PiStatus />
         <TimeWeather />
         <MusicPlayer />
       </div>

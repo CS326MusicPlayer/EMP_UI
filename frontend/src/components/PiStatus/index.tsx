@@ -27,7 +27,7 @@ export default function PiStatus(): React.ReactElement {
     <div className={classes.container}>
       <span className={classes.status}>
         <Popover content={isOnline ? onlineContent : offlineContent} trigger="hover" placement="top">
-          <div className={classes.statusIconContainer} style={{ backgroundColor: `${isOnline && '#8ae9c9'}` }} >
+          <div className={classes.statusIconContainer} style={{ backgroundColor: `${isOnline && '#8ae9c9'}`, borderColor: `${isOnline && '#d1f3e7'}` }} >
             {isOnline ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
           </div>
         </Popover>
@@ -36,7 +36,7 @@ export default function PiStatus(): React.ReactElement {
       <span className={classes.status}>
         <p className={classes.piName}>Receiver Pi</p>
         <Popover content={isOnline ? onlineContent : offlineContent} trigger="hover" placement="top">
-          <div className={classes.statusIconContainer} style={{ backgroundColor: `${isOnline && '#8ae9c9'}` }} >
+          <div className={classes.statusIconContainer} style={{ backgroundColor: `${isOnline && '#8ae9c9'}`, borderColor: `${isOnline && '#d1f3e7'}` }} >
             {isOnline ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
           </div>
         </Popover>

@@ -1,5 +1,4 @@
 import React, { useState, useEffect }  from "react";
-import { Switch } from "antd";
 import sunIcon from '../../assets/icons/sun.png';
 import moonIcon from '../../assets/icons/moon.png';
 import sunnyIcon from '../../assets/icons/brightness.png';
@@ -19,12 +18,9 @@ export default function TimeWeather(): React.ReactElement {
     hours: 0
   });
 
-  
   // Hardcoded weather data for demonstration
   // Replace with actual API call
   const weather: 'SUNNY' | 'RAINY' | 'SNOWY' | 'UNKNOWN' = 'SUNNY';
-
-
 
   useEffect(() => {
     // Update the time every second
@@ -57,6 +53,16 @@ export default function TimeWeather(): React.ReactElement {
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
   const isDaytime = time.getHours() < 18 && time.getHours() >= 6;   // We might want to get the sunrise and sunset time from an API
 
+  const [isAuto, setIsAuto] = useState(true);
+  
+  const toggleMode = () => {
+    setIsAuto(!isAuto);
+  };
+  
+  const buttonStyle = {
+    backgroundColor: isAuto ? '#52c597' : '#a5a5a5',
+  };
+
   return (
     <div className={classes.container}>
       {/* Time */}
@@ -81,7 +87,14 @@ export default function TimeWeather(): React.ReactElement {
 
       {/* Control */}
       <div className={classes.control}>
-        <Switch checkedChildren="Auto" unCheckedChildren="Manual" defaultChecked />
+        {/* <Switch checkedChildren="Auto" unCheckedChildren="Manual" defaultChecked /> */}
+        <button 
+          style={buttonStyle} 
+          className={classes.toggleButton}
+          onClick={toggleMode}
+        >
+          {isAuto ? 'Auto' : 'Manual'}
+      </button>
       </div>
 
       {/* Weather */}

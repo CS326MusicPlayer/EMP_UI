@@ -133,3 +133,25 @@ hr {
   transform: scale(75%);
 }
 
+.toggleButton {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  transition: all 0.3s;
+  background-color: var(--emerald2);
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 1.2rem;
+  border: 0.4rem solid var(--lightgray0);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toggleButton:hover {
+  background-color: var(--emerald) !important;
+}
+

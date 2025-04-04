@@ -175,7 +175,7 @@ export default function MusicPlayer() {
       const clickPosition = e.clientX - progressBarRect.left;
       const progressBarWidth = progressBarRect.width;
       const seekTime = (clickPosition / progressBarWidth) * duration;
-      
+
       audioRef.current.currentTime = seekTime;
       setCurrentTime(seekTime);
     }
@@ -196,7 +196,7 @@ export default function MusicPlayer() {
         audioRef.current.play();
       }
     }
-  }, [currentSongIndex]);
+  }, [currentSongIndex, isPlaying]);
 
   // Set loop attribute
   useEffect(() => {
@@ -210,7 +210,7 @@ export default function MusicPlayer() {
       <span className={classes.musicTitleContainer}>
         <img src={currentSong.weatherIcon} alt="Weather Icon" className={classes.weatherIcon} style={{ transform: `scale(${currentSong.wiScale})` }} />
         <h2 className={classes.songTitle}
-          style={{ 
+          style={{
             background: `radial-gradient(circle at 100%, ${currentSong.colorFrom}, ${currentSong.colorTo} 50%, ${currentSong.colorFrom} 75%, ${currentSong.colorFrom} 100%)`,
           }}
         >{currentSong.title}</h2>
@@ -219,13 +219,13 @@ export default function MusicPlayer() {
 
       <div className={classes.timeControl}>
         <span className={classes.timeDisplay}>{formatTime(currentTime)}</span>
-        <div 
+        <div
           ref={progressBarRef}
-          className={classes.progressBarContainer} 
+          className={classes.progressBarContainer}
           onClick={handleProgressClick}
         >
-          <div 
-            className={classes.progressBar} 
+          <div
+            className={classes.progressBar}
             style={{ width: `${(currentTime / duration) * 100}%` }}
           ></div>
         </div>
@@ -237,36 +237,36 @@ export default function MusicPlayer() {
           <button onClick={playPrevious} className={classes.controlButton}>
             <LuSkipBack />
           </button>
-          
+
           <button onClick={togglePlay} className={classes.controlButton}>
             {isPlaying ? <LuPause /> : <LuPlay />}
           </button>
-          
+
           <button onClick={playNext} className={classes.controlButton}>
             <LuSkipForward />
           </button>
-          
+
           <button onClick={cycleLoopMode} className={classes.loopButton}>
             {loopMode === 'all' ? <LuRepeat /> : <LuRepeat1 />}
           </button>
         </div>
-        
+
         <div className={classes.volumeControl}>
           <LuVolume1 />
-          <input 
-            type="range" 
-            min="0" 
-            max="1" 
-            step="0.01" 
-            value={volume} 
-            onChange={handleVolumeChange} 
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
             className={classes.volumeSlider}
           />
           <LuVolume2 />
         </div>
       </div>
-      
-      <audio 
+
+      <audio
         ref={audioRef}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}

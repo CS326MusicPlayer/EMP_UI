@@ -91,7 +91,7 @@ export default function TimeWeather(): React.ReactElement {
           className={classes.toggleButton}
           onClick={toggleMode}
         >
-          {isAuto ? 'Auto' : 'Manual'}
+          <p className={classes.toggleButtonText}>{isAuto ? 'AUTO' : 'MANUAL'}</p>
       </button>
       </div>
 

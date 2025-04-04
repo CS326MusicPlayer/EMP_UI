@@ -67,7 +67,7 @@
   border-radius: 50%;
   border: 6rem solid var(--emerald);
   clip-path: circle(4% at 50% 0%);
-  transition: transform 0.2s ease-in-out;
+  transition: all 0.5s ease-in-out;
 }
 
 .digitalTime {
@@ -155,3 +155,25 @@ hr {
   background-color: var(--emerald) !important;
 }
 
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* For the blinking colon in digital time */
+.blinkingColon {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.3;
+  }
+}

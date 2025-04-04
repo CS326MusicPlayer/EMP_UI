@@ -10,38 +10,50 @@ import classes from './styles.module.css';
 
 
 export default function TimeWeather(): React.ReactElement {
-  const [time, setTime] = useState(new Date());
   const [isAuto, setIsAuto] = useState(true);
+  const [time, setTime] = useState(new Date());
+  const [prevSeconds, setPrevSeconds] = useState(0);
+  const [rotationCount, setRotationCount] = useState({
+    seconds: 0,
+    minutes: 0,
+    hours: 0
+  });
 
-  // Synchronize clock on component mount
+  // Hardcoded weather data for demonstration
+  // Replace with actual API call
+  const weather: 'SUNNY' | 'RAINY' | 'SNOWY' | 'UNKNOWN' = 'SUNNY';
+
   useEffect(() => {
-    // First, update to exact second
-    const now = new Date();
-    setTime(now);
+    // Update the time every second
+    const interval = setInterval(() => {
+      const newTime = new Date();
+      const newSeconds = newTime.getSeconds();
+      
+      // Check if we've completed a full rotation
+      if (prevSeconds > 50 && newSeconds < 10) {
+        setRotationCount(prev => ({
+          ...prev,
+          seconds: prev.seconds + 1
+        }));
+      }
+      
+      setPrevSeconds(newSeconds);
+      setTime(newTime);
+    }, 1000);
     
-    // Then set up minute updates
-    const minuteInterval = setInterval(() => {
-      setTime(new Date());
-    }, 60000);
-    
-    // Clean up
-    return () => clearInterval(minuteInterval);
-  }, []);
+    return () => clearInterval(interval);
+  }, [prevSeconds]);
 
-  // Format time display
-  const hours = time.getHours();
-  const minutes = time.getMinutes();
+  // Calculate hand positions with more precision
   const seconds = time.getSeconds();
+  const minutes = time.getMinutes() + seconds / 60;
+  const hours = (time.getHours() % 12) + minutes / 60;
   
-  const hoursDisplay = hours.toString().padStart(2, '0');
-  const minutesDisplay = minutes.toString().padStart(2, '0');
-  const isDaytime = hours < 18 && hours >= 6;
-  
-  // Calculate the initial rotation for the second hand (6 degrees per second)
-  const secondsInitialRotation = seconds * 6;
-  
-  // Calculate animation delay to synchronize with real time; start from the current second
-  const animationDelay = -seconds; 
+  const hoursDisplay = Math.floor(hours).toString().padStart(2, '0');
+  const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
+  const secondRotation = seconds * 6 + rotationCount.seconds * 360;
+  const isDaytime = time.getHours() < 18 && time.getHours() >= 6;   // We might want to get the sunrise and sunset time from an API
+
   
   const toggleMode = () => {
     setIsAuto(!isAuto);
@@ -51,22 +63,12 @@ export default function TimeWeather(): React.ReactElement {
     backgroundColor: isAuto ? '#52c597' : '#a5a5a5',
   };
 
-  // Weather data (mock)
-  const weather: 'SUNNY' | 'RAINY' | 'SNOWY' | 'UNKNOWN' = 'SUNNY';
-
   return (
     <div className={classes.container}>
       {/* Time */}
       <div className={classes.time}>
         <div className={classes.clock}>
-          <div 
-            className={classes.secondRing} 
-            style={{
-              transform: `rotate(${secondsInitialRotation}deg)`,
-              animation: `${classes.rotate} 60s linear infinite`,
-              animationDelay: `${animationDelay}s`
-            }}
-          ></div>
+          <div className={classes.secondRing} style={{ transform: `rotate(${secondRotation}deg)` }}></div>
         </div>
         <div className={classes.digitalTime}>
           <p className={classes.digitalTimeText}>

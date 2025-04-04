@@ -1,11 +1,11 @@
 import React, { useState, useEffect }  from "react";
 import { Switch } from "antd";
-import sunIcon from '../../assets/sun.png';
-import moonIcon from '../../assets/moon.png';
-import sunnyIcon from '../../assets/brightness.png';
-import rainyIcon from '../../assets/storm.png';
-import snowyIcon from '../../assets/snowflakes.png';
-import unknownIcon from '../../assets/unknown.png';
+import sunIcon from '../../assets/icons/sun.png';
+import moonIcon from '../../assets/icons/moon.png';
+import sunnyIcon from '../../assets/icons/brightness.png';
+import rainyIcon from '../../assets/icons/storm.png';
+import snowyIcon from '../../assets/icons/snowflakes.png';
+import unknownIcon from '../../assets/icons/unknown.png';
 
 import classes from './styles.module.css';
 

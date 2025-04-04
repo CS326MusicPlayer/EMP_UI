@@ -11,6 +11,7 @@
   --lightgray0: #f3f3f3;
   --lightgray1: #eeeeee;
   --lightgray2: #e0e0e0;
+  --gray: #8e8e8e;
   --black: #616161;
   --red: #FF8080;
   --blue: #279EFF;
@@ -28,7 +29,7 @@ body {
   display: flex;
 }
 
-/* For pointer cursor (when hovering clickable elements) */
-button, a, [role="button"], .clickable {
+/* For pointer cursor (when hovering all hoverable elements) */
+button, a, [role="button"], .clickable, slider, input[type="range"] {
   cursor: url(https://cdn.custom-cursor.com/db/12617/32/cute-frog-and-mushroom-pointer.png), pointer !important
 }

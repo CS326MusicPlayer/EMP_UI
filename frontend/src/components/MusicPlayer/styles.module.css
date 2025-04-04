@@ -1,0 +1,165 @@
+.musicPlayer {
+  width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 2rem;
+  background-color: #ffffff;
+  color: var(--black);
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.musicTitleContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.songTitle {
+  text-align: center;
+  font-size: 1.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background-size: 200% auto !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: transparent !important;
+  animation: alternateTextColor 8s linear infinite;
+  font-weight: 800;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.weatherIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.timeIcon {
+  width: 2rem;
+  height: 2rem;
+}
+
+
+@keyframes alternateTextColor {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.controller {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.controlButton,
+.loopButton {
+  width: 3rem;
+  height: 3rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  padding: 0.2rem;
+  border-radius: 50%;
+  transition: all 0.1s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.controlButton:hover {
+  color: var(--emerald2);
+}
+
+.loopButton {
+  color: var(--emerald2);
+}
+
+.loopButton:hover {
+  color: var(--lightgray2) !important;
+}
+
+.timeControl {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.timeDisplay {
+  font-size: 0.8rem;
+  color: #555;
+  width: 40px;
+  text-align: center;
+}
+
+.progressBarContainer {
+  flex-grow: 1;
+  height: 8px;
+  background-color: var(--lightgray1);
+  border-radius: 4px;
+  position: relative;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: var(--emerald2);
+  border-radius: 4px;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.volumeControl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.volumeSlider {
+  width: 8rem;
+}
+
+/* Custom styling for range input */
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 0.5rem;
+  border-radius: 0.3rem;
+  background: var(--lightgray1);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--emerald2);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: var(--emerald2);
+}

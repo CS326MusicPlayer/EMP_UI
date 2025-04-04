@@ -65,6 +65,36 @@ export default function TimeWeather(): React.ReactElement {
 
   return (
     <div className={classes.container}>
+      {/* Weather */}
+      <div className={classes.weather}>
+        <div className={classes.forecast}>
+          <div className={classes.forecastData}>
+            <p className={classes.temperature}>88°F</p>
+            <hr />
+            <span className={classes.condition}>
+              {
+                weather === 'SUNNY' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
+                weather === 'RAINY' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
+                weather === 'SNOWY' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
+                <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Control */}
+      <div className={classes.control}>
+        {/* <Switch checkedChildren="Auto" unCheckedChildren="Manual" defaultChecked /> */}
+        <button 
+          style={buttonStyle} 
+          className={classes.toggleButton}
+          onClick={toggleMode}
+        >
+          {isAuto ? 'Auto' : 'Manual'}
+      </button>
+      </div>
+
       {/* Time */}
       <div className={classes.time}>
         <div className={classes.clock}>
@@ -82,36 +112,6 @@ export default function TimeWeather(): React.ReactElement {
               <img src={moonIcon} alt="PM" className={classes.moonIcon} />
             }
           </span>
-        </div>
-      </div>
-
-      {/* Control */}
-      <div className={classes.control}>
-        {/* <Switch checkedChildren="Auto" unCheckedChildren="Manual" defaultChecked /> */}
-        <button 
-          style={buttonStyle} 
-          className={classes.toggleButton}
-          onClick={toggleMode}
-        >
-          {isAuto ? 'Auto' : 'Manual'}
-      </button>
-      </div>
-
-      {/* Weather */}
-      <div className={classes.weather}>
-        <div className={classes.forecast}>
-          <div className={classes.forecastData}>
-            <p className={classes.temperature}>88°F</p>
-            <hr />
-            <span className={classes.condition}>
-              {
-                weather === 'SUNNY' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
-                weather === 'RAINY' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
-                weather === 'SNOWY' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
-                <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
-              }
-            </span>
-          </div>
         </div>
       </div>
 

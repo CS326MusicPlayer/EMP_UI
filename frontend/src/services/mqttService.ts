@@ -1,3 +1,5 @@
+// Based on: https://github.com/riotu-lab/react-mqtt/blob/main/src/config/mqtt.js
+
 import mqtt from 'mqtt';
 
 // Environment variables

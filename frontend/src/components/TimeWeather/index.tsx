@@ -1,4 +1,5 @@
 import React, { useState, useEffect }  from "react";
+import { Popover } from 'antd';
 import sunIcon from '../../assets/icons/sun.png';
 import moonIcon from '../../assets/icons/moon.png';
 import sunnyIcon from '../../assets/icons/brightness.png';
@@ -28,7 +29,7 @@ export default function TimeWeather(): React.ReactElement {
     const interval = setInterval(() => {
       const newTime = new Date();
       const newSeconds = newTime.getSeconds();
-      
+
       // Check if we've completed a full rotation
       if (prevSeconds > 50 && newSeconds < 10) {
         setRotationCount(prev => ({
@@ -36,11 +37,11 @@ export default function TimeWeather(): React.ReactElement {
           seconds: prev.seconds + 1
         }));
       }
-      
+
       setPrevSeconds(newSeconds);
       setTime(newTime);
     }, 1000);
-    
+
     return () => clearInterval(interval);
   }, [prevSeconds]);
 
@@ -48,20 +49,27 @@ export default function TimeWeather(): React.ReactElement {
   const seconds = time.getSeconds();
   const minutes = time.getMinutes() + seconds / 60;
   const hours = (time.getHours() % 12) + minutes / 60;
-  
+
   const hoursDisplay = Math.floor(hours).toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
   const isDaytime = time.getHours() < 18 && time.getHours() >= 6;   // We might want to get the sunrise and sunset time from an API
 
-  
+
   const toggleMode = () => {
     setIsAuto(!isAuto);
   };
-  
+
   const buttonStyle = {
     backgroundColor: isAuto ? '#52c597' : '#a5a5a5',
   };
+
+  const modeSwitchContent = (
+    <div style={{ textAlign: 'center' }}>
+      <p style={{ color: '#616161' }}>Click to switch to "{isAuto ? 'Manual' : 'Auto'}" mode</p>
+      <p style={{ color: '#8e8e8e' }}>{isAuto ? '"Auto" mode is on' : '"Manual" mode is on'}</p>
+    </div>
+  );
 
   return (
     <div className={classes.container}>
@@ -85,14 +93,15 @@ export default function TimeWeather(): React.ReactElement {
 
       {/* Control */}
       <div className={classes.control}>
-        {/* <Switch checkedChildren="Auto" unCheckedChildren="Manual" defaultChecked /> */}
-        <button 
-          style={buttonStyle} 
-          className={classes.toggleButton}
-          onClick={toggleMode}
-        >
-          <p className={classes.toggleButtonText}>{isAuto ? 'AUTO' : 'MANUAL'}</p>
-      </button>
+        <Popover content={modeSwitchContent} trigger="hover" placement="top">
+          <button
+            style={buttonStyle}
+            className={classes.toggleButton}
+            onClick={toggleMode}
+          >
+            <p className={classes.toggleButtonText}>{isAuto ? 'AUTO' : 'MANUAL'}</p>
+          </button>
+        </Popover>
       </div>
 
       {/* Time */}

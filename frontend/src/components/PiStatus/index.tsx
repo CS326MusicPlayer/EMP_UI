@@ -3,9 +3,14 @@ import { LuCheck, LuEllipsis } from "react-icons/lu";
 import { Popover } from "antd";
 import classes from './styles.module.css';
 
-export default function PiStatus(): React.ReactElement {
-  // TODO: Replace with actual Pi status, received from MQTT
-  const [isOnline, _setIsOnline] = useState(true);
+export default function PiStatus({
+  senderPiConnected,
+  receiverPiConnected
+}: {
+    senderPiConnected: boolean;
+    receiverPiConnected: boolean;
+  }
+): React.ReactElement {
   // Hardcoded for demonstration
   const onlineSince = '3 minutes ago';
 
@@ -26,18 +31,18 @@ export default function PiStatus(): React.ReactElement {
   return (
     <div className={classes.container}>
       <span className={classes.status}>
-        <Popover content={isOnline ? onlineContent : offlineContent} trigger="hover" placement="top">
-          <div className={classes.statusIconContainer} style={{ backgroundColor: `${isOnline && '#8ae9c9'}`, borderColor: `${isOnline && '#d1f3e7'}` }} >
-            {isOnline ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
+        <Popover content={senderPiConnected ? onlineContent : offlineContent} trigger="hover" placement="top">
+          <div className={classes.statusIconContainer} style={{ backgroundColor: `${senderPiConnected && '#8ae9c9'}`, borderColor: `${senderPiConnected && '#d1f3e7'}` }} >
+            {senderPiConnected ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
           </div>
         </Popover>
         <p className={classes.piName}>Sender Pi</p>
       </span>
       <span className={classes.status}>
         <p className={classes.piName}>Receiver Pi</p>
-        <Popover content={isOnline ? onlineContent : offlineContent} trigger="hover" placement="top">
-          <div className={classes.statusIconContainer} style={{ backgroundColor: `${isOnline && '#8ae9c9'}`, borderColor: `${isOnline && '#d1f3e7'}` }} >
-            {isOnline ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
+        <Popover content={receiverPiConnected ? onlineContent : offlineContent} trigger="hover" placement="top">
+          <div className={classes.statusIconContainer} style={{ backgroundColor: `${receiverPiConnected && '#8ae9c9'}`, borderColor: `${receiverPiConnected && '#d1f3e7'}` }} >
+            {receiverPiConnected ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
           </div>
         </Popover>
       </span>

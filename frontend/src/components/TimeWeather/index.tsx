@@ -10,7 +10,15 @@ import unknownIcon from '../../assets/icons/unknown.png';
 import classes from './styles.module.css';
 
 
-export default function TimeWeather(): React.ReactElement {
+export default function TimeWeather({
+  piWeather,
+  piTime
+}: {
+    piWeather: string;
+    piTime: string;
+  }
+
+): React.ReactElement {
   const [isAuto, setIsAuto] = useState(true);
   const [time, setTime] = useState(new Date());
   const [prevSeconds, setPrevSeconds] = useState(0);
@@ -20,9 +28,6 @@ export default function TimeWeather(): React.ReactElement {
     hours: 0
   });
 
-  // Hardcoded weather data for demonstration
-  // Replace with actual API call
-  const weather: 'SUNNY' | 'RAINY' | 'SNOWY' | 'UNKNOWN' = 'SUNNY';
 
   useEffect(() => {
     // Update the time every second
@@ -53,7 +58,7 @@ export default function TimeWeather(): React.ReactElement {
   const hoursDisplay = Math.floor(hours).toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
-  const isDaytime = time.getHours() < 18 && time.getHours() >= 6;   // We might want to get the sunrise and sunset time from an API
+  // const isDaytime = time.getHours() < 18 && time.getHours() >= 6;   // We might want to get the sunrise and sunset time from an API
 
 
   const toggleMode = () => {
@@ -81,9 +86,9 @@ export default function TimeWeather(): React.ReactElement {
             <hr />
             <span className={classes.condition}>
               {
-                weather === 'SUNNY' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
-                weather === 'RAINY' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
-                weather === 'SNOWY' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
+                piWeather === 'SUNNY' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
+                piWeather === 'RAINY' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
+                piWeather === 'SNOWY' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
                 <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
               }
             </span>
@@ -115,10 +120,15 @@ export default function TimeWeather(): React.ReactElement {
           </p>
           <hr />
           <span className={classes.dayOrNight}>
-            {isDaytime ?
+            {/* {isDaytime ?
               <img src={sunIcon} alt="AM" className={classes.sunIcon} />
               :
               <img src={moonIcon} alt="PM" className={classes.moonIcon} />
+            } */}
+            {
+              piTime === 'DAY' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
+              piTime === 'NIGHT' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
+              <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
             }
           </span>
         </div>

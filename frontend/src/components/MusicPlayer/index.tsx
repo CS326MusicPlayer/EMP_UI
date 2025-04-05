@@ -17,7 +17,14 @@ import night_sunny from '../../assets/music/night_sunny.mp3';
 import night_rainy from '../../assets/music/night_rainy.mp3';
 import night_snowy from '../../assets/music/night_snowy.mp3';
 
-export default function MusicPlayer() {
+export default function MusicPlayer({
+  piWeather,
+  piTime
+}: {
+    piWeather: string;
+    piTime: string;
+  }
+): React.ReactElement {
   const musicList = [
     {
       title: "Sunny Day",
@@ -197,6 +204,8 @@ export default function MusicPlayer() {
       }
     }
   }, [currentSongIndex, isPlaying]);
+
+
 
   // Set loop attribute
   useEffect(() => {

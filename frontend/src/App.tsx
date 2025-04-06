@@ -1,15 +1,16 @@
 import { ConfigProvider } from 'antd';
 import React, { useEffect, useState, useRef } from 'react';
-import PiStatus from './components/PiStatus';
+import MqttStatus from './components/MqttStatus';
 import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
 import mqttClient from './services/mqttService';
 import './App.css';
 
+
 function App(): React.ReactElement {
   const [piWeather, setPiWeather] = useState<'none' | 'rain' | 'snow' | 'unknown'>('none');
   const [piTime, setPiTime] = useState<'day' | 'night'>('day');
-  const [isConnected, setIsConnected] = useState(false);    // TODO: Actually this is not RPi status, but MQTT connection status
+  const [isConnected, setIsConnected] = useState(false);
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
   const [isAuto, setIsAuto] = useState(true);    // To track if the user has enabled auto mode
 
@@ -18,6 +19,7 @@ function App(): React.ReactElement {
   };
 
   const currentHour = new Date().getHours();
+
 
   // Initialize MQTT service
   useEffect(() => {
@@ -31,14 +33,15 @@ function App(): React.ReactElement {
       changeBackgroundColor('#3a3a5c');
     }
 
+    // Set up MQTT event handlers
     mqttClient.on('connect', function () {
       setIsConnected(true);
       console.log('Connected to MQTT broker');
-
-      // Only subscribe if we haven't already
+      
+      // Subscribe to the topic
       if (!hasSubscribed.current) {
         hasSubscribed.current = true;
-
+        
         // Subscribe to topics
         mqttClient.subscribe('emp/environment', (err) => {
           if (!err) {
@@ -50,28 +53,46 @@ function App(): React.ReactElement {
       }
     });
 
-    // Only set up the message handler once
-    // The topic is 'emp/environment' and the message is a JSON string
-    // Example: {"precipitation_status":"rain", "day_status":"day"}
+    mqttClient.on('disconnect', function () {
+      setIsConnected(false);
+      console.log('Disconnected from MQTT broker');
+    });
+
+    mqttClient.on('offline', function () {
+      setIsConnected(false);
+      console.log('Offline from MQTT broker');
+    });
+
+    mqttClient.on('error', function (error: any) {
+      setIsConnected(false);
+      console.error('MQTT error:', error);
+    });
+
+    // Message handler
     const messageHandler = function (topic: string, message: Buffer) {
       console.log('Received message:', topic, message.toString());
-      // Check the topic and parse the message accordingly
-
+      
       if (topic === 'emp/environment') {
-        const data = JSON.parse(message.toString());
-        const weather = data.precipitation_status;
-        const time = data.day_status;
-        console.log(`Weather: ${weather}, Time: ${time}`);
+        try {
+          const data = JSON.parse(message.toString());
+          const weather = data.precipitation_status;
+          const time = data.day_status;
+          console.log(`Weather: ${weather}, Time: ${time}`);
 
-        // Update the state based on the received data
-        setPiWeather(weather as 'none' | 'rain' | 'snow' | 'unknown');
-        setPiTime(time as 'day' | 'night');
+          // Update the state based on the received data
+          setPiWeather(weather as 'none' | 'rain' | 'snow' | 'unknown');
+          setPiTime(time as 'day' | 'night');
 
-        // Change the background color based on the time
-        if (time === 'day') {
-          changeBackgroundColor('#b3e6ff');
-        } else if (time === 'night') {
-          changeBackgroundColor('#3a3a5c');
+          // Change the background color based on the time if auto mode is enabled
+          if (isAuto) {
+            if (time === 'day') {
+              changeBackgroundColor('#b3e6ff');
+            } else if (time === 'night') {
+              changeBackgroundColor('#3a3a5c');
+            }
+          }
+        } catch (err) {
+          console.error('Error parsing message:', err);
         }
       }
     };
@@ -81,8 +102,11 @@ function App(): React.ReactElement {
     // Clean up on unmount
     return () => {
       mqttClient.off('message', messageHandler);
+      mqttClient.end(true);
+      console.log('MQTT client disconnected');
+      setIsConnected(false);
     };
-  }, [currentHour]);
+  }, [currentHour, isAuto]);
 
   return (
     <ConfigProvider
@@ -94,9 +118,14 @@ function App(): React.ReactElement {
       }}
     >
       <div className="App">
-        <PiStatus
-          senderPiConnected={isConnected}
-          receiverPiConnected={isConnected}
+        <MqttStatus
+          mqttConnected={isConnected}
+          onConnect={() => {
+            mqttClient.connect();
+          }}
+          onDisconnect={() => {
+            mqttClient.end(true);
+          }}
         />
         <TimeWeather
           piWeather={piWeather}

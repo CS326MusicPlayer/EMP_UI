@@ -19,9 +19,8 @@ const client = mqtt.connect(URL, {
   port: 8083,
   keepalive: 60,
   clean: true,
-});
-client.on('connect', () => {
-  console.log('Connected to MQTT broker');
+  reconnectPeriod: 0,
+  connectTimeout: 5000,
 });
 
 export default client;

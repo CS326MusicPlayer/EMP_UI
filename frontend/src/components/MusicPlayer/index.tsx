@@ -129,7 +129,7 @@ export default function MusicPlayer({
   // Current song
   const currentSong = musicList[currentSongIndex];
 
-  // Effect to change song based on weather and time
+  // Effect to change song based on weather and time (and fade in/out)
   // This is only done if auto mode is enabled
   // Written with the help of Copilot
   useEffect(() => {
@@ -149,7 +149,7 @@ export default function MusicPlayer({
           // Only fade if currently playing
           if (isPlaying && !audioRef.current.paused) {
             setIsFading(true);
-            console.log('Starting fade-out');
+            // console.log('Starting fade-out');
 
             // Save initial volume to restore later
             const initialVolume = volume;
@@ -226,13 +226,13 @@ export default function MusicPlayer({
                         fadeIntervalRef.current.fadeIn = window.setInterval(() => {
                           if (audioRef.current && audioRef.current.volume < initialVolume - 0.05) {
                             audioRef.current.volume += 0.05;
-                            console.log('Fading in, current volume:', audioRef.current.volume);
+                            // console.log('Fading in, current volume:', audioRef.current.volume);
                           } else {
                             // Reset to original volume and clear interval
                             if (audioRef.current) {
                               // Explicitly set to the exact original volume
                               audioRef.current.volume = initialVolume;
-                              console.log('Fade complete, restored volume to:', initialVolume);
+                              // console.log('Fade complete, restored volume to:', initialVolume);
                             }
 
                             if (fadeIntervalRef.current.fadeIn) {
@@ -411,7 +411,7 @@ export default function MusicPlayer({
           playPromise
             .then(() => {
               // Autoplay started successfully
-              console.log('Audio playback started successfully');
+              // console.log('Audio playback started successfully');
             })
             .catch(error => {
               // Autoplay was prevented due to browser policy

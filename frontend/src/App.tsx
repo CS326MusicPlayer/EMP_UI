@@ -7,8 +7,8 @@ import mqttClient from './services/mqttService';
 import './App.css';
 
 function App(): React.ReactElement {
-  const [piWeather, setPiWeather] = useState<'SUNNY' | 'RAINY' | 'SNOWY' | 'UNKNOWN'>('SUNNY');
-  const [piTime, setPiTime] = useState<'DAY' | 'NIGHT'>('DAY');
+  const [piWeather, setPiWeather] = useState<'none' | 'rain' | 'snow' | 'unknown'>('none');
+  const [piTime, setPiTime] = useState<'day' | 'night'>('day');
   const [isConnected, setIsConnected] = useState(false);    // TODO: Actually this is not RPi status, but MQTT connection status
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
   const [isAuto, setIsAuto] = useState(true);    // To track if the user has enabled auto mode
@@ -39,17 +39,10 @@ function App(): React.ReactElement {
       if (!hasSubscribed.current) {
         hasSubscribed.current = true;
 
-        mqttClient.subscribe('emp/weather', (err) => {
+        // Subscribe to topics
+        mqttClient.subscribe('emp/environment', (err) => {
           if (!err) {
-            console.log('Subscribed to topic: emp/weather');
-          } else {
-            console.error('Subscription error:', err);
-          }
-        });
-
-        mqttClient.subscribe('emp/time', (err) => {
-          if (!err) {
-            console.log('Subscribed to topic: emp/time');
+            console.log('Subscribed to topic: emp/environment');
           } else {
             console.error('Subscription error:', err);
           }
@@ -58,18 +51,26 @@ function App(): React.ReactElement {
     });
 
     // Only set up the message handler once
+    // The topic is 'emp/environment' and the message is a JSON string
+    // Example: {"precipitation_status":"rain", "day_status":"day"}
     const messageHandler = function (topic: string, message: Buffer) {
-      if (topic === 'emp/weather') {
-        const weather = message.toString().toUpperCase();
-        console.log('Weather:', weather);
-        setPiWeather(weather as 'SUNNY' | 'RAINY' | 'SNOWY' | 'UNKNOWN');
-      } else if (topic === 'emp/time') {
-        const time = message.toString().toUpperCase();
-        console.log('Time:', time);
-        setPiTime(time as 'DAY' | 'NIGHT');
-        if (time === 'DAY') {
+      console.log('Received message:', topic, message.toString());
+      // Check the topic and parse the message accordingly
+
+      if (topic === 'emp/environment') {
+        const data = JSON.parse(message.toString());
+        const weather = data.precipitation_status;
+        const time = data.day_status;
+        console.log(`Weather: ${weather}, Time: ${time}`);
+
+        // Update the state based on the received data
+        setPiWeather(weather as 'none' | 'rain' | 'snow' | 'unknown');
+        setPiTime(time as 'day' | 'night');
+
+        // Change the background color based on the time
+        if (time === 'day') {
           changeBackgroundColor('#b3e6ff');
-        } else if (time === 'NIGHT') {
+        } else if (time === 'night') {
           changeBackgroundColor('#3a3a5c');
         }
       }

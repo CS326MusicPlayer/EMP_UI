@@ -6,7 +6,6 @@ import sunnyIcon from '../../assets/icons/brightness.png';
 import rainyIcon from '../../assets/icons/storm.png';
 import snowyIcon from '../../assets/icons/snowflakes.png';
 import unknownIcon from '../../assets/icons/unknown.png';
-
 import classes from './styles.module.css';
 
 
@@ -62,7 +61,6 @@ export default function TimeWeather({
   const hoursDisplay = Math.floor(hours).toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
-  // const isDaytime = time.getHours() < 18 && time.getHours() >= 6;   // We might want to get the sunrise and sunset time from an API
 
 
   const toggleMode = () => {
@@ -90,9 +88,9 @@ export default function TimeWeather({
             <hr />
             <span className={classes.condition}>
               {
-                piWeather === 'SUNNY' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
-                piWeather === 'RAINY' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
-                piWeather === 'SNOWY' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
+                piWeather === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
+                piWeather === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
+                piWeather === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
                 <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
               }
             </span>
@@ -130,8 +128,8 @@ export default function TimeWeather({
               <img src={moonIcon} alt="PM" className={classes.moonIcon} />
             } */}
             {
-              piTime === 'DAY' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
-              piTime === 'NIGHT' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
+              piTime === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
+              piTime === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
               <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
             }
           </span>

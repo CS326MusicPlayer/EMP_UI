@@ -18,9 +18,11 @@ import night_rainy from '../../assets/music/night_rainy.mp3';
 import night_snowy from '../../assets/music/night_snowy.mp3';
 
 export default function MusicPlayer({
+  isAuto,
   piWeather,
   piTime
 }: {
+    isAuto: boolean;
     piWeather: string;
     piTime: string;
   }
@@ -34,7 +36,9 @@ export default function MusicPlayer({
       timeIcon: sunIcon,
       tiScale: 0.75,
       colorFrom: "#14C38E",
-      colorTo: "#F9D423"
+      colorTo: "#F9D423",
+      weather: "SUNNY",
+      time: "DAY"
     },
     {
       title: "Rainy Day",
@@ -44,7 +48,9 @@ export default function MusicPlayer({
       timeIcon: sunIcon,
       tiScale: 0.75,
       colorFrom: "#14C38E",
-      colorTo: "#F9D423"
+      colorTo: "#F9D423",
+      weather: "RAINY",
+      time: "DAY"
     },
     {
       title: "Snowy Day",
@@ -54,7 +60,9 @@ export default function MusicPlayer({
       timeIcon: sunIcon,
       tiScale: 0.75,
       colorFrom: "#14C38E",
-      colorTo: "#F9D423"
+      colorTo: "#F9D423",
+      weather: "SNOWY",
+      time: "DAY"
     },
     {
       title: "Sunny Night",
@@ -64,7 +72,9 @@ export default function MusicPlayer({
       timeIcon: moonIcon,
       tiScale: 1,
       colorFrom: "#1c73d0",
-      colorTo: "#d24388"
+      colorTo: "#d24388",
+      weather: "SUNNY",
+      time: "NIGHT"
     },
     {
       title: "Rainy Night",
@@ -74,7 +84,9 @@ export default function MusicPlayer({
       timeIcon: moonIcon,
       tiScale: 1,
       colorFrom: "#1c73d0",
-      colorTo: "#d24388"
+      colorTo: "#d24388",
+      weather: "RAINY",
+      time: "NIGHT"
     },
     {
       title: "Snowy Night",
@@ -84,7 +96,9 @@ export default function MusicPlayer({
       timeIcon: moonIcon,
       tiScale: 1,
       colorFrom: "#1c73d0",
-      colorTo: "#d24388"
+      colorTo: "#d24388",
+      weather: "SNOWY",
+      time: "NIGHT"
     }
   ];
 
@@ -102,6 +116,22 @@ export default function MusicPlayer({
 
   // Current song
   const currentSong = musicList[currentSongIndex];
+
+  // Effect to change song based on weather and time
+  // This is only done if auto mode is enabled
+  useEffect(() => {
+    if (isAuto && piWeather && piTime) {
+      const matchingSongIndex = musicList.findIndex(
+        song => song.weather === piWeather && song.time === piTime
+      );
+
+      if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex) {
+        setCurrentSongIndex(matchingSongIndex);
+        // Start playing automatically when weather/time changes
+        setIsPlaying(true);
+      }
+    }
+  }, [piWeather, piTime, isAuto]);
 
   // Event handlers
   const togglePlay = () => {
@@ -177,7 +207,7 @@ export default function MusicPlayer({
 
   // Handle progress bar click (only enabled for manual mode)
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (progressBarRef.current && audioRef.current) {
+    if (progressBarRef.current && audioRef.current && !isAuto) {
       const progressBarRect = progressBarRef.current.getBoundingClientRect();
       const clickPosition = e.clientX - progressBarRect.left;
       const progressBarWidth = progressBarRect.width;
@@ -214,6 +244,8 @@ export default function MusicPlayer({
     }
   }, [loopMode]);
 
+
+  // TODO: disable controls (play, pause, next, previous, progressbar, loop) when auto mode is enabled
   return (
     <div className={classes.musicPlayer}>
       <span className={classes.musicTitleContainer}>
@@ -235,7 +267,11 @@ export default function MusicPlayer({
         >
           <div
             className={classes.progressBar}
-            style={{ width: `${(currentTime / duration) * 100}%` }}
+            style={{
+              width: `${(currentTime / duration) * 100}%`,
+              background: `linear-gradient(to right, ${currentSong.colorFrom}, ${currentSong.colorTo})`,
+              opacity: isAuto ? 0.5 : 1
+            }}
           ></div>
         </div>
         <span className={classes.timeDisplay}>{formatTime(duration)}</span>
@@ -243,20 +279,20 @@ export default function MusicPlayer({
 
       <div className={classes.controller}>
         <div className={classes.controls}>
-          <button onClick={playPrevious} className={classes.controlButton}>
-            <LuSkipBack />
+          <button onClick={playPrevious} className={classes.controlButton} disabled={isAuto}>
+            <LuSkipBack style={{opacity: isAuto ? 0.5 : 1}} />
           </button>
 
-          <button onClick={togglePlay} className={classes.controlButton}>
-            {isPlaying ? <LuPause /> : <LuPlay />}
+          <button onClick={togglePlay} className={classes.controlButton} disabled={isAuto}>
+            {isPlaying ? <LuPause style={{opacity: isAuto ? 0.5 : 1}} /> : <LuPlay style={{opacity: isAuto ? 0.5 : 1}} />}
           </button>
 
-          <button onClick={playNext} className={classes.controlButton}>
-            <LuSkipForward />
+          <button onClick={playNext} className={classes.controlButton} disabled={isAuto}>
+            <LuSkipForward style={{opacity: isAuto ? 0.5 : 1}} />
           </button>
 
-          <button onClick={cycleLoopMode} className={classes.loopButton}>
-            {loopMode === 'all' ? <LuRepeat /> : <LuRepeat1 />}
+          <button onClick={cycleLoopMode} className={classes.loopButton} disabled={isAuto}>
+            {loopMode === 'all' ? <LuRepeat style={{opacity: isAuto ? 0.5 : 1}} /> : <LuRepeat1 style={{opacity: isAuto ? 0.5 : 1}} />}
           </button>
         </div>
 

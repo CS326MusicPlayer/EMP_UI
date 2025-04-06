@@ -83,6 +83,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s;
 }
 
 .controlButton:hover {
@@ -121,11 +122,11 @@
 
 .progressBar {
   height: 100%;
-  background-color: var(--emerald2);
   border-radius: 4px;
   position: absolute;
   top: 0;
   left: 0;
+  transition: all 0.2s;
 }
 
 .volumeControl {
@@ -142,6 +143,7 @@
 /* Custom styling for range input */
 input[type="range"] {
   -webkit-appearance: none;
+  appearance: none;
   height: 0.5rem;
   border-radius: 0.3rem;
   background: var(--lightgray1);

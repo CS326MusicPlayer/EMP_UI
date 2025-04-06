@@ -11,6 +11,7 @@ function App(): React.ReactElement {
   const [piTime, setPiTime] = useState<'DAY' | 'NIGHT'>('DAY');
   const [isConnected, setIsConnected] = useState(false);    // TODO: Actually this is not RPi status, but MQTT connection status
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
+  const [isAuto, setIsAuto] = useState(true);    // To track if the user has enabled auto mode
 
   const changeBackgroundColor = (newColor: string) => {
     document.documentElement.style.setProperty('--background-color', newColor);
@@ -20,6 +21,9 @@ function App(): React.ReactElement {
 
   // Initialize MQTT service
   useEffect(() => {
+    // Initially set the auto mode to true
+    setIsAuto(true);
+
     // Initially set the background color based on the time
     if (currentHour >= 6 && currentHour < 18) {
       changeBackgroundColor('#b3e6ff');
@@ -96,8 +100,11 @@ function App(): React.ReactElement {
         <TimeWeather
           piWeather={piWeather}
           piTime={piTime}
+          isAuto={isAuto}
+          setIsAuto={setIsAuto}
         />
         <MusicPlayer
+          isAuto={isAuto}
           piWeather={piWeather}
           piTime={piTime}
         />

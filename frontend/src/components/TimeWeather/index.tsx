@@ -12,14 +12,18 @@ import classes from './styles.module.css';
 
 export default function TimeWeather({
   piWeather,
-  piTime
+  piTime,
+  isAuto,
+  setIsAuto
 }: {
     piWeather: string;
     piTime: string;
+    isAuto: boolean;
+    setIsAuto: (isAuto: boolean) => void;
   }
 
 ): React.ReactElement {
-  const [isAuto, setIsAuto] = useState(true);
+  // const [isAuto, setIsAuto] = useState(true);
   const [time, setTime] = useState(new Date());
   const [prevSeconds, setPrevSeconds] = useState(0);
   const [rotationCount, setRotationCount] = useState({

@@ -10,6 +10,8 @@ import './App.css';
 function App(): React.ReactElement {
   const [mqttData, setMqttData] = useState<Record<string, any>>({});
   const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  // TODO: It will later have three modes rather than two: INTERNET, SENSOR, and MANUAL
   const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
 
   const [musicIsFading, setMusicIsFading] = useState<boolean>(false);

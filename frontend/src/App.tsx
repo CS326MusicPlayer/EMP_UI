@@ -120,10 +120,6 @@ function App(): React.ReactElement {
           mqttClient.subscribe('emp/environment', (err) => {
             if (!err) {
               console.log('Subscribed to topic: emp/environment');
-              messageApi.info({
-                content: 'Subscribed to topic: emp/environment',
-                duration: 3,
-              });
             } else {
               console.error('Subscription error:', err);
             }

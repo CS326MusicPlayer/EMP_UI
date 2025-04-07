@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
-import { LuPlay, LuPause, LuVolume1, LuVolume2, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack } from "react-icons/lu";
+import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2 } from "react-icons/lu";
 import classes from './styles.module.css';
 
 // Import icons
@@ -294,24 +294,24 @@ export default function MusicPlayer({
   }, [piWeather, piTime, currentSongIndex, volume, isFading, isPlaying, isAuto]);
 
   // Event handlers
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isAuto) return; // Disable play/pause in auto mode
+  // const togglePlay = () => {
+  //   if (!audioRef.current) return;
+  //   if (isAuto) return; // Disable play/pause in auto mode
 
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      const playPromise = audioRef.current.play();
+  //   if (isPlaying) {
+  //     audioRef.current.pause();
+  //   } else {
+  //     const playPromise = audioRef.current.play();
 
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.warn('Play was prevented:', error);
-          setIsPlaying(false);
-        });
-      }
-    }
-    setIsPlaying(!isPlaying);
-  };
+  //     if (playPromise !== undefined) {
+  //       playPromise.catch(error => {
+  //         console.warn('Play was prevented:', error);
+  //         setIsPlaying(false);
+  //       });
+  //     }
+  //   }
+  //   setIsPlaying(!isPlaying);
+  // };
 
   // Volume control
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -323,24 +323,24 @@ export default function MusicPlayer({
   };
 
   // Loop mode control
-  const cycleLoopMode = () => {
-    if (isAuto) return; // Disable loop mode in auto mode (it should be always 'one')
-    if (loopMode === 'all') {
-      setLoopMode('one');
-    } else {
-      setLoopMode('all');
-    }
-  };
+  // const cycleLoopMode = () => {
+  //   if (isAuto) return; // Disable loop mode in auto mode (it should be always 'one')
+  //   if (loopMode === 'all') {
+  //     setLoopMode('one');
+  //   } else {
+  //     setLoopMode('all');
+  //   }
+  // };
 
-  // Play previous and next song
-  const playPrevious = () => {
-    if (isAuto || isFading) return; // Disable previous song in auto mode or during fade
-    let newIndex = currentSongIndex - 1;
-    if (newIndex < 0) {
-      newIndex = musicList.length - 1;
-    }
-    setCurrentSongIndex(newIndex);
-  };
+  // // Play previous and next song
+  // const playPrevious = () => {
+  //   if (isAuto || isFading) return; // Disable previous song in auto mode or during fade
+  //   let newIndex = currentSongIndex - 1;
+  //   if (newIndex < 0) {
+  //     newIndex = musicList.length - 1;
+  //   }
+  //   setCurrentSongIndex(newIndex);
+  // };
 
   const playNext = () => {
     if (isAuto || isFading) return; // Disable next song in auto mode or during fade
@@ -475,7 +475,7 @@ export default function MusicPlayer({
       </div>
 
       <div className={classes.controller}>
-        <div className={classes.controls}>
+        {/* <div className={classes.controls}>
           <button onClick={playPrevious} className={classes.controlButton} disabled={isAuto || isFading}>
             <LuSkipBack style={{opacity: isAuto || isFading ? 0.5 : 1}} />
           </button>
@@ -491,7 +491,7 @@ export default function MusicPlayer({
           <button onClick={cycleLoopMode} className={classes.loopButton} disabled={isAuto || isFading}>
             {loopMode === 'all' ? <LuRepeat style={{opacity: isAuto || isFading ? 0.5 : 1}} /> : <LuRepeat1 style={{opacity: isAuto || isFading ? 0.5 : 1}} />}
           </button>
-        </div>
+        </div> */}
 
         <div className={classes.volumeControl}>
           <LuVolume1 />

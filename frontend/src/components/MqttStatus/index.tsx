@@ -25,7 +25,7 @@ export default function MqttStatus({
 
   const offlineContent = (
     <div>
-      <p style={{ color: '#616161' }}>Your device seems to be offline!</p>
+      <p style={{ color: '#616161' }}>Your device seems to be offline</p>
       <p style={{ color: '#8e8e8e' }}>Last seen {onlineSince}</p>
     </div>
   );
@@ -34,17 +34,17 @@ export default function MqttStatus({
     <div className={classes.container}>
       <span className={classes.status}>
         <Popover content={mqttConnected ? onlineContent : offlineContent} trigger="hover" placement="top">
-          <div className={classes.statusIconContainer} style={{ backgroundColor: `${mqttConnected && '#8ae9c9'}`, borderColor: `${mqttConnected && '#d1f3e7'}` }} >
+          <div className={classes.statusIconContainer} style={{ backgroundColor: `${mqttConnected ? '#8ae9c9' : '#eeeeee'}`, borderColor: `${mqttConnected ? '#d1f3e7' : '#f3f3f3'}` }} >
             {mqttConnected ? <LuCheck className={classes.statusIcon} /> : <LuEllipsis className={classes.statusIcon} />}
           </div>
         </Popover>
-        <p className={classes.piName}>Sender Pi</p>
+        <p className={classes.statusText}>{mqttConnected ? 'Online' : 'Offline'}</p>
       </span>
       <span className={classes.connection}>
         {mqttConnected ? (
-          <button className={classes.disconnectButton} onClick={onDisconnect}>Disconnect</button>
+          <button className={classes.connButton} onClick={onDisconnect}>Disconnect</button>
         ) : (
-          <button className={classes.connectButton} onClick={onConnect}>Connect</button>
+          <button className={classes.connButton} onClick={onConnect}>Connect</button>
         )}
       </span>
     </div>

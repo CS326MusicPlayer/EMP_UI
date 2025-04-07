@@ -34,8 +34,28 @@
   border: 0.2rem solid var(--lightgray0);
 }
 
-.piName {
+.statusText {
   font-size: 1rem;
   color: var(--black);
   margin: 0 0.6rem;
+}
+
+.connButton {
+  width: 8rem;
+  height: 2rem;
+  background-color: var(--lightgray1);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--black);
+  transition: all 0.2s;
+  border: 0.2rem solid var(--lightgray0);
+}
+.connButton:hover {
+  background-color: var(--emerald);
+  border: 0.2rem solid var(--emerald0);
 }

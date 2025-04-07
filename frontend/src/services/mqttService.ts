@@ -10,17 +10,22 @@ const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || `client_${Math.random().toSt
 const URL = `wss://${HOST}:8083/mqtt`;
 
 
-const client = mqtt.connect(URL, {
+// Create client options
+const options = {
   clientId: CLIENT_ID,
   username: USERNAME,
   password: PASSWORD,
-  protocol: 'wss',
+  protocol: 'mqtts' as mqtt.MqttProtocol,
   rejectUnauthorized: false,
   port: 8083,
   keepalive: 60,
   clean: true,
   reconnectPeriod: 0,
   connectTimeout: 5000,
-});
+  manualConnect: true
+};
+
+// Create the client object without connecting
+const client = mqtt.connect(URL, options);
 
 export default client;

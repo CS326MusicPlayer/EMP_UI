@@ -186,13 +186,13 @@ export default function MusicPlayer({
   }, [isAuto]); 
 
   // Effect to change song based on weather and time (and fade in/out)
-  // This is only done if auto mode is enabled
+  // Fade in/out only done when weather/time condition changes (music control will have no fade in/out)
   // Written with the help of Copilot
   useEffect(() => {
     let safetyTimeoutId: NodeJS.Timeout | null = null;
   
     async function handleSongChange() {
-      if (!isAuto || !piWeather || !piTime) return;
+      if (!piWeather || !piTime) return;
       
       const matchingSongIndex = musicList.findIndex(
         song => song.weather === piWeather && song.time === piTime
@@ -291,7 +291,7 @@ export default function MusicPlayer({
         fadeIntervalRef.current.fadeIn = null;
       }
     };
-  }, [piWeather, piTime, isAuto, currentSongIndex, volume, isFading, isPlaying]);
+  }, [piWeather, piTime, currentSongIndex, volume, isFading, isPlaying, isAuto]);
 
   // Event handlers
   const togglePlay = () => {

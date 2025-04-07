@@ -13,12 +13,16 @@ export default function TimeWeather({
   piWeather,
   piTime,
   isAuto,
-  setIsAuto
+  setIsAuto,
+  setManualWeather,
+  setManualTime
 }: {
     piWeather: string;
     piTime: string;
     isAuto: boolean;
     setIsAuto: (isAuto: boolean) => void;
+    setManualWeather: (weather: string) => void;
+    setManualTime: (time: string) => void;
   }
 
 ): React.ReactElement {
@@ -74,9 +78,44 @@ export default function TimeWeather({
   const modeSwitchContent = (
     <div style={{ textAlign: 'center' }}>
       <p style={{ color: '#616161' }}>Click to switch to "{isAuto ? 'Manual' : 'Auto'}" mode</p>
-      <p style={{ color: '#8e8e8e' }}>{isAuto ? '"Auto" mode is on' : '"Manual" mode is on'}</p>
+      <p style={{ color: '#8e8e8e' }}>"{isAuto ? 'Auto' : 'Manual'}" mode enabled</p>
     </div>
   );
+
+  // In the manual mode, user can change the weather and day/night
+  const toggleWeather = () => {
+    // Safe return if the mode is not manual
+    if (isAuto) return;
+
+    // console.log('Toggling weather condition...');
+    // console.log('Current weather condition:', piWeather);
+
+    // Toggle-rotate the weather condition using the setter function from props
+    if (piWeather === 'none') {
+      setManualWeather('rain');
+    } else if (piWeather === 'rain') {
+      setManualWeather('snow');
+    } else if (piWeather === 'snow' || piWeather === 'unknown' || piWeather === undefined || piWeather === null) {
+      setManualWeather('none');
+    }
+  };
+
+  const toggleDayNight = () => {
+    // Safe return if the mode is not manual
+    if (isAuto) return;
+
+    console.log('Toggling day/night condition...');
+    console.log('Current day/night condition:', piTime);
+
+    // Toggle-rotate the day/night condition using the setter function from props
+    if (piTime === 'day') {
+      setManualTime('night');
+    } else if (piTime === 'night') {
+      setManualTime('day');
+    } else if (piTime === 'unknown' || piTime === undefined || piTime === null) {
+      setManualTime('day');
+    }
+  };
 
   return (
     <div className={classes.container}>
@@ -86,7 +125,7 @@ export default function TimeWeather({
           <div className={classes.forecastData}>
             <p className={classes.temperature}>88°F</p>
             <hr />
-            <span className={classes.condition}>
+            <span className={classes.condition} onClick={toggleWeather}>
               {
                 piWeather === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
                 piWeather === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
@@ -121,12 +160,7 @@ export default function TimeWeather({
             {hoursDisplay}<span className={classes.blinkingColon}>:</span>{minutesDisplay}
           </p>
           <hr />
-          <span className={classes.dayOrNight}>
-            {/* {isDaytime ?
-              <img src={sunIcon} alt="AM" className={classes.sunIcon} />
-              :
-              <img src={moonIcon} alt="PM" className={classes.moonIcon} />
-            } */}
+          <span className={classes.dayOrNight} onClick={toggleDayNight}>
             {
               piTime === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
               piTime === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :

@@ -8,14 +8,31 @@ import './App.css';
 
 
 function App(): React.ReactElement {
-  // const [piWeather, setPiWeather] = useState<'none' | 'rain' | 'snow' | 'unknown'>('none');
-  // const [piTime, setPiTime] = useState<'day' | 'night'>('day');
   const [mqttData, setMqttData] = useState<Record<string, any>>({});
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
+
+  const [manualWeather, setManualWeather] = useState('none');
+  const [manualTime, setManualTime] = useState('day');
+  const prevManualWeatherRef = useRef(manualWeather);
+  const prevManualTimeRef = useRef(manualTime);
+  
   const [messageApi, contextHolder] = message.useMessage();
   const hasConnected = useRef(false);    // To track if the initial connection has been made
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
+
+  // Update the last connected time of the MQTT client and save it to local storage
+  // const lastConnectedTime = useRef<string | null>(null);
+  // useEffect(() => {
+  //   if (isConnected) {
+  //     lastConnectedTime.current = new Date().toLocaleString();
+  //     localStorage.setItem('lastConnectedTime', lastConnectedTime.current);
+  //     console.log('Last connected time:', lastConnectedTime.current);
+  //   } else {
+  //     lastConnectedTime.current = null; // Reset the last connected time when disconnected
+  //     localStorage.removeItem('lastConnectedTime');
+  //   }
+  // }, [isConnected]);
 
 
   const changeBackgroundColor = (newColor: string) => {
@@ -42,15 +59,28 @@ function App(): React.ReactElement {
   }, [isConnected, messageApi]);
 
   // Show notification when data is updated
+  // Also, if the user manually sets the weather/time, show a notification
   useEffect(() => {
     // TODO: change the message to be more user-friendly
-    if (mqttData.hasUpdated) {
+    if (mqttData.hasUpdated && isAuto) {
       messageApi.info({
         content: `Weather: ${mqttData.weather}, Time: ${mqttData.time}, Temperature: ${mqttData.temperature}, Light Level: ${mqttData.light_level}`,
         duration: 5,
       });
     }
-  }, [mqttData, messageApi]);
+
+     // Show notification only when manual values change (not on initial render)
+    if (!isAuto && (prevManualWeatherRef.current !== manualWeather || prevManualTimeRef.current !== manualTime)) {
+      messageApi.info({
+        content: `Weather: ${manualWeather}, Time: ${manualTime}`,
+        duration: 5,
+      });
+    }
+    
+    // Update refs with current values for next comparison
+    prevManualWeatherRef.current = manualWeather;
+    prevManualTimeRef.current = manualTime;
+  }, [mqttData, messageApi, isAuto, manualWeather, manualTime]);
 
 
   // Initialize MQTT service
@@ -228,15 +258,17 @@ function App(): React.ReactElement {
           onDisconnect={handleDisconnect}
         />
         <TimeWeather
-          piWeather={mqttData.weather}
-          piTime={mqttData.time}
+          piWeather={isAuto ? mqttData.weather : manualWeather}
+          piTime={isAuto ? mqttData.time : manualTime}
           isAuto={isAuto}
           setIsAuto={setIsAuto}
+          setManualWeather={setManualWeather}
+          setManualTime={setManualTime}
         />
         <MusicPlayer
           isAuto={isAuto}
-          piWeather={mqttData.weather}
-          piTime={mqttData.time}
+          piWeather={isAuto ? mqttData.weather : manualWeather}
+          piTime={isAuto ? mqttData.time : manualTime}
         />
       </div>
     </ConfigProvider>

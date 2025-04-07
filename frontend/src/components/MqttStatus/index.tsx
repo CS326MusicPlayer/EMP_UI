@@ -1,14 +1,16 @@
 import React from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
-import { Popover } from "antd";
+import { Popover, Spin } from "antd";
 import classes from './styles.module.css';
 
 export default function MqttStatus({
   mqttConnected,
+  musicIsFading,
   onConnect,
   onDisconnect
 }: {
     mqttConnected: boolean;
+    musicIsFading: boolean;
     onConnect: () => void;
     onDisconnect: () => void;
   }
@@ -40,6 +42,7 @@ export default function MqttStatus({
         </Popover>
         <p className={classes.statusText}>{mqttConnected ? 'Online' : 'Offline'}</p>
       </span>
+      {musicIsFading && (<Spin className={classes.musicStatusSpinner} />)}
       <span className={classes.connection}>
         {mqttConnected ? (
           <button className={classes.connButton} onClick={onDisconnect}>Disconnect</button>

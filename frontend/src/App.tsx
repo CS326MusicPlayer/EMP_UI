@@ -12,6 +12,7 @@ function App(): React.ReactElement {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
 
+  const [musicIsFading, setMusicIsFading] = useState<boolean>(false);
   const [manualWeather, setManualWeather] = useState('none');
   const [manualTime, setManualTime] = useState('day');
   const prevManualWeatherRef = useRef(manualWeather);
@@ -254,6 +255,7 @@ function App(): React.ReactElement {
         {contextHolder}
         <MqttStatus
           mqttConnected={isConnected}
+          musicIsFading={musicIsFading}
           onConnect={handleConnect}
           onDisconnect={handleDisconnect}
         />
@@ -269,6 +271,7 @@ function App(): React.ReactElement {
           isAuto={isAuto}
           piWeather={isAuto ? mqttData.weather : manualWeather}
           piTime={isAuto ? mqttData.time : manualTime}
+          onFadingChange={setMusicIsFading}
         />
       </div>
     </ConfigProvider>

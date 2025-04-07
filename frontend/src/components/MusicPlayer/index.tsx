@@ -25,11 +25,13 @@ const FADE_IN_TIME = 1; // seconds
 export default function MusicPlayer({
   isAuto,
   piWeather,
-  piTime
+  piTime,
+  onFadingChange
 }: {
     isAuto: boolean;
     piWeather: string;
     piTime: string;
+    onFadingChange?: (isFading: boolean) => void;
   }
 ): React.ReactElement {
   const musicList = [
@@ -129,6 +131,14 @@ export default function MusicPlayer({
 
   // Current song
   const currentSong = musicList[currentSongIndex];
+
+
+  // Update the parent component whenever isFading changes
+  useEffect(() => {
+    if (onFadingChange) {
+      onFadingChange(isFading);
+    }
+  }, [isFading, onFadingChange]);
 
 
   // Fade in and fade out functions
@@ -446,13 +456,23 @@ export default function MusicPlayer({
   return (
     <div className={classes.musicPlayer}>
       <span className={classes.musicTitleContainer}>
-        <img src={currentSong.weatherIcon} alt="Weather Icon" className={classes.weatherIcon} style={{ transform: `scale(${currentSong.wiScale})` }} />
+        <img
+          src={currentSong.weatherIcon}
+          alt="Weather Icon"
+          className={classes.weatherIcon}
+          style={{ transform: `scale(${currentSong.wiScale})`, opacity: isFading ? 0.5 : 1 }}
+        />
         <h2 className={classes.songTitle}
           style={{
             background: `radial-gradient(circle at 100%, ${currentSong.colorFrom}, ${currentSong.colorTo} 50%, ${currentSong.colorFrom} 75%, ${currentSong.colorFrom} 100%)`,
+            opacity: isFading ? 0.5 : 1
           }}
         >{currentSong.title}</h2>
-        <img src={currentSong.timeIcon} alt="Time Icon" className={classes.timeIcon} style={{ transform: `scale(${currentSong.tiScale})` }} />
+        <img
+          src={currentSong.timeIcon}
+          alt="Time Icon" className={classes.timeIcon}
+          style={{ transform: `scale(${currentSong.tiScale})`, opacity: isFading ? 0.5 : 1 }}
+        />
       </span>
 
       <div className={classes.timeControl}>

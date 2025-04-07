@@ -36,16 +36,19 @@
   font-weight: 800;
   margin: 0;
   padding: 0.5rem;
+  transition: all 0.2s;
 }
 
 .weatherIcon {
   width: 2rem;
   height: 2rem;
+  transition: all 0.2s;
 }
 
 .timeIcon {
   width: 2rem;
   height: 2rem;
+  transition: all 0.2s;
 }
 
 

@@ -12,6 +12,7 @@ import classes from './styles.module.css';
 export default function TimeWeather({
   piWeather,
   piTime,
+  piTemperature,
   isAuto,
   setIsAuto,
   setManualWeather,
@@ -19,6 +20,7 @@ export default function TimeWeather({
 }: {
     piWeather: string;
     piTime: string;
+    piTemperature: string;
     isAuto: boolean;
     setIsAuto: (isAuto: boolean) => void;
     setManualWeather: (weather: string) => void;
@@ -26,7 +28,7 @@ export default function TimeWeather({
   }
 
 ): React.ReactElement {
-  // const [isAuto, setIsAuto] = useState(true);
+  const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [time, setTime] = useState(new Date());
   const [prevSeconds, setPrevSeconds] = useState(0);
   const [rotationCount, setRotationCount] = useState({
@@ -66,6 +68,28 @@ export default function TimeWeather({
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
 
+  const convertTemp = (temp: string | null): string => {
+    if (!temp || temp === "--") return "--";
+    
+    try {
+      const tempValue = parseFloat(temp);
+      if (isNaN(tempValue)) return "--";
+      
+      if (tempUnit === 'C') {
+        return tempValue.toFixed(0);
+      } else {
+        // Convert Celsius to Fahrenheit: (C × 9/5) + 32
+        return (tempValue * 9/5 + 32).toFixed(0);
+      }
+    } catch (error) {
+      console.error('Error converting temperature:', error);
+      return "--";
+    }
+  };
+
+  const toggleTempUnit = () => {
+    setTempUnit(prev => prev === 'C' ? 'F' : 'C');
+  };
 
   const toggleMode = () => {
     setIsAuto(!isAuto);
@@ -123,7 +147,7 @@ export default function TimeWeather({
       <div className={classes.weather}>
         <div className={classes.forecast}>
           <div className={classes.forecastData}>
-            <p className={classes.temperature}>88°F</p>
+            <p className={classes.temperature} onClick={toggleTempUnit}>{convertTemp(piTemperature)}°{tempUnit}</p>
             <hr />
             <span className={classes.condition} onClick={toggleWeather}>
               {

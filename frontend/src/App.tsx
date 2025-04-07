@@ -269,6 +269,7 @@ function App(): React.ReactElement {
         <TimeWeather
           piWeather={isAuto ? mqttData.weather : manualWeather}
           piTime={isAuto ? mqttData.time : manualTime}
+          piTemperature={mqttData.temperature}
           isAuto={isAuto}
           setIsAuto={setIsAuto}
           setManualWeather={setManualWeather}

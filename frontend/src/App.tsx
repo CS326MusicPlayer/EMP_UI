@@ -41,11 +41,21 @@ function App(): React.ReactElement {
     }
   }, [isConnected, messageApi]);
 
+  // Show notification when data is updated
+  useEffect(() => {
+    // TODO: change the message to be more user-friendly
+    if (mqttData.hasUpdated) {
+      messageApi.info({
+        content: `Weather: ${mqttData.weather}, Time: ${mqttData.time}, Temperature: ${mqttData.temperature}, Light Level: ${mqttData.light_level}`,
+        duration: 5,
+      });
+    }
+  }, [mqttData, messageApi]);
+
 
   // Initialize MQTT service
   useEffect(() => {
     // Initially set the auto mode to true
-    // TODO: use local storage to save preferences
     setIsAuto(true);
 
     // Initially set the background color based on the time
@@ -71,6 +81,10 @@ function App(): React.ReactElement {
           mqttClient.subscribe('emp/environment', (err) => {
             if (!err) {
               console.log('Subscribed to topic: emp/environment');
+              messageApi.info({
+                content: 'Subscribed to topic: emp/environment',
+                duration: 3,
+              });
             } else {
               console.error('Subscription error:', err);
             }
@@ -108,22 +122,45 @@ function App(): React.ReactElement {
         if (topic === 'emp/environment') {
           try {
             const data = JSON.parse(message.toString());
-            console.log('Parsed data:', data);
+            // console.log('Parsed data:', data);
             // Data will have the following format:
             // {precipitation_status: 'snow', sunrise: '07:23', sunset: '20:14', temperature: '25', light_level: 0.5}
 
             // Set day/night status based on the current time and sunrise/sunset times
-            const currentTime = new Date();    // This should be RPi's time, depending on the timezone
+            const currentTime = new Date();    // TODO: This should be RPi's time, depending on the timezone
             const dayOrNight = currentTime.getHours() >= parseInt(data.sunrise.split(':')[0]) && currentTime.getHours() < parseInt(data.sunset.split(':')[0]) ? 'day' : 'night';
 
-            // Curate the data (to be edited later)
-            setMqttData({
+            // Create a data object to store the new values
+            const newData = {
               weather: data.precipitation_status,
               time: dayOrNight,
               temperature: data.temperature,
               light_level: data.light_level,
-            })
+              hasUpdated: false // Flag to track if data was updated
+            };
 
+            // Curate the data (to be edited later)
+            // If the data is not the same as the previous one, update the state
+            setMqttData(prevData => {
+              // Only update if there are actual changes
+              if (
+                prevData.weather !== data.precipitation_status || 
+                prevData.time !== dayOrNight || 
+                prevData.temperature !== data.temperature || 
+                prevData.light_level !== data.light_level
+              ) {
+                // console.log('Updating state with new data');
+                
+                // Return the new state with update flag
+                return {
+                  ...newData,
+                  hasUpdated: true
+                };
+              }
+              
+              // console.log('No update needed');
+              return prevData; // Return unchanged state
+            });
 
             // Change the background color based on the time if auto mode is enabled
             if (isAuto) {

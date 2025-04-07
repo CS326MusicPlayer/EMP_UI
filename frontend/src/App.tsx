@@ -8,8 +8,9 @@ import './App.css';
 
 
 function App(): React.ReactElement {
-  const [piWeather, setPiWeather] = useState<'none' | 'rain' | 'snow' | 'unknown'>('none');
-  const [piTime, setPiTime] = useState<'day' | 'night'>('day');
+  // const [piWeather, setPiWeather] = useState<'none' | 'rain' | 'snow' | 'unknown'>('none');
+  // const [piTime, setPiTime] = useState<'day' | 'night'>('day');
+  const [mqttData, setMqttData] = useState<Record<string, any>>({});
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
   const [messageApi, contextHolder] = message.useMessage();
@@ -44,6 +45,7 @@ function App(): React.ReactElement {
   // Initialize MQTT service
   useEffect(() => {
     // Initially set the auto mode to true
+    // TODO: use local storage to save preferences
     setIsAuto(true);
 
     // Initially set the background color based on the time
@@ -107,19 +109,27 @@ function App(): React.ReactElement {
           try {
             const data = JSON.parse(message.toString());
             console.log('Parsed data:', data);
+            // Data will have the following format:
+            // {precipitation_status: 'snow', sunrise: '07:23', sunset: '20:14', temperature: '25', light_level: 0.5}
 
-            const weather = data.precipitation_status;
-            const time = data.day_status;
-            
-            // Update the state based on the received data
-            setPiWeather(weather as 'none' | 'rain' | 'snow' | 'unknown');
-            setPiTime(time as 'day' | 'night');
+            // Set day/night status based on the current time and sunrise/sunset times
+            const currentTime = new Date();    // This should be RPi's time, depending on the timezone
+            const dayOrNight = currentTime.getHours() >= parseInt(data.sunrise.split(':')[0]) && currentTime.getHours() < parseInt(data.sunset.split(':')[0]) ? 'day' : 'night';
+
+            // Curate the data (to be edited later)
+            setMqttData({
+              weather: data.precipitation_status,
+              time: dayOrNight,
+              temperature: data.temperature,
+              light_level: data.light_level,
+            })
+
 
             // Change the background color based on the time if auto mode is enabled
             if (isAuto) {
-              if (time === 'day') {
+              if (dayOrNight === 'day') {
                 changeBackgroundColor('#b3e6ff');
-              } else if (time === 'night') {
+              } else if (dayOrNight === 'night') {
                 changeBackgroundColor('#3a3a5c');
               }
             }
@@ -143,7 +153,7 @@ function App(): React.ReactElement {
         setIsConnected(false);
       };
     }
-  }, [currentHour, isAuto]);
+  }, [currentHour]);
 
 
 
@@ -181,15 +191,15 @@ function App(): React.ReactElement {
           onDisconnect={handleDisconnect}
         />
         <TimeWeather
-          piWeather={piWeather}
-          piTime={piTime}
+          piWeather={mqttData.weather}
+          piTime={mqttData.time}
           isAuto={isAuto}
           setIsAuto={setIsAuto}
         />
         <MusicPlayer
           isAuto={isAuto}
-          piWeather={piWeather}
-          piTime={piTime}
+          piWeather={mqttData.weather}
+          piTime={mqttData.time}
         />
       </div>
     </ConfigProvider>

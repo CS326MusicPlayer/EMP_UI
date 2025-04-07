@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Popover } from 'antd';
 import { LuPlay, LuPause, LuVolume1, LuVolume2, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack } from "react-icons/lu";
 import classes from './styles.module.css';
 
@@ -109,7 +110,7 @@ export default function MusicPlayer({
   // State variables
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.8); // Start with slightly lower volume
+  const [volume, setVolume] = useState(1);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [loopMode, setLoopMode] = useState('one'); // 'one', 'all'
@@ -129,151 +130,162 @@ export default function MusicPlayer({
   // Current song
   const currentSong = musicList[currentSongIndex];
 
+
+  // Fade in and fade out functions
+  // Based on: https://stackoverflow.com/questions/64520315/how-to-fade-in-and-out-of-audio/64521347#64521347
+  function fadeIn(audioElement: HTMLAudioElement, targetVolume: number, duration: number = 1000): number {
+    const startVolume = 0;
+    audioElement.volume = startVolume;
+    
+    const startTime = performance.now();
+    
+    const fadeId = window.setInterval(() => {
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      audioElement.volume = startVolume + (targetVolume - startVolume) * progress;
+      
+      if (progress >= 1) {
+        clearInterval(fadeId);
+        audioElement.volume = targetVolume; // Ensure we end at exactly the target volume
+      }
+    }, 16); // ~60fps for smooth transition
+    
+    return fadeId;
+  }
+  
+  function fadeOut(audioElement: HTMLAudioElement, duration: number = 1000): Promise<void> {
+    return new Promise((resolve) => {
+      const startVolume = audioElement.volume;
+      const startTime = performance.now();
+      
+      const fadeId = window.setInterval(() => {
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        audioElement.volume = startVolume * (1 - progress);
+        
+        if (progress >= 1) {
+          clearInterval(fadeId);
+          audioElement.volume = 0; // Ensure we end at exactly 0
+          resolve();
+        }
+      }, 16); // ~60fps for smooth transition
+      
+      fadeIntervalRef.current.fadeOut = fadeId;
+    });
+  }
+
+  // If auto mode is enabled, loopMode should change to 'one'
+  useEffect(() => {
+    // If auto mode is enabled, set loop mode to 'one'
+    if (isAuto && loopMode !== 'one') {
+      setLoopMode('one');
+      console.log('Auto mode enabled, setting loop mode to: one');
+    }
+  }, [isAuto]); 
+
   // Effect to change song based on weather and time (and fade in/out)
   // This is only done if auto mode is enabled
   // Written with the help of Copilot
   useEffect(() => {
-    // Store timeout ID in ref so we can clean it up
     let safetyTimeoutId: NodeJS.Timeout | null = null;
-
-    if (isAuto && piWeather && piTime) {
+  
+    async function handleSongChange() {
+      if (!isAuto || !piWeather || !piTime) return;
+      
       const matchingSongIndex = musicList.findIndex(
         song => song.weather === piWeather && song.time === piTime
       );
-
-      if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex) {
+  
+      if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex && audioRef.current) {
         console.log(`Changing song to match weather: ${piWeather}, time: ${piTime}`);
-
-        // Start fade-out of current song before changing
-        if (audioRef.current && audioRef.current.volume > 0) {
-          // Only fade if currently playing
-          if (isPlaying && !audioRef.current.paused) {
-            setIsFading(true);
-            // console.log('Starting fade-out');
-
-            // Save initial volume to restore later
-            const initialVolume = volume;
-
-            // Set safety timeout to restore controls if fade gets stuck
-            safetyTimeoutId = setTimeout(() => {
-              if (isFading) {
-                console.warn('Fade safety timeout triggered - forcibly restoring controls');
-                if (audioRef.current) {
-                  audioRef.current.volume = initialVolume;
-                }
-
-                if (fadeIntervalRef.current.fadeOut) {
-                  clearInterval(fadeIntervalRef.current.fadeOut);
-                  fadeIntervalRef.current.fadeOut = null;
-                }
-
-                if (fadeIntervalRef.current.fadeIn) {
-                  clearInterval(fadeIntervalRef.current.fadeIn);
-                  fadeIntervalRef.current.fadeIn = null;
-                }
-
-                setIsFading(false);
+        
+        // Only fade if currently playing
+        if (isPlaying && !audioRef.current.paused) {
+          setIsFading(true);
+          const initialVolume = volume;
+  
+          // Set safety timeout
+          safetyTimeoutId = setTimeout(() => {
+            if (isFading) {
+              console.warn('Fade safety timeout triggered');
+              setIsFading(false);
+              if (audioRef.current) audioRef.current.volume = initialVolume;
+              // Clear any intervals
+              if (fadeIntervalRef.current.fadeOut) {
+                clearInterval(fadeIntervalRef.current.fadeOut);
+                fadeIntervalRef.current.fadeOut = null;
               }
-            }, (FADE_OUT_TIME + FADE_IN_TIME + 2) * 1000); // Add 2 seconds buffer
-
-            // Clear any existing fade intervals
-            if (fadeIntervalRef.current.fadeOut) {
-              clearInterval(fadeIntervalRef.current.fadeOut);
-              fadeIntervalRef.current.fadeOut = null;
-            }
-            if (fadeIntervalRef.current.fadeIn) {
-              clearInterval(fadeIntervalRef.current.fadeIn);
-              fadeIntervalRef.current.fadeIn = null;
-            }
-
-            // Create fade-out effect
-            fadeIntervalRef.current.fadeOut = window.setInterval(() => {
-              if (audioRef.current && audioRef.current.volume > 0.05) {
-                audioRef.current.volume -= 0.05;
-              } else {
-                // Clear interval when volume is near zero
-                if (fadeIntervalRef.current.fadeOut) {
-                  clearInterval(fadeIntervalRef.current.fadeOut);
-                  fadeIntervalRef.current.fadeOut = null;
-                }
-
-                // Change song and prepare for fade-in
-                setCurrentSongIndex(matchingSongIndex);
-                setIsPlaying(true);
-
-                // Schedule fade-in after song change is applied
-                setTimeout(() => {
-                  // Start with zero volume
-                  if (audioRef.current) {
-                    audioRef.current.volume = 0;
-
-                    // Ensure new audio is playing before fading in
-                    const playPromise = audioRef.current.play().catch(error => {
-                      console.warn('Auto-play prevented:', error);
-                      setIsPlaying(false);
-                      setIsFading(false);
-
-                      // Also restore volume if play fails
-                      if (audioRef.current) {
-                        audioRef.current.volume = initialVolume;
-                      }
-                      return false;
-                    });
-
-                    playPromise.then((success) => {
-                      if (success !== false) {
-                        // Create fade-in effect only if play was successful
-                        fadeIntervalRef.current.fadeIn = window.setInterval(() => {
-                          if (audioRef.current && audioRef.current.volume < initialVolume - 0.05) {
-                            audioRef.current.volume += 0.05;
-                            // console.log('Fading in, current volume:', audioRef.current.volume);
-                          } else {
-                            // Reset to original volume and clear interval
-                            if (audioRef.current) {
-                              // Explicitly set to the exact original volume
-                              audioRef.current.volume = initialVolume;
-                              // console.log('Fade complete, restored volume to:', initialVolume);
-                            }
-
-                            if (fadeIntervalRef.current.fadeIn) {
-                              clearInterval(fadeIntervalRef.current.fadeIn);
-                              fadeIntervalRef.current.fadeIn = null;
-                            }
-
-                            // IMPORTANT: Make sure to set isFading to false here
-                            setIsFading(false);
-                          }
-                        }, FADE_IN_TIME * 1000 / 20); // Divide into 20 steps
-                      }
-                    });
-                  }
-                }, 100); // Small delay to ensure song change is applied
+              if (fadeIntervalRef.current.fadeIn) {
+                clearInterval(fadeIntervalRef.current.fadeIn);
+                fadeIntervalRef.current.fadeIn = null;
               }
-            }, FADE_OUT_TIME * 1000 / 20); // Divide into 20 steps
-          } else {
-            // No fade needed if not playing - immediately change
+            }
+          }, (FADE_OUT_TIME + FADE_IN_TIME + 2) * 1000);
+  
+          // Clear any existing fade intervals
+          if (fadeIntervalRef.current.fadeOut) {
+            clearInterval(fadeIntervalRef.current.fadeOut);
+            fadeIntervalRef.current.fadeOut = null;
+          }
+          if (fadeIntervalRef.current.fadeIn) {
+            clearInterval(fadeIntervalRef.current.fadeIn);
+            fadeIntervalRef.current.fadeIn = null;
+          }
+  
+          // Fade out current song
+          try {
+            await fadeOut(audioRef.current, FADE_OUT_TIME * 1000);
+            
+            // Change song
             setCurrentSongIndex(matchingSongIndex);
-            setIsPlaying(true);
+            
+            // Small delay to ensure React updates with new song
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            if (audioRef.current) {
+              audioRef.current.volume = 0;
+              
+              try {
+                await audioRef.current.play();
+                // Start fade in
+                fadeIntervalRef.current.fadeIn = fadeIn(audioRef.current, initialVolume, FADE_IN_TIME * 1000);
+                
+                // Set a timeout to mark fading as complete
+                setTimeout(() => {
+                  setIsFading(false);
+                }, FADE_IN_TIME * 1000);
+              } catch (error) {
+                console.warn('Auto-play prevented:', error);
+                setIsPlaying(false);
+                setIsFading(false);
+                audioRef.current.volume = initialVolume;
+              }
+            }
+          } catch (error) {
+            console.error('Error during fade transition:', error);
+            setIsFading(false);
           }
         } else {
-          // No audio element or volume already at 0 - immediately change
+          // No fade needed - directly change song
           setCurrentSongIndex(matchingSongIndex);
           setIsPlaying(true);
         }
       }
     }
-
-    // Clean up any running fade intervals and timeouts
+    
+    handleSongChange();
+    
+    // Clean up function
     return () => {
       if (safetyTimeoutId) {
         clearTimeout(safetyTimeoutId);
       }
-
       if (fadeIntervalRef.current.fadeOut) {
         clearInterval(fadeIntervalRef.current.fadeOut);
         fadeIntervalRef.current.fadeOut = null;
       }
-
       if (fadeIntervalRef.current.fadeIn) {
         clearInterval(fadeIntervalRef.current.fadeIn);
         fadeIntervalRef.current.fadeIn = null;
@@ -483,17 +495,32 @@ export default function MusicPlayer({
 
         <div className={classes.volumeControl}>
           <LuVolume1 />
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-            className={classes.volumeSlider}
-            disabled={isFading}
-            style={{opacity: isFading ? 0.5 : 1}}
-          />
+          {isFading ? (
+            <Popover content={<p>Music is currently fading in/out!</p>} trigger="hover" placement="bottom">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={handleVolumeChange}
+                className={classes.volumeSlider}
+                disabled={true}
+                style={{opacity: 0.5}}
+              />
+            </Popover>
+          ) : (
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+              className={classes.volumeSlider}
+              disabled={false}
+            />
+          )}
           <LuVolume2 />
         </div>
       </div>

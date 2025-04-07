@@ -332,6 +332,27 @@ export default function MusicPlayer({
     }
   };
 
+  // On keyboard event 'm' toggle mute
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'm') {
+      if (audioRef.current) {
+        if (audioRef.current.volume > 0) {
+          audioRef.current.volume = 0;
+          setVolume(0);
+        } else {
+          audioRef.current.volume = 1;
+          setVolume(1);
+        }
+      }
+    }
+  };
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   // Loop mode control
   // const cycleLoopMode = () => {
   //   if (isAuto) return; // Disable loop mode in auto mode (it should be always 'one')

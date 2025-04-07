@@ -23,17 +23,23 @@ function App(): React.ReactElement {
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
 
   // Update the last connected time of the MQTT client and save it to local storage
-  // const lastConnectedTime = useRef<string | null>(null);
-  // useEffect(() => {
-  //   if (isConnected) {
-  //     lastConnectedTime.current = new Date().toLocaleString();
-  //     localStorage.setItem('lastConnectedTime', lastConnectedTime.current);
-  //     console.log('Last connected time:', lastConnectedTime.current);
-  //   } else {
-  //     lastConnectedTime.current = null; // Reset the last connected time when disconnected
-  //     localStorage.removeItem('lastConnectedTime');
-  //   }
-  // }, [isConnected]);
+  const lastConnectedTime = useRef<string | null>(
+    localStorage.getItem('lastConnectedTime') || null
+  );
+
+  // Update the last connected time when the connection status changes
+  useEffect(() => {
+    if (isConnected) {
+      // Store the raw timestamp in a consistent format
+      const now = new Date();
+      lastConnectedTime.current = now.toISOString(); // Use ISO format for consistent parsing
+      localStorage.setItem('lastConnectedTime', lastConnectedTime.current);
+      console.log('Last connected time stored:', lastConnectedTime.current);
+    } else {
+      // We keep the last connected time when disconnecting
+      console.log('Disconnected. Last known connection time:', lastConnectedTime.current);
+    }
+  }, [isConnected]);
 
 
   const changeBackgroundColor = (newColor: string) => {
@@ -256,6 +262,7 @@ function App(): React.ReactElement {
         <MqttStatus
           mqttConnected={isConnected}
           musicIsFading={musicIsFading}
+          lastConnectedTime={lastConnectedTime.current}
           onConnect={handleConnect}
           onDisconnect={handleDisconnect}
         />

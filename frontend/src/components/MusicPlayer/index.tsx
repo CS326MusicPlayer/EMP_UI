@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
-import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2 } from "react-icons/lu";
+import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
 import classes from './styles.module.css';
 
 // Import icons
@@ -535,7 +535,15 @@ export default function MusicPlayer({
         </div> */}
 
         <div className={classes.volumeControl}>
-          <LuVolume1 />
+          <Popover content={<p>Press "m" to toggle mute</p>} placement="left" mouseEnterDelay={0.5}>
+            {
+              volume === 0 ? (
+                <LuVolumeOff />
+              ) : (
+                <LuVolume1 />
+              )
+            }
+          </Popover>
           {isFading ? (
             <Popover content={<p>Music is currently fading in/out!</p>} trigger="hover" placement="bottom">
               <input

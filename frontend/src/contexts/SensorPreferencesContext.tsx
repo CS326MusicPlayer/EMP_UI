@@ -9,13 +9,14 @@ interface SensorPreferencesContextType {
 
 const defaultContextValue: SensorPreferencesContextType = {
   useWeather: true,
-  setUseWeather: () => {},
+  setUseWeather: () => { },
   useTime: true,
-  setUseTime: () => {},
+  setUseTime: () => { },
 };
 
-export const SensorPreferencesContext = createContext<SensorPreferencesContextType>(defaultContextValue);
+const SensorPreferencesContext = createContext<SensorPreferencesContextType>(defaultContextValue);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useSensorPreferences = () => useContext(SensorPreferencesContext);
 
 export const SensorPreferencesProvider = ({ children }: { children: ReactNode }) => {

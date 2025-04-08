@@ -33,13 +33,13 @@ export default function MusicPlayer({
   piLightLevel,
   onFadingChange
 }: {
-    isAuto: boolean;
-    piWeather: string;
-    piTime: string;
-    piTemperature: string;
-    piLightLevel: string;
-    onFadingChange?: (isFading: boolean) => void;
-  }
+  isAuto: boolean;
+  piWeather: string;
+  piTime: string;
+  piTemperature: string;
+  piLightLevel: string;
+  onFadingChange?: (isFading: boolean) => void;
+}
 ): React.ReactElement {
   const musicList = [
     {
@@ -156,42 +156,42 @@ export default function MusicPlayer({
   function fadeIn(audioElement: HTMLAudioElement, targetVolume: number, duration: number = 1000): number {
     const startVolume = 0;
     audioElement.volume = startVolume;
-    
+
     const startTime = performance.now();
-    
+
     const fadeId = window.setInterval(() => {
       const elapsed = performance.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      
+
       audioElement.volume = startVolume + (targetVolume - startVolume) * progress;
-      
+
       if (progress >= 1) {
         clearInterval(fadeId);
         audioElement.volume = targetVolume; // Ensure we end at exactly the target volume
       }
     }, 16); // ~60fps for smooth transition
-    
+
     return fadeId;
   }
-  
+
   function fadeOut(audioElement: HTMLAudioElement, duration: number = 1000): Promise<void> {
     return new Promise((resolve) => {
       const startVolume = audioElement.volume;
       const startTime = performance.now();
-      
+
       const fadeId = window.setInterval(() => {
         const elapsed = performance.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         audioElement.volume = startVolume * (1 - progress);
-        
+
         if (progress >= 1) {
           clearInterval(fadeId);
           audioElement.volume = 0; // Ensure we end at exactly 0
           resolve();
         }
       }, 16); // ~60fps for smooth transition
-      
+
       fadeIntervalRef.current.fadeOut = fadeId;
     });
   }
@@ -203,14 +203,15 @@ export default function MusicPlayer({
       setLoopMode('one');
       console.log('Auto mode enabled, setting loop mode to: one');
     }
-  }, [isAuto]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuto]);
 
   // Effect to change song based on weather and time (and fade in/out)
   // Fade in/out only done when weather/time condition changes (music control will have no fade in/out)
   // Written with the help of Copilot
   useEffect(() => {
     let safetyTimeoutId: NodeJS.Timeout | null = null;
-  
+
     async function handleSongChange() {
       // Safe returns if necessary data is not available
       if (!isAuto && ((useWeather && !piWeather) || (!useWeather && !piTemperature))) {
@@ -226,20 +227,20 @@ export default function MusicPlayer({
       const musicTimeToUse = getMusicTime(piTime, piLightLevel, useTime);
       console.log(`Music weather: ${musicWeatherToUse}, Music time: ${musicTimeToUse}`);
       console.log(`Currently using ${useWeather ? 'weather' : 'temperature'} and ${useTime ? 'time' : 'light level'}`);
-      
+
       // Find the index of the song that matches the current weather/time, depending on the mode
       const matchingSongIndex = musicList.findIndex(
         song => song.weather === musicWeatherToUse && song.time === musicTimeToUse
       );
-  
+
       if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex && audioRef.current) {
         console.log(`Changing song to match weather: ${piWeather}, time: ${piTime}`);
-        
+
         // Only fade if currently playing
         if (isPlaying && !audioRef.current.paused) {
           setIsFading(true);
           const initialVolume = volume;
-  
+
           // Set safety timeout
           safetyTimeoutId = setTimeout(() => {
             if (isFading) {
@@ -257,7 +258,7 @@ export default function MusicPlayer({
               }
             }
           }, (FADE_OUT_TIME + FADE_IN_TIME + 2) * 1000);
-  
+
           // Clear any existing fade intervals
           if (fadeIntervalRef.current.fadeOut) {
             clearInterval(fadeIntervalRef.current.fadeOut);
@@ -267,25 +268,25 @@ export default function MusicPlayer({
             clearInterval(fadeIntervalRef.current.fadeIn);
             fadeIntervalRef.current.fadeIn = null;
           }
-  
+
           // Fade out current song
           try {
             await fadeOut(audioRef.current, FADE_OUT_TIME * 1000);
-            
+
             // Change song
             setCurrentSongIndex(matchingSongIndex);
-            
+
             // Small delay to ensure React updates with new song
             await new Promise(resolve => setTimeout(resolve, 100));
-            
+
             if (audioRef.current) {
               audioRef.current.volume = 0;
-              
+
               try {
                 await audioRef.current.play();
                 // Start fade in
                 fadeIntervalRef.current.fadeIn = fadeIn(audioRef.current, initialVolume, FADE_IN_TIME * 1000);
-                
+
                 // Set a timeout to mark fading as complete
                 setTimeout(() => {
                   setIsFading(false);
@@ -308,9 +309,9 @@ export default function MusicPlayer({
         }
       }
     }
-    
+
     handleSongChange();
-    
+
     // Clean up function
     return () => {
       if (safetyTimeoutId) {
@@ -322,9 +323,11 @@ export default function MusicPlayer({
       }
       if (fadeIntervalRef.current.fadeIn) {
         clearInterval(fadeIntervalRef.current.fadeIn);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         fadeIntervalRef.current.fadeIn = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSongIndex, volume, isFading, isPlaying, isAuto, piWeather, piTime, piTemperature, piLightLevel, useWeather, useTime]);
 
   // Event handlers
@@ -378,6 +381,7 @@ export default function MusicPlayer({
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Loop mode control
@@ -432,7 +436,7 @@ export default function MusicPlayer({
         onFadingChange(false);
       }
     }
-} 
+  }
 
   // Progress bar control
   const handleTimeUpdate = () => {
@@ -517,6 +521,7 @@ export default function MusicPlayer({
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSongIndex, isPlaying]);
 
   // Set loop attribute
@@ -613,7 +618,7 @@ export default function MusicPlayer({
                 onChange={handleVolumeChange}
                 className={classes.volumeSlider}
                 disabled={true}
-                style={{opacity: 0.5}}
+                style={{ opacity: 0.5 }}
               />
             </Popover>
           ) : (

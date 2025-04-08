@@ -10,6 +10,7 @@ import './App.css';
 
 
 function App(): React.ReactElement {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mqttData, setMqttData] = useState<Record<string, any>>({});
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -21,7 +22,7 @@ function App(): React.ReactElement {
   const [manualTime, setManualTime] = useState('day');
   const prevManualWeatherRef = useRef(manualWeather);
   const prevManualTimeRef = useRef(manualTime);
-  
+
   const [messageApi, contextHolder] = message.useMessage();
   const hasConnected = useRef(false);    // To track if the initial connection has been made
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
@@ -81,14 +82,14 @@ function App(): React.ReactElement {
       });
     }
 
-     // Show notification only when manual values change (not on initial render)
+    // Show notification only when manual values change (not on initial render)
     if (!isAuto && (prevManualWeatherRef.current !== manualWeather || prevManualTimeRef.current !== manualTime)) {
       messageApi.info({
         content: `Weather: ${manualWeather}, Time: ${manualTime}`,
         duration: 5,
       });
     }
-    
+
     // Update refs with current values for next comparison
     prevManualWeatherRef.current = manualWeather;
     prevManualTimeRef.current = manualTime;
@@ -114,11 +115,11 @@ function App(): React.ReactElement {
         setIsConnected(true);
         hasConnected.current = true;
         console.log('Connected to MQTT broker');
-        
+
         // Subscribe to the topic
         if (!hasSubscribed.current) {
           hasSubscribed.current = true;
-          
+
           // Subscribe to topics
           mqttClient.subscribe('emp/environment', (err) => {
             if (!err) {
@@ -148,7 +149,7 @@ function App(): React.ReactElement {
         console.log('Offline from MQTT broker');
       });
 
-      mqttClient.on('error', function (error: any) {
+      mqttClient.on('error', function (error: Error) {
         setIsConnected(false);
         console.error('MQTT error:', error);
       });
@@ -156,7 +157,7 @@ function App(): React.ReactElement {
       // Message handler
       const messageHandler = function (topic: string, message: Buffer) {
         console.log('Received message:', topic, message.toString());
-        
+
         if (topic === 'emp/environment') {
           try {
             const data = JSON.parse(message.toString());
@@ -185,20 +186,20 @@ function App(): React.ReactElement {
             setMqttData(prevData => {
               // Only update if there are actual changes
               if (
-                prevData.weather !== data.precipitation_status || 
-                prevData.time !== dayOrNight || 
-                prevData.temperature !== data.temperature || 
+                prevData.weather !== data.precipitation_status ||
+                prevData.time !== dayOrNight ||
+                prevData.temperature !== data.temperature ||
                 prevData.light_level !== data.light_level
               ) {
                 // console.log('Updating state with new data');
-                
+
                 // Return the new state with update flag
                 return {
                   ...newData,
                   hasUpdated: true
                 };
               }
-              
+
               // console.log('No update needed');
               return prevData; // Return unchanged state
             });
@@ -231,6 +232,7 @@ function App(): React.ReactElement {
         setIsConnected(false);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentHour]);
 
 

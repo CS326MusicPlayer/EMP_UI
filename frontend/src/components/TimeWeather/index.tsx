@@ -1,4 +1,4 @@
-import React, { useState, useEffect }  from "react";
+import React, { useState, useEffect } from "react";
 import { Popover } from 'antd';
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
 import { getMusicWeather, getMusicTime, getTimeUsingTimezone } from '../../utilities/utils';
@@ -27,16 +27,16 @@ export default function TimeWeather({
   setManualWeather,
   setManualTime
 }: {
-    piWeather: string;
-    piTime: string;
-    piTemperature: string;
-    piLightLevel: string;
-    timezone: string;
-    isAuto: boolean;
-    setIsAuto: (isAuto: boolean) => void;
-    setManualWeather: (weather: string) => void;
-    setManualTime: (time: string) => void;
-  }
+  piWeather: string;
+  piTime: string;
+  piTemperature: string;
+  piLightLevel: string;
+  timezone: string;
+  isAuto: boolean;
+  setIsAuto: (isAuto: boolean) => void;
+  setManualWeather: (weather: string) => void;
+  setManualTime: (time: string) => void;
+}
 
 ): React.ReactElement {
   const { useWeather, setUseWeather, useTime, setUseTime } = useSensorPreferences();
@@ -72,6 +72,7 @@ export default function TimeWeather({
     }, 1000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prevSeconds]);
 
   // Calculate hand positions with more precision
@@ -87,16 +88,16 @@ export default function TimeWeather({
 
   const convertTemp = (temp: string | null): string => {
     if (!temp || temp === "--") return "--";
-    
+
     try {
       const tempValue = parseFloat(temp);
       if (isNaN(tempValue)) return "--";
-      
+
       if (tempUnit === 'C') {
         return tempValue.toFixed(0);
       } else {
         // Convert Celsius to Fahrenheit: (C × 9/5) + 32
-        return (tempValue * 9/5 + 32).toFixed(0);
+        return (tempValue * 9 / 5 + 32).toFixed(0);
       }
     } catch (error) {
       console.error('Error converting temperature:', error);
@@ -163,7 +164,7 @@ export default function TimeWeather({
       {/* Weather */}
       <div className={classes.weather}>
         {/* Toggle Chip */}
-        {isAuto ? 
+        {isAuto ?
           <Popover
             content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p><p>Click to use {!useWeather ? '"precipitation"' : '"temperature"'}</p></>}
             trigger="hover"
@@ -172,7 +173,7 @@ export default function TimeWeather({
           >
             <div
               className={!isAuto ? classes.toggleWeatherTemperatureDisabled : classes.toggleWeatherTemperature}
-              onClick={ () => {
+              onClick={() => {
                 // Toggle whether to use weather or temperature
                 if (!isAuto) return;
                 setUseWeather(!useWeather);
@@ -184,7 +185,7 @@ export default function TimeWeather({
           :
           <div
             className={!isAuto ? classes.toggleWeatherTemperatureDisabled : classes.toggleWeatherTemperature}
-            onClick={ () => {
+            onClick={() => {
               // Toggle whether to use weather or temperature
               if (!isAuto) return;
               setUseWeather(!useWeather);
@@ -204,16 +205,16 @@ export default function TimeWeather({
               onClick={toggleWeather}
               onMouseEnter={() => setIsHoveringWeather(true)}
               onMouseLeave={() => setIsHoveringWeather(false)}
-              style={{ 
+              style={{
                 opacity: !isAuto && isHoveringWeather ? 0.5 : 1,
                 transition: 'opacity 0.2s ease'
               }}
             >
               {
                 getMusicWeather(piWeather, piTemperature, useWeather) === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
-                getMusicWeather(piWeather, piTemperature, useWeather) === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
-                getMusicWeather(piWeather, piTemperature, useWeather) === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
-                <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
+                  getMusicWeather(piWeather, piTemperature, useWeather) === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
+                    getMusicWeather(piWeather, piTemperature, useWeather) === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
+                      <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
               }
             </span>
           </div>
@@ -245,7 +246,7 @@ export default function TimeWeather({
           >
             <div
               className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
-              onClick={ () => {
+              onClick={() => {
                 // Toggle whether to use time or lightsensor
                 if (!isAuto) return;
                 setUseTime(!useTime);
@@ -257,7 +258,7 @@ export default function TimeWeather({
           :
           <div
             className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
-            onClick={ () => {
+            onClick={() => {
               // Toggle whether to use time or lightsensor
               if (!isAuto) return;
               setUseTime(!useTime);
@@ -280,15 +281,15 @@ export default function TimeWeather({
             onClick={toggleDayNight}
             onMouseEnter={() => setIsHoveringTime(true)}
             onMouseLeave={() => setIsHoveringTime(false)}
-            style={{ 
+            style={{
               opacity: !isAuto && isHoveringTime ? 0.5 : 1,
               transition: 'opacity 0.2s ease'
             }}
           >
             {
               getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
-              getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
-              <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
+                getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
+                  <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
             }
           </span>
         </div>

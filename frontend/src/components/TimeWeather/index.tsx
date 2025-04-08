@@ -163,12 +163,25 @@ export default function TimeWeather({
       {/* Weather */}
       <div className={classes.weather}>
         {/* Toggle Chip */}
-        <Popover
-          content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p><p>Click to use {!useWeather ? '"precipitation"' : '"temperature"'}</p></>}
-          trigger="hover"
-          placement="left"
-          mouseEnterDelay={0.2}
-        >
+        {isAuto ? 
+          <Popover
+            content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p><p>Click to use {!useWeather ? '"precipitation"' : '"temperature"'}</p></>}
+            trigger="hover"
+            placement="left"
+            mouseEnterDelay={0.2}
+          >
+            <div
+              className={!isAuto ? classes.toggleWeatherTemperatureDisabled : classes.toggleWeatherTemperature}
+              onClick={ () => {
+                // Toggle whether to use weather or temperature
+                if (!isAuto) return;
+                setUseWeather(!useWeather);
+              }}
+            >
+              <img src={useWeather ? precipitation : temperature} alt="Weather" className={classes.toggleChipIcon} />
+            </div>
+          </Popover>
+          :
           <div
             className={!isAuto ? classes.toggleWeatherTemperatureDisabled : classes.toggleWeatherTemperature}
             onClick={ () => {
@@ -179,7 +192,7 @@ export default function TimeWeather({
           >
             <img src={useWeather ? precipitation : temperature} alt="Weather" className={classes.toggleChipIcon} />
           </div>
-        </Popover>
+        }
 
         {/* Weather Data */}
         <div className={classes.forecast}>
@@ -223,12 +236,25 @@ export default function TimeWeather({
       {/* Time */}
       <div className={classes.time}>
         {/* Toggle Chip */}
-        <Popover
-          content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useTime ? '"time"' : '"light level"'}</p><p>Click to use {!useTime ? '"time"' : '"light level"'}</p></>}
-          trigger="hover"
-          placement="right"
-          mouseEnterDelay={0.2}
-        >
+        {isAuto ?
+          <Popover
+            content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useTime ? '"time"' : '"light level"'}</p><p>Click to use {!useTime ? '"time"' : '"light level"'}</p></>}
+            trigger="hover"
+            placement="right"
+            mouseEnterDelay={0.2}
+          >
+            <div
+              className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
+              onClick={ () => {
+                // Toggle whether to use time or lightsensor
+                if (!isAuto) return;
+                setUseTime(!useTime);
+              }}
+            >
+              <img src={useTime ? clocktime : lightsensor} alt="Time" className={classes.toggleChipIcon} />
+            </div>
+          </Popover>
+          :
           <div
             className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
             onClick={ () => {
@@ -239,7 +265,7 @@ export default function TimeWeather({
           >
             <img src={useTime ? clocktime : lightsensor} alt="Time" className={classes.toggleChipIcon} />
           </div>
-        </Popover>
+        }
 
         <div className={classes.clock}>
           <div className={classes.secondRing} style={{ transform: `rotate(${secondRotation}deg)` }}></div>

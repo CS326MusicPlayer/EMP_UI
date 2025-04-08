@@ -27,7 +27,8 @@
 }
 
 /* Weather/Time toggle chip button */
-.toggleWeatherTemperature {
+.toggleWeatherTemperature,
+.toggleWeatherTemperatureDisabled {
   position: absolute;
   top: -0.6rem;
   left: -0.6rem;
@@ -46,8 +47,16 @@
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
   border: 0.2rem solid var(--lightgray0);
 }
+.toggleWeatherTemperatureDisabled {
+  opacity: 0.5;
+}
+.toggleWeatherTemperatureDisabled:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 0.2rem solid var(--lightgray2);
+}
 
-.toggleTimeLightsensor {
+.toggleTimeLightsensor,
+.toggleTimeLightsensorDisabled {
   position: absolute;
   top: -0.6rem;
   right: -0.6rem;
@@ -65,6 +74,13 @@
 .toggleTimeLightsensor:hover {
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
   border: 0.2rem solid var(--lightgray0);
+}
+.toggleTimeLightsensorDisabled {
+  opacity: 0.5;
+}
+.toggleTimeLightsensorDisabled:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 0.2rem solid var(--lightgray2);
 }
 
 .toggleChipIcon {

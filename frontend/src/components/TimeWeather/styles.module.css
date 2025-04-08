@@ -91,6 +91,7 @@ hr {
   border: none;
 }
 
+.condition,
 .dayOrNight {
   font-size: 2rem;
 }

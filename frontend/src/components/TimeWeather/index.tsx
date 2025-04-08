@@ -29,6 +29,9 @@ export default function TimeWeather({
 
 ): React.ReactElement {
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
+  const [isHoveringWeather, setIsHoveringWeather] = useState(false);
+  const [isHoveringTime, setIsHoveringTime] = useState(false);
+
   const [time, setTime] = useState(new Date());
   const [prevSeconds, setPrevSeconds] = useState(0);
   const [rotationCount, setRotationCount] = useState({
@@ -149,7 +152,16 @@ export default function TimeWeather({
           <div className={classes.forecastData}>
             <p className={classes.temperature} onClick={toggleTempUnit}>{convertTemp(piTemperature)}°{tempUnit}</p>
             <hr />
-            <span className={classes.condition} onClick={toggleWeather}>
+            <span
+              className={classes.condition}
+              onClick={toggleWeather}
+              onMouseEnter={() => setIsHoveringWeather(true)}
+              onMouseLeave={() => setIsHoveringWeather(false)}
+              style={{ 
+                opacity: !isAuto && isHoveringWeather ? 0.5 : 1,
+                transition: 'opacity 0.2s ease'
+              }}
+            >
               {
                 piWeather === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
                 piWeather === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
@@ -184,7 +196,16 @@ export default function TimeWeather({
             {hoursDisplay}<span className={classes.blinkingColon}>:</span>{minutesDisplay}
           </p>
           <hr />
-          <span className={classes.dayOrNight} onClick={toggleDayNight}>
+          <span
+            className={classes.dayOrNight}
+            onClick={toggleDayNight}
+            onMouseEnter={() => setIsHoveringTime(true)}
+            onMouseLeave={() => setIsHoveringTime(false)}
+            style={{ 
+              opacity: !isAuto && isHoveringTime ? 0.5 : 1,
+              transition: 'opacity 0.2s ease'
+            }}
+          >
             {
               piTime === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
               piTime === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :

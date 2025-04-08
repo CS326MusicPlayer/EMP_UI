@@ -13,19 +13,18 @@ function App(): React.ReactElement {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mqttData, setMqttData] = useState<Record<string, any>>({});
   const [isConnected, setIsConnected] = useState<boolean>(false);
-
-  // TODO: It will later have three modes rather than two: INTERNET, SENSOR, and MANUAL
   const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
-
   const [musicIsFading, setMusicIsFading] = useState<boolean>(false);
   const [manualWeather, setManualWeather] = useState('none');
   const [manualTime, setManualTime] = useState('day');
+
   const prevManualWeatherRef = useRef(manualWeather);
   const prevManualTimeRef = useRef(manualTime);
-
   const [messageApi, contextHolder] = message.useMessage();
   const hasConnected = useRef(false);    // To track if the initial connection has been made
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
+
+  const currentHour = new Date().getHours();
 
   // Update the last connected time of the MQTT client and save it to local storage
   const lastConnectedTime = useRef<string | null>(
@@ -47,12 +46,11 @@ function App(): React.ReactElement {
   }, [isConnected]);
 
 
+  // Function to change the background color based on the time of day
   const changeBackgroundColor = (newColor: string) => {
     document.documentElement.style.setProperty('--background-color', newColor);
   };
 
-  // TODO: we should get the time (timezone) from the RPi
-  const currentHour = new Date().getHours();
 
   // Toast message according to the connection status
   useEffect(() => {
@@ -169,7 +167,7 @@ function App(): React.ReactElement {
             const currentTime = getTimeUsingTimezone(data.timezone);
             const dayOrNight = currentTime.getHours() >= parseInt(data.sunrise.split(':')[0]) && currentTime.getHours() < parseInt(data.sunset.split(':')[0]) ? 'day' : 'night';
 
-            console.log('Current time:', currentTime, 'Timezone:', data.timezone, 'Day/Night:', dayOrNight);
+            // console.log('Current time:', currentTime, 'Timezone:', data.timezone, 'Day/Night:', dayOrNight);
 
             // Create a data object to store the new values
             const newData = {
@@ -234,7 +232,6 @@ function App(): React.ReactElement {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentHour]);
-
 
 
   // Manual connect/disconnect function that ensures the status is updated

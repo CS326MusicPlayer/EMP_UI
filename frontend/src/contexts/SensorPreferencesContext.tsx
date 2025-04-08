@@ -19,6 +19,8 @@ const SensorPreferencesContext = createContext<SensorPreferencesContextType>(def
 // eslint-disable-next-line react-refresh/only-export-components
 export const useSensorPreferences = () => useContext(SensorPreferencesContext);
 
+
+// Context for sensor preferences
 export const SensorPreferencesProvider = ({ children }: { children: ReactNode }) => {
   const [useWeather, setUseWeather] = useState(true);
   const [useTime, setUseTime] = useState(true);

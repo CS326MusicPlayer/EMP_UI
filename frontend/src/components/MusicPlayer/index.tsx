@@ -41,6 +41,7 @@ export default function MusicPlayer({
   onFadingChange?: (isFading: boolean) => void;
 }
 ): React.ReactElement {
+  // Music list
   const musicList = [
     {
       title: "Sunny Day",
@@ -196,7 +197,6 @@ export default function MusicPlayer({
     });
   }
 
-  // If auto mode is enabled, loopMode should change to 'one'
   useEffect(() => {
     // If auto mode is enabled, set loop mode to 'one'
     if (isAuto && loopMode !== 'one') {
@@ -212,6 +212,7 @@ export default function MusicPlayer({
   useEffect(() => {
     let safetyTimeoutId: NodeJS.Timeout | null = null;
 
+    // Function to handle song change based on weather and time
     async function handleSongChange() {
       // Safe returns if necessary data is not available
       if (!isAuto && ((useWeather && !piWeather) || (!useWeather && !piTemperature))) {

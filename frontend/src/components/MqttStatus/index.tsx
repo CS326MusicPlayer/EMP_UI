@@ -12,20 +12,20 @@ export default function MqttStatus({
   onConnect,
   onDisconnect
 }: {
-    mqttConnected: boolean;
-    musicIsFading: boolean;
-    lastConnectedTime: string | null;
-    onConnect: () => void;
-    onDisconnect: () => void;
-  }
+  mqttConnected: boolean;
+  musicIsFading: boolean;
+  lastConnectedTime: string | null;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}
 ): React.ReactElement {
   const [timeDisplay, setTimeDisplay] = useState<string>('');
-  
+
   // Update the time display initially and when lastConnectedTime changes
   useEffect(() => {
     setTimeDisplay(formatTimeAgo(lastConnectedTime));
   }, [lastConnectedTime]);
-  
+
   // Handle mouse enter to refresh the time display
   const handleMouseEnter = () => {
     setTimeDisplay(formatTimeAgo(lastConnectedTime));

@@ -53,8 +53,14 @@ export default function TimeWeather({
   });
 
 
+
   useEffect(() => {
-    // Update the time every second
+    /**
+     * Sets up an interval that updates the time every second.
+     *
+     * @param {string | undefined} timezone - Optional timezone to use for time calculation
+     * @returns {NodeJS.Timeout} Interval ID that can be used with clearInterval
+     */
     const interval = setInterval(() => {
       const newTime = timezone ? getTimeUsingTimezone(timezone) : new Date();
       const newSeconds = newTime.getSeconds();
@@ -86,6 +92,17 @@ export default function TimeWeather({
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
 
+
+  /**
+   * Converts temperature value between Celsius and Fahrenheit based on the current temperature unit setting.
+   *
+   * @param temp - The temperature value as a string or null
+   * @returns The converted temperature as a string with no decimal places, or "--" if the input is invalid
+   *
+   * If the current unit is Celsius (tempUnit === 'C'), returns the original temperature.
+   * If the current unit is Fahrenheit, converts from Celsius to Fahrenheit
+   * Returns "--" in case of null, empty string, invalid number format, or error during conversion.
+   */
   const convertTemp = (temp: string | null): string => {
     if (!temp || temp === "--") return "--";
 
@@ -105,14 +122,17 @@ export default function TimeWeather({
     }
   };
 
+  // Toggle between Celsius and Fahrenheit
   const toggleTempUnit = () => {
     setTempUnit(prev => prev === 'C' ? 'F' : 'C');
   };
 
+  // Toggle between auto and manual mode
   const toggleMode = () => {
     setIsAuto(!isAuto);
   };
 
+  // Define the button style based on the mode
   const buttonStyle = {
     backgroundColor: isAuto ? '#52c597' : '#a5a5a5',
   };
@@ -142,12 +162,13 @@ export default function TimeWeather({
     }
   };
 
+  // Toggle between day and night
   const toggleDayNight = () => {
     // Safe return if the mode is not manual
     if (isAuto) return;
 
-    console.log('Toggling day/night condition...');
-    console.log('Current day/night condition:', piTime);
+    // console.log('Toggling day/night condition...');
+    // console.log('Current day/night condition:', piTime);
 
     // Toggle-rotate the day/night condition using the setter function from props
     if (piTime === 'day') {
@@ -207,7 +228,7 @@ export default function TimeWeather({
               onMouseLeave={() => setIsHoveringWeather(false)}
               style={{
                 opacity: !isAuto && isHoveringWeather ? 0.5 : 1,
-                transition: 'opacity 0.2s ease'
+                transition: 'opacity 0.2s ease-in-out'
               }}
             >
               {
@@ -283,7 +304,7 @@ export default function TimeWeather({
             onMouseLeave={() => setIsHoveringTime(false)}
             style={{
               opacity: !isAuto && isHoveringTime ? 0.5 : 1,
-              transition: 'opacity 0.2s ease'
+              transition: 'opacity 0.2s ease-in-out'
             }}
           >
             {

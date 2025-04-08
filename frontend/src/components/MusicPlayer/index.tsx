@@ -334,6 +334,9 @@ export default function MusicPlayer({
 
   // On keyboard event 'm' toggle mute
   const handleKeyDown = (e: KeyboardEvent) => {
+    // If is fading, ignore key events
+    if (isFading) return;
+
     if (e.key === 'm') {
       if (audioRef.current) {
         if (audioRef.current.volume > 0) {

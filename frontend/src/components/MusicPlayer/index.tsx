@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
 import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff, LuRotateCcw } from "react-icons/lu";
+import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
+import { getMusicWeather, getMusicTime } from '../../utilities/utils';
 import classes from './styles.module.css';
 
 // Import icons
@@ -22,15 +24,20 @@ import night_snowy from '../../assets/music/night_snowy.mp3';
 const FADE_OUT_TIME = 5; // seconds
 const FADE_IN_TIME = 1; // seconds
 
+
 export default function MusicPlayer({
   isAuto,
   piWeather,
   piTime,
+  piTemperature,
+  piLightLevel,
   onFadingChange
 }: {
     isAuto: boolean;
     piWeather: string;
     piTime: string;
+    piTemperature: string;
+    piLightLevel: string;
     onFadingChange?: (isFading: boolean) => void;
   }
 ): React.ReactElement {
@@ -108,6 +115,9 @@ export default function MusicPlayer({
       time: "night"
     }
   ];
+
+  // Context
+  const { useWeather, useTime } = useSensorPreferences();
 
   // State variables
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
@@ -202,10 +212,24 @@ export default function MusicPlayer({
     let safetyTimeoutId: NodeJS.Timeout | null = null;
   
     async function handleSongChange() {
-      if (!piWeather || !piTime) return;
+      // Safe returns if necessary data is not available
+      if (!isAuto && ((useWeather && !piWeather) || (!useWeather && !piTemperature))) {
+        console.warn('No weather or temperature data available');
+        return;
+      }
+      if (!isAuto && ((useTime && !piTime) || (!useTime && !piLightLevel))) {
+        console.warn('No time or light level data available');
+        return;
+      }
+
+      const musicWeatherToUse = getMusicWeather(piWeather, piTemperature, useWeather);
+      const musicTimeToUse = getMusicTime(piTime, piLightLevel, useTime);
+      console.log(`Music weather: ${musicWeatherToUse}, Music time: ${musicTimeToUse}`);
+      console.log(`Currently using ${useWeather ? 'weather' : 'temperature'} and ${useTime ? 'time' : 'light level'}`);
       
+      // Find the index of the song that matches the current weather/time, depending on the mode
       const matchingSongIndex = musicList.findIndex(
-        song => song.weather === piWeather && song.time === piTime
+        song => song.weather === musicWeatherToUse && song.time === musicTimeToUse
       );
   
       if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex && audioRef.current) {
@@ -301,7 +325,7 @@ export default function MusicPlayer({
         fadeIntervalRef.current.fadeIn = null;
       }
     };
-  }, [piWeather, piTime, currentSongIndex, volume, isFading, isPlaying, isAuto]);
+  }, [currentSongIndex, volume, isFading, isPlaying, isAuto, piWeather, piTime, piTemperature, piLightLevel, useWeather, useTime]);
 
   // Event handlers
   // const togglePlay = () => {

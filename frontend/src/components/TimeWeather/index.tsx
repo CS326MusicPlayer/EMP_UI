@@ -1,11 +1,18 @@
 import React, { useState, useEffect }  from "react";
 import { Popover } from 'antd';
+import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
+import { getMusicWeather, getMusicTime } from '../../utilities/utils';
+
 import sunIcon from '../../assets/icons/sun.png';
 import moonIcon from '../../assets/icons/moon.png';
 import sunnyIcon from '../../assets/icons/brightness.png';
 import rainyIcon from '../../assets/icons/storm.png';
 import snowyIcon from '../../assets/icons/snowflakes.png';
 import unknownIcon from '../../assets/icons/unknown.png';
+import lightsensor from '../../assets/icons/lightsensor.png';
+import clocktime from '../../assets/icons/clocktime.png';
+import temperature from '../../assets/icons/temperature.png';
+import precipitation from '../../assets/icons/precipitation.png';
 import classes from './styles.module.css';
 
 
@@ -13,6 +20,7 @@ export default function TimeWeather({
   piWeather,
   piTime,
   piTemperature,
+  piLightLevel,
   isAuto,
   setIsAuto,
   setManualWeather,
@@ -21,6 +29,7 @@ export default function TimeWeather({
     piWeather: string;
     piTime: string;
     piTemperature: string;
+    piLightLevel: string;
     isAuto: boolean;
     setIsAuto: (isAuto: boolean) => void;
     setManualWeather: (weather: string) => void;
@@ -28,6 +37,7 @@ export default function TimeWeather({
   }
 
 ): React.ReactElement {
+  const { useWeather, setUseWeather, useTime, setUseTime } = useSensorPreferences();
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [isHoveringWeather, setIsHoveringWeather] = useState(false);
   const [isHoveringTime, setIsHoveringTime] = useState(false);
@@ -148,6 +158,16 @@ export default function TimeWeather({
     <div className={classes.container}>
       {/* Weather */}
       <div className={classes.weather}>
+        {/* Toggle Chip */}
+        <div
+          className={classes.toggleWeatherTemperature}
+          onClick={ () => {
+            // Toggle whether to use weather or temperature
+            setUseWeather(!useWeather);
+          }}
+        >
+          <img src={useWeather ? temperature : precipitation} alt="Weather" className={classes.toggleChipIcon} />
+        </div>
         <div className={classes.forecast}>
           <div className={classes.forecastData}>
             <p className={classes.temperature} onClick={toggleTempUnit}>{convertTemp(piTemperature)}°{tempUnit}</p>
@@ -163,9 +183,9 @@ export default function TimeWeather({
               }}
             >
               {
-                piWeather === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
-                piWeather === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
-                piWeather === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
+                getMusicWeather(piWeather, piTemperature, useWeather) === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
+                getMusicWeather(piWeather, piTemperature, useWeather) === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
+                getMusicWeather(piWeather, piTemperature, useWeather) === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
                 <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
               }
             </span>
@@ -188,6 +208,17 @@ export default function TimeWeather({
 
       {/* Time */}
       <div className={classes.time}>
+        {/* Toggle Chip */}
+        <div
+          className={classes.toggleTimeLightsensor}
+          onClick={ () => {
+            // Toggle whether to use time or lightsensor
+            setUseTime(!useTime);
+          }}
+        >
+          <img src={useTime ? clocktime : lightsensor} alt="Time" className={classes.toggleChipIcon} />
+        </div>
+
         <div className={classes.clock}>
           <div className={classes.secondRing} style={{ transform: `rotate(${secondRotation}deg)` }}></div>
         </div>
@@ -207,8 +238,8 @@ export default function TimeWeather({
             }}
           >
             {
-              piTime === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
-              piTime === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
+              getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
+              getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
               <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
             }
           </span>

@@ -14,6 +14,7 @@
   border-radius: 2rem;
 }
 
+
 .time,
 .weather {
   display: flex;
@@ -22,6 +23,58 @@
   height: 16rem;
   width: 16rem;
   border-radius: 50%;
+  position: relative;
+}
+
+/* Weather/Time toggle chip button */
+.toggleWeatherTemperature {
+  position: absolute;
+  top: -0.6rem;
+  left: -0.6rem;
+  border: 0.2rem solid var(--lightgray2);
+  background-color: var(--lightgray1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0.4rem;
+  z-index: 999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+.toggleWeatherTemperature:hover {
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+  border: 0.2rem solid var(--lightgray0);
+}
+
+.toggleTimeLightsensor {
+  position: absolute;
+  top: -0.6rem;
+  right: -0.6rem;
+  border: 0.2rem solid var(--lightgray2);
+  background-color: var(--lightgray1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0.4rem;
+  z-index: 999;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+.toggleTimeLightsensor:hover {
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+  border: 0.2rem solid var(--lightgray0);
+}
+
+.toggleChipIcon {
+  height: 1.8rem;
+  width: 1.8rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(5px 5px 5px #cacaca);
 }
 
 .time {

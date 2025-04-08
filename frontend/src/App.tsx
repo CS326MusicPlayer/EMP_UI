@@ -4,6 +4,7 @@ import MqttStatus from './components/MqttStatus';
 import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
 import mqttClient from './services/mqttService';
+import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
 import './App.css';
 
 
@@ -48,6 +49,7 @@ function App(): React.ReactElement {
     document.documentElement.style.setProperty('--background-color', newColor);
   };
 
+  // TODO: we should get the time (timezone) from the RPi
   const currentHour = new Date().getHours();
 
   // Toast message according to the connection status
@@ -255,31 +257,36 @@ function App(): React.ReactElement {
         },
       }}
     >
-      <div className="App">
-        {contextHolder}
-        <MqttStatus
-          mqttConnected={isConnected}
-          musicIsFading={musicIsFading}
-          lastConnectedTime={lastConnectedTime.current}
-          onConnect={handleConnect}
-          onDisconnect={handleDisconnect}
-        />
-        <TimeWeather
-          piWeather={isAuto ? mqttData.weather : manualWeather}
-          piTime={isAuto ? mqttData.time : manualTime}
-          piTemperature={mqttData.temperature}
-          isAuto={isAuto}
-          setIsAuto={setIsAuto}
-          setManualWeather={setManualWeather}
-          setManualTime={setManualTime}
-        />
-        <MusicPlayer
-          isAuto={isAuto}
-          piWeather={isAuto ? mqttData.weather : manualWeather}
-          piTime={isAuto ? mqttData.time : manualTime}
-          onFadingChange={setMusicIsFading}
-        />
-      </div>
+      <SensorPreferencesProvider>
+        <div className="App">
+          {contextHolder}
+          <MqttStatus
+            mqttConnected={isConnected}
+            musicIsFading={musicIsFading}
+            lastConnectedTime={lastConnectedTime.current}
+            onConnect={handleConnect}
+            onDisconnect={handleDisconnect}
+          />
+          <TimeWeather
+            piWeather={isAuto ? mqttData.weather : manualWeather}
+            piTime={isAuto ? mqttData.time : manualTime}
+            piTemperature={mqttData.temperature}
+            piLightLevel={mqttData.light_level}
+            isAuto={isAuto}
+            setIsAuto={setIsAuto}
+            setManualWeather={setManualWeather}
+            setManualTime={setManualTime}
+          />
+          <MusicPlayer
+            isAuto={isAuto}
+            piWeather={isAuto ? mqttData.weather : manualWeather}
+            piTime={isAuto ? mqttData.time : manualTime}
+            piTemperature={mqttData.temperature}
+            piLightLevel={mqttData.light_level}
+            onFadingChange={setMusicIsFading}
+          />
+        </div>
+      </SensorPreferencesProvider>
     </ConfigProvider>
   )
 }

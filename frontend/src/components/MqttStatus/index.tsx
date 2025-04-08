@@ -1,47 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
 import { Popover, Spin } from "antd";
+import { formatTimeAgo } from '../../utilities/utils';
 import classes from './styles.module.css';
-
-
-// This should move to separate utility file
-const formatTimeAgo = (timestamp: string | null): string => {
-  if (!timestamp) return 'Unknown';
-  
-  try {
-    // Parse the timestamp
-    const date = new Date(timestamp);
-    
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
-      console.warn('Invalid date format received:', timestamp);
-      return 'Invalid date';
-    }
-    
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    
-    // Convert to appropriate units
-    const diffSecs = Math.floor(diffMs / 1000);
-    const diffMins = Math.floor(diffSecs / 60);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    // Format as human-readable string
-    if (diffDays > 0) {
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
-    } else if (diffHours > 0) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    } else if (diffMins > 0) {
-      return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    } else {
-      return 'Just now';
-    }
-  } catch (error) {
-    console.error('Error formatting timestamp:', error);
-    return 'Error';
-  }
-};
 
 
 export default function MqttStatus({

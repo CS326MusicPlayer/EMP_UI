@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
-import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
+import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff, LuRotateCcw } from "react-icons/lu";
 import classes from './styles.module.css';
 
 // Import icons
@@ -366,7 +366,7 @@ export default function MusicPlayer({
   //   }
   // };
 
-  // // Play previous and next song
+  // // Play previous song
   // const playPrevious = () => {
   //   if (isAuto || isFading) return; // Disable previous song in auto mode or during fade
   //   let newIndex = currentSongIndex - 1;
@@ -376,6 +376,7 @@ export default function MusicPlayer({
   //   setCurrentSongIndex(newIndex);
   // };
 
+  // Play next song
   const playNext = () => {
     if (isAuto || isFading) return; // Disable next song in auto mode or during fade
     let newIndex = currentSongIndex + 1;
@@ -384,6 +385,30 @@ export default function MusicPlayer({
     }
     setCurrentSongIndex(newIndex);
   };
+
+  // Reset Player
+  const resetPlayer = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentTime(0);
+      // setDuration(0);
+      setVolume(1);
+      setIsFading(false);
+      if (fadeIntervalRef.current.fadeOut) {
+        clearInterval(fadeIntervalRef.current.fadeOut);
+        fadeIntervalRef.current.fadeOut = null;
+      }
+      if (fadeIntervalRef.current.fadeIn) {
+        clearInterval(fadeIntervalRef.current.fadeIn);
+        fadeIntervalRef.current.fadeIn = null;
+      }
+      if (onFadingChange) {
+        onFadingChange(false);
+      }
+    }
+} 
 
   // Progress bar control
   const handleTimeUpdate = () => {
@@ -479,6 +504,12 @@ export default function MusicPlayer({
 
   return (
     <div className={classes.musicPlayer}>
+      <Popover content={<p style={{ 'color': 'var(--black)' }}>Click to reset the player</p>} placement="top" mouseEnterDelay={0.5}>
+        <LuRotateCcw
+          onClick={resetPlayer}
+          className={classes.resetMusicButton}
+        />
+      </Popover>
       <span className={classes.musicTitleContainer}>
         <img
           src={currentSong.weatherIcon}
@@ -538,7 +569,7 @@ export default function MusicPlayer({
         </div> */}
 
         <div className={classes.volumeControl}>
-          <Popover content={<p>Press "m" to toggle mute</p>} placement="left" mouseEnterDelay={0.5}>
+          <Popover content={<p style={{ 'color': 'var(--black)' }}>Press "m" to toggle mute</p>} placement="left" mouseEnterDelay={0.5}>
             {
               volume === 0 ? (
                 <LuVolumeOff />

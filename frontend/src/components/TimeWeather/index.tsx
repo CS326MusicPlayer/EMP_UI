@@ -1,7 +1,7 @@
 import React, { useState, useEffect }  from "react";
 import { Popover } from 'antd';
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
-import { getMusicWeather, getMusicTime } from '../../utilities/utils';
+import { getMusicWeather, getMusicTime, getTimeUsingTimezone } from '../../utilities/utils';
 
 import sunIcon from '../../assets/icons/sun.png';
 import moonIcon from '../../assets/icons/moon.png';
@@ -21,6 +21,7 @@ export default function TimeWeather({
   piTime,
   piTemperature,
   piLightLevel,
+  timezone,
   isAuto,
   setIsAuto,
   setManualWeather,
@@ -30,6 +31,7 @@ export default function TimeWeather({
     piTime: string;
     piTemperature: string;
     piLightLevel: string;
+    timezone: string;
     isAuto: boolean;
     setIsAuto: (isAuto: boolean) => void;
     setManualWeather: (weather: string) => void;
@@ -54,7 +56,7 @@ export default function TimeWeather({
   useEffect(() => {
     // Update the time every second
     const interval = setInterval(() => {
-      const newTime = new Date();
+      const newTime = timezone ? getTimeUsingTimezone(timezone) : new Date();
       const newSeconds = newTime.getSeconds();
 
       // Check if we've completed a full rotation
@@ -73,10 +75,12 @@ export default function TimeWeather({
   }, [prevSeconds]);
 
   // Calculate hand positions with more precision
-  const seconds = time.getSeconds();
-  const minutes = time.getMinutes() + seconds / 60;
-  const hours = (time.getHours() % 12) + minutes / 60;
+  const currentTime = time;
+  const seconds = currentTime.getSeconds();
+  const minutes = currentTime.getMinutes() + seconds / 60;
+  const hours = (currentTime.getHours() % 12) + minutes / 60;
 
+  // Format the time for 12-hour display
   const hoursDisplay = Math.floor(hours).toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
@@ -166,7 +170,7 @@ export default function TimeWeather({
             setUseWeather(!useWeather);
           }}
         >
-          <img src={useWeather ? temperature : precipitation} alt="Weather" className={classes.toggleChipIcon} />
+          <img src={useWeather ? precipitation : temperature} alt="Weather" className={classes.toggleChipIcon} />
         </div>
         <div className={classes.forecast}>
           <div className={classes.forecastData}>

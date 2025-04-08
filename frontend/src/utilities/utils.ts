@@ -19,6 +19,7 @@ export const getMusicWeather = (piWeather: string, piTemperature: string, useWea
     }
   }
 }
+
 export const getMusicTime = (piTime: string, piLightLevel: string, useTime: boolean) => {
   if (useTime) {
     return piTime;
@@ -31,4 +32,8 @@ export const getMusicTime = (piTime: string, piLightLevel: string, useTime: bool
       return 'day';
     }
   }
+}
+
+export const getTimeUsingTimezone = (timezone: string) => {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: timezone }))
 }

@@ -5,6 +5,7 @@ import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
 import mqttClient from './services/mqttService';
 import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
+import { getTimeUsingTimezone } from './utilities/utils';
 import './App.css';
 
 
@@ -161,16 +162,19 @@ function App(): React.ReactElement {
             const data = JSON.parse(message.toString());
             // console.log('Parsed data:', data);
             // Data will have the following format:
-            // {precipitation_status: 'snow', sunrise: '07:23', sunset: '20:14', temperature: '25', light_level: 0.5}
+            // {precipitation_status: 'snow', sunrise: '07:23', sunset: '20:14', timezone: 'America/Detroit' , temperature: '25', light_level: 0.5}
 
             // Set day/night status based on the current time and sunrise/sunset times
-            const currentTime = new Date();    // TODO: This should be RPi's time, depending on the timezone
+            const currentTime = getTimeUsingTimezone(data.timezone);
             const dayOrNight = currentTime.getHours() >= parseInt(data.sunrise.split(':')[0]) && currentTime.getHours() < parseInt(data.sunset.split(':')[0]) ? 'day' : 'night';
+
+            console.log('Current time:', currentTime, 'Timezone:', data.timezone, 'Day/Night:', dayOrNight);
 
             // Create a data object to store the new values
             const newData = {
               weather: data.precipitation_status,
               time: dayOrNight,
+              timezone: data.timezone,
               temperature: data.temperature,
               light_level: data.light_level,
               hasUpdated: false // Flag to track if data was updated
@@ -272,6 +276,7 @@ function App(): React.ReactElement {
             piTime={isAuto ? mqttData.time : manualTime}
             piTemperature={mqttData.temperature}
             piLightLevel={mqttData.light_level}
+            timezone={mqttData.timezone}
             isAuto={isAuto}
             setIsAuto={setIsAuto}
             setManualWeather={setManualWeather}

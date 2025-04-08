@@ -74,7 +74,7 @@ export default function MqttStatus({
   const onlineContent = (
     <div>
       <p style={{ color: '#616161' }}>Your device seems to be online!</p>
-      <p style={{ color: '#8e8e8e' }}>Connected with MQTT Server</p>
+      <p style={{ color: '#8e8e8e' }}>Connected to MQTT Server</p>
     </div>
   );
 

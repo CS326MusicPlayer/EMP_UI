@@ -39,7 +39,7 @@ function App(): React.ReactElement {
       console.log('Last connected time stored:', lastConnectedTime.current);
     } else {
       // We keep the last connected time when disconnecting
-      console.log('Disconnected. Last known connection time:', lastConnectedTime.current);
+      console.log('Not connected to mqtt server. Last seen: ', lastConnectedTime.current);
     }
   }, [isConnected]);
 

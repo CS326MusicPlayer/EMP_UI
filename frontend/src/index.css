@@ -19,7 +19,6 @@
 }
 
 
-
 /* For the default cursor */
 /* Cursor from: https://custom-cursor.com/en/collection/cute-cursors/cute-frog-mushroom */
 body {
@@ -28,6 +27,16 @@ body {
   min-width: 320px;
   min-height: 100vh;
   display: flex;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  background-color: var(--emerald0);
+}
+
+::selection {
+  background: var(--emerald);
+  color: var(--white);
 }
 
 /* For pointer cursor (when hovering all hoverable elements) */

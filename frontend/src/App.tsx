@@ -6,7 +6,16 @@ import MusicPlayer from './components/MusicPlayer';
 import mqttClient from './services/mqttService';
 import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
 import { getTimeUsingTimezone } from './utilities/utils';
+
+import sunIcon from './assets/icons/sun.png';
+import moonIcon from './assets/icons/moon.png';
+import sunnyIcon from './assets/icons/brightness.png';
+import rainyIcon from './assets/icons/storm.png';
+import snowyIcon from './assets/icons/snowflakes.png';
+import unknownIcon from './assets/icons/unknown.png';
+
 import './App.css';
+import mqtt from 'mqtt';
 
 
 function App(): React.ReactElement {
@@ -75,7 +84,22 @@ function App(): React.ReactElement {
     // TODO: change the message to be more user-friendly
     if (mqttData.hasUpdated && isAuto) {
       messageApi.info({
-        content: `Weather: ${mqttData.weather}, Time: ${mqttData.time}, Temperature: ${mqttData.temperature}, Light Level: ${mqttData.light_level}`,
+        content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {
+            mqttData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            mqttData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            mqttData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+          },
+          {
+            mqttData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+          },
+          {mqttData.timezone},
+          {mqttData.temperature}°C,
+          Light Level: {mqttData.light_level}/{1.2}
+        </div>,
         duration: 5,
       });
     }
@@ -83,7 +107,20 @@ function App(): React.ReactElement {
     // Show notification only when manual values change (not on initial render)
     if (!isAuto && (prevManualWeatherRef.current !== manualWeather || prevManualTimeRef.current !== manualTime)) {
       messageApi.info({
-        content: `Weather: ${manualWeather}, Time: ${manualTime}`,
+        // content: `Weather: ${manualWeather}, Time: ${manualTime}`,
+        content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          Weather: {
+            manualWeather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            manualWeather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            manualWeather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+          },
+          Time: {
+            manualTime === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            manualTime === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+          }
+        </div>,
         duration: 5,
       });
     }

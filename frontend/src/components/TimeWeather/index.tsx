@@ -85,10 +85,9 @@ export default function TimeWeather({
   const currentTime = time;
   const seconds = currentTime.getSeconds();
   const minutes = currentTime.getMinutes() + seconds / 60;
-  const hours = (currentTime.getHours() % 12) + minutes / 60;
 
   // Format the time for 12-hour display
-  const hoursDisplay = Math.floor(hours).toString().padStart(2, '0');
+  const hoursDisplay = currentTime.getHours().toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
   const secondRotation = seconds * 6 + rotationCount.seconds * 360;
 
@@ -187,7 +186,7 @@ export default function TimeWeather({
         {/* Toggle Chip */}
         {isAuto ?
           <Popover
-            content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p><p>Click to use {!useWeather ? '"precipitation"' : '"temperature"'}</p></>}
+            content={<><p>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p><p style={{ 'color': 'var(--black)' }}>Click to use {!useWeather ? '"precipitation"' : '"temperature"'}</p></>}
             trigger="hover"
             placement="left"
             mouseEnterDelay={0.2}
@@ -218,27 +217,40 @@ export default function TimeWeather({
 
         {/* Weather Data */}
         <div className={classes.forecast}>
-          <div className={classes.forecastData}>
-            <p className={classes.temperature} onClick={toggleTempUnit}>{convertTemp(piTemperature)}°{tempUnit}</p>
-            <hr />
-            <span
-              className={classes.condition}
-              onClick={toggleWeather}
-              onMouseEnter={() => setIsHoveringWeather(true)}
-              onMouseLeave={() => setIsHoveringWeather(false)}
-              style={{
-                opacity: !isAuto && isHoveringWeather ? 0.5 : 1,
-                transition: 'opacity 0.2s ease-in-out'
-              }}
-            >
-              {
-                getMusicWeather(piWeather, piTemperature, useWeather) === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
+          <Popover
+            title={
+              <span style={{ display: 'inline-flex' }}>
+                <h3 style={{ opacity: useWeather ? 1 : 0.5 }}>{piWeather==='none' ? 'Sunny or Overcast' : piWeather==='rain' ? 'Rainy' : piWeather==='snow' ? 'Snowy' : 'Unknown'}</h3>
+                <h3 style={{ padding: '0 0.2rem' }}>/</h3>
+                <h3 style={{ opacity: !useWeather ? 1 : 0.5 }}>{convertTemp(piTemperature)}°{tempUnit}</h3>
+              </span>
+            }
+            content={<p style={{ 'color': 'var(--black)' }}>You are using {useWeather ? 'weather' : 'temperature'} for playing music</p>}
+            trigger="hover"
+            placement="left"
+          >
+            <div className={classes.forecastData}>
+              <p className={classes.temperature} style={{ opacity: useWeather ? 0.3 : 1 }} onClick={toggleTempUnit}>{convertTemp(piTemperature)}°{tempUnit}</p>
+              <hr />
+              <span
+                className={classes.condition}
+                onClick={toggleWeather}
+                onMouseEnter={() => setIsHoveringWeather(true)}
+                onMouseLeave={() => setIsHoveringWeather(false)}
+                style={{
+                  opacity: !isAuto && isHoveringWeather ? 0.5 : 1,
+                  transition: 'opacity 0.2s ease-in-out'
+                }}
+              >
+                {
+                  getMusicWeather(piWeather, piTemperature, useWeather) === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
                   getMusicWeather(piWeather, piTemperature, useWeather) === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
-                    getMusicWeather(piWeather, piTemperature, useWeather) === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
-                      <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
-              }
-            </span>
-          </div>
+                  getMusicWeather(piWeather, piTemperature, useWeather) === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
+                  <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
+                }
+              </span>
+            </div>
+          </Popover>
         </div>
       </div>
 
@@ -260,7 +272,7 @@ export default function TimeWeather({
         {/* Toggle Chip */}
         {isAuto ?
           <Popover
-            content={<><p style={{ 'color': 'var(--black)' }}>Music played based on {useTime ? '"time"' : '"light level"'}</p><p>Click to use {!useTime ? '"time"' : '"light level"'}</p></>}
+            content={<><p>Music played based on {useTime ? '"time"' : '"light level"'}</p><p style={{ 'color': 'var(--black)' }}>Click to use {!useTime ? '"time"' : '"light level"'}</p></>}
             trigger="hover"
             placement="right"
             mouseEnterDelay={0.2}
@@ -292,28 +304,41 @@ export default function TimeWeather({
         <div className={classes.clock}>
           <div className={classes.secondRing} style={{ transform: `rotate(${secondRotation}deg)` }}></div>
         </div>
-        <div className={classes.digitalTime}>
-          <p className={classes.digitalTimeText}>
-            {hoursDisplay}<span className={classes.blinkingColon}>:</span>{minutesDisplay}
-          </p>
-          <hr />
-          <span
-            className={classes.dayOrNight}
-            onClick={toggleDayNight}
-            onMouseEnter={() => setIsHoveringTime(true)}
-            onMouseLeave={() => setIsHoveringTime(false)}
-            style={{
-              opacity: !isAuto && isHoveringTime ? 0.5 : 1,
-              transition: 'opacity 0.2s ease-in-out'
-            }}
-          >
-            {
-              getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
+        <Popover
+          title={
+            <span style={{ display: 'inline-flex' }}>
+              <h3 style={{ opacity: useTime ? 1 : 0.5 }}>{piTime==='day' ? 'Day' : piTime==='night' ? 'Night' : 'Unknown'}</h3>
+              <h3 style={{ padding: '0 0.2rem' }}>/</h3>
+              <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>{(Number(piLightLevel)/1.2).toFixed(2)}%</h3>
+            </span>
+          }
+          content={<p style={{ 'color': 'var(--black)' }}>You are using {useTime ? 'time' : 'light level'} for playing music</p>}
+          trigger="hover"
+          placement="right"
+        >
+          <div className={classes.digitalTime}>
+            <p className={classes.digitalTimeText} style={{ opacity: !useTime ? 0.3 : 1 }}>
+              {hoursDisplay}<span className={classes.blinkingColon}>:</span>{minutesDisplay}
+            </p>
+            <hr />
+            <span
+              className={classes.dayOrNight}
+              onClick={toggleDayNight}
+              onMouseEnter={() => setIsHoveringTime(true)}
+              onMouseLeave={() => setIsHoveringTime(false)}
+              style={{
+                opacity: !isAuto && isHoveringTime ? 0.5 : 1,
+                transition: 'opacity 0.2s ease-in-out'
+              }}
+            >
+              {
+                getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
                 getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
-                  <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
-            }
-          </span>
-        </div>
+                <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
+              }
+            </span>
+          </div>
+        </Popover>
       </div>
 
     </div>

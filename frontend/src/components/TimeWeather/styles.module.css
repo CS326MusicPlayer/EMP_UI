@@ -109,6 +109,8 @@
   font-size: 2rem;
   color: var(--black);
   padding: 0.5rem;
+  transition: all 0.3s;
+  user-select: none;
 }
 
 .control {
@@ -150,6 +152,7 @@
   font-size: 2rem;
   color: var(--black);
   padding: 0.5rem;
+  user-select: none;
 }
 
 hr {
@@ -163,6 +166,7 @@ hr {
 .condition,
 .dayOrNight {
   font-size: 2rem;
+  transition: all 0.3s;
 }
 
 .sunIcon {

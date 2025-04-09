@@ -101,20 +101,19 @@ function AppContent(): React.ReactElement {
     if (mqttData.hasUpdated && isAuto) {
       messageApi.info({
         content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{mqttData.temperature}°C</p>
           {
             mqttData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             mqttData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             mqttData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          },
+          }
           {
             mqttData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          },
-          {mqttData.timezone},
-          {mqttData.temperature}°C,
-          Light Level: {mqttData.light_level}/{1.2}
+          }
+          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>Light: {(Number(mqttData.light_level)/1.2).toFixed(2)}%</p>
         </div>,
         duration: 5,
       });
@@ -129,7 +128,7 @@ function AppContent(): React.ReactElement {
             manualWeather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             manualWeather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          },
+          }
           Time: {
             manualTime === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             manualTime === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :

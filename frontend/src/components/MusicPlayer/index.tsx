@@ -201,7 +201,7 @@ export default function MusicPlayer({
     // If auto mode is enabled, set loop mode to 'one'
     if (isAuto && loopMode !== 'one') {
       setLoopMode('one');
-      console.log('Auto mode enabled, setting loop mode to: one');
+      // console.log('Auto mode enabled, setting loop mode to: one');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuto]);
@@ -226,8 +226,8 @@ export default function MusicPlayer({
 
       const musicWeatherToUse = getMusicWeather(piWeather, piTemperature, useWeather);
       const musicTimeToUse = getMusicTime(piTime, piLightLevel, useTime);
-      console.log(`Music weather: ${musicWeatherToUse}, Music time: ${musicTimeToUse}`);
-      console.log(`Currently using ${useWeather ? 'weather' : 'temperature'} and ${useTime ? 'time' : 'light level'}`);
+      // console.log(`Music weather: ${musicWeatherToUse}, Music time: ${musicTimeToUse}`);
+      // console.log(`Currently using ${useWeather ? 'weather' : 'temperature'} and ${useTime ? 'time' : 'light level'}`);
 
       // Find the index of the song that matches the current weather/time, depending on the mode
       const matchingSongIndex = musicList.findIndex(
@@ -235,7 +235,7 @@ export default function MusicPlayer({
       );
 
       if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex && audioRef.current) {
-        console.log(`Changing song to match weather: ${piWeather}, time: ${piTime}`);
+        // console.log(`Changing song to match weather: ${piWeather}, time: ${piTime}`);
 
         // Only fade if currently playing
         if (isPlaying && !audioRef.current.paused) {

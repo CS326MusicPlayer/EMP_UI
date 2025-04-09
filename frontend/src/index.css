@@ -20,9 +20,8 @@
 
 
 /* For the default cursor */
-/* Cursor from: https://custom-cursor.com/en/collection/cute-cursors/cute-frog-mushroom */
 body {
-  cursor: url(https://cdn.custom-cursor.com/db/12618/32/cute-frog-and-mushroom-cursor.png), default !important;
+  cursor: url(./assets/cursors/cursor.png), default !important;
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
@@ -41,5 +40,5 @@ body::-webkit-scrollbar {
 
 /* For pointer cursor (when hovering all hoverable elements) */
 button, a, [role="button"], .clickable, slider, input[type="range"] {
-  cursor: url(https://cdn.custom-cursor.com/db/12617/32/cute-frog-and-mushroom-pointer.png), pointer !important
+  cursor: url(./assets/cursors/pointer.png), pointer !important;
 }

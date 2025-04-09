@@ -9,6 +9,7 @@
 ---
 ## Running Locally
 - `git clone` this repository
+  - You will need `.env` file in `frontend` directory
 - `cd frontend`
 - `npm install`
 - `npm run dev`
@@ -16,4 +17,3 @@
 ---
 ## Credit
 - Icons: created by [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
-- Cursor: [custom-cursor](https://custom-cursor.com/en/collection/cute-cursors/cute-frog-mushroom)

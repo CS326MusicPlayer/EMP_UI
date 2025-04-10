@@ -186,7 +186,12 @@ export default function TimeWeather({
         {/* Toggle Chip */}
         {isAuto ?
           <Popover
-            content={<><p>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p><p style={{ 'color': 'var(--black)' }}>Click to use {!useWeather ? '"precipitation"' : '"temperature"'}</p></>}
+            content={
+              <>
+                <p>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p>
+                <p style={{ 'color': 'var(--black)' }}>Click to switch to {!useWeather ? '"precipitation"' : '"temperature"'}</p>
+              </>
+            }
             trigger="hover"
             placement="left"
             mouseEnterDelay={0.2}
@@ -220,12 +225,22 @@ export default function TimeWeather({
           <Popover
             title={
               <span style={{ display: 'inline-flex' }}>
-                <h3 style={{ opacity: useWeather ? 1 : 0.5 }}>{piWeather==='none' ? 'Sunny or Overcast' : piWeather==='rain' ? 'Rainy' : piWeather==='snow' ? 'Snowy' : 'Unknown'}</h3>
-                <h3 style={{ padding: '0 0.2rem' }}>/</h3>
-                <h3 style={{ opacity: !useWeather ? 1 : 0.5 }}>{convertTemp(piTemperature)}°{tempUnit}</h3>
+                {isAuto ? 
+                  <>
+                    <h3 style={{ opacity: useWeather ? 1 : 0.5 }}>{piWeather==='none' ? 'Sunny or Overcast' : piWeather==='rain' ? 'Rainy' : piWeather==='snow' ? 'Snowy' : 'Unknown'}</h3>
+                    <h3 style={{ padding: '0 0.2rem' }}>/</h3>
+                    <h3 style={{ opacity: !useWeather ? 1 : 0.5 }}>{convertTemp(piTemperature)}°{tempUnit}</h3>
+                  </>
+                  :
+                  <h3>Manual Mode</h3>
+                }
               </span>
             }
-            content={<p style={{ 'color': 'var(--black)' }}>You are using {useWeather ? 'weather' : 'temperature'} for playing music</p>}
+            content={isAuto ?
+              <p style={{ 'color': 'var(--black)' }}>You are using {useWeather ? 'weather' : 'temperature'} for playing music</p>
+              :
+              <p style={{ 'color': 'var(--black)' }}>Click to toggle sunny/rainy/snowy</p>
+            }
             trigger="hover"
             placement="left"
           >
@@ -272,7 +287,12 @@ export default function TimeWeather({
         {/* Toggle Chip */}
         {isAuto ?
           <Popover
-            content={<><p>Music played based on {useTime ? '"time"' : '"light level"'}</p><p style={{ 'color': 'var(--black)' }}>Click to use {!useTime ? '"time"' : '"light level"'}</p></>}
+            content={
+              <>
+                <p>Music played based on {useTime ? '"time"' : '"light level"'}</p>
+                <p style={{ 'color': 'var(--black)' }}>Click to switch to {!useTime ? '"time"' : '"light level"'}</p>
+              </>
+            }
             trigger="hover"
             placement="right"
             mouseEnterDelay={0.2}
@@ -307,12 +327,22 @@ export default function TimeWeather({
         <Popover
           title={
             <span style={{ display: 'inline-flex' }}>
-              <h3 style={{ opacity: useTime ? 1 : 0.5 }}>{piTime==='day' ? 'Day' : piTime==='night' ? 'Night' : 'Unknown'}</h3>
-              <h3 style={{ padding: '0 0.2rem' }}>/</h3>
-              <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>{(Number(piLightLevel)/1.2).toFixed(2)}%</h3>
+              {isAuto ?
+                <>
+                  <h3 style={{ opacity: useTime ? 1 : 0.5 }}>{piTime==='day' ? 'Day' : piTime==='night' ? 'Night' : 'Unknown'}</h3>
+                  <h3 style={{ padding: '0 0.2rem' }}>/</h3>
+                  <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>{piLightLevel ? (Number(piLightLevel)/1.2).toFixed(2) : '--'}%</h3>
+                </>
+                :
+                <h3>Manual Mode</h3>
+              }
             </span>
           }
-          content={<p style={{ 'color': 'var(--black)' }}>You are using {useTime ? 'time' : 'light level'} for playing music</p>}
+          content={isAuto ?
+            <p style={{ 'color': 'var(--black)' }}>You are using {useTime ? 'time' : 'light level'} for playing music</p>
+            :
+            <p style={{ 'color': 'var(--black)' }}>Click to toggle day/night</p>
+          }
           trigger="hover"
           placement="right"
         >

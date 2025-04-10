@@ -113,7 +113,14 @@ function AppContent(): React.ReactElement {
             mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
           }
-          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>Light: {(Number(mqttData.light_level)/1.2).toFixed(2)}%</p>
+          {/* <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>Light: {(Number(mqttData.light_level)/1.2).toFixed(2)}%</p> */}
+          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
+            {
+              getMusicTime(mqttData.time, mqttData.light_level, false) === 'day' ? 'Bright' :
+              getMusicTime(mqttData.time, mqttData.light_level, false) === 'night' ? 'Dark' :
+              'Unknown'
+            }
+            </p>
         </div>,
         duration: 5,
       });

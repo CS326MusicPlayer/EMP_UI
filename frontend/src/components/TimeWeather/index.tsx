@@ -237,7 +237,7 @@ export default function TimeWeather({
               </span>
             }
             content={isAuto ?
-              <p style={{ 'color': 'var(--black)' }}>You are using {useWeather ? 'weather' : 'temperature'} for playing music</p>
+              <p style={{ 'color': 'var(--black)' }}>You are using "{useWeather ? 'weather' : 'temperature'}" for playing music</p>
               :
               <p style={{ 'color': 'var(--black)' }}>Click to toggle sunny/rainy/snowy</p>
             }
@@ -339,7 +339,7 @@ export default function TimeWeather({
             </span>
           }
           content={isAuto ?
-            <p style={{ 'color': 'var(--black)' }}>You are using {useTime ? 'time' : 'light level'} for playing music</p>
+            <p style={{ 'color': 'var(--black)' }}>You are using "{useTime ? 'time' : 'light level'}" for playing music</p>
             :
             <p style={{ 'color': 'var(--black)' }}>Click to toggle day/night</p>
           }

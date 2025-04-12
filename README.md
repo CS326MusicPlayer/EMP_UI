@@ -9,7 +9,7 @@
 ---
 ## Running Locally
 - `git clone` this repository
-  - You will need `.env` file in `frontend` directory
+  - You will need `.env` file under `frontend` directory
 - `cd frontend`
 - `npm install`
 - `npm run dev`

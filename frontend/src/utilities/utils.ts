@@ -29,6 +29,7 @@ export const getMusicWeather = (piWeather: string, piTemperature: string, useWea
   }
 }
 
+
 /**
  * Determines the music time condition based on light level and time preference.
  *
@@ -53,6 +54,19 @@ export const getMusicTime = (piTime: string, piLightLevel: string, useTime: bool
 }
 
 /**
+ * Determines if it's day or night based on sunrise and sunset times.
+ *
+ * @param sunrise - The sunrise time as a string in "HH:MM" format
+ * @param sunset - The sunset time as a string in "HH:MM" format
+ * @returns 'day' if current time is between sunrise and sunset, otherwise 'night'
+ */
+export const getDayOrNight = (currentTime: Date, sunrise: string, sunset: string) => {
+  const sunriseTime = new Date(currentTime.toDateString() + ' ' + sunrise);
+  const sunsetTime = new Date(currentTime.toDateString() + ' ' + sunset);
+  return currentTime.getHours() >= sunriseTime.getHours() && currentTime.getHours() < sunsetTime.getHours() ? 'day' : 'night';
+}
+
+/**
  * Converts a timestamp to a human-readable format.
  *
  * @param timezone - The timezone to use to get the time
@@ -61,6 +75,7 @@ export const getMusicTime = (piTime: string, piLightLevel: string, useTime: bool
 export const getTimeUsingTimezone = (timezone: string) => {
   return new Date(new Date().toLocaleString('en-US', { timeZone: timezone }))
 }
+
 
 /**
  * Formats a timestamp to a human-readable "time ago" format.
@@ -104,4 +119,74 @@ export const formatTimeAgo = (timestamp: string | null): string => {
     console.error('Error formatting timestamp:', error);
     return 'Error';
   }
+};
+
+/**
+ * Calculates the sun position in a circular display based on the current time, sunrise, and sunset times.
+ * Written with the help of Copilot
+ *
+ * @param timezone - The current time as a Date object or string
+ * @param sunriseTime - The sunrise time as a string in "HH:MM" format
+ * @param sunsetTime - The sunset time as a string in "HH:MM" format
+ * @returns The sun position in degrees
+ */
+export const calculateSunPosition = (timezone: string, sunriseTime: string, sunsetTime: string) => {
+  // Get the current time in the specified timezone
+  const currentDate = getTimeUsingTimezone(timezone.toString());
+  const sunriseDate = new Date(currentDate.toDateString() + ' ' + sunriseTime);
+  const sunsetDate = new Date(currentDate.toDateString() + ' ' + sunsetTime);
+  
+  // Create noon date
+  const noonDate = new Date(currentDate.toDateString() + ' 12:00');
+  
+  // Get the current hour as a decimal (e.g., 6.5 for 6:30)
+  const currentHour = currentDate.getHours() + currentDate.getMinutes() / 60;
+  
+  // Determine if it's day or night
+  const isDaytime = currentDate >= sunriseDate && currentDate <= sunsetDate;
+  
+  let sunPosition;
+  
+  if (isDaytime) {
+    // During daylight: position from -90° (sunrise) through 0° (noon) to 90° (sunset)
+    // Calculate where we are in the day cycle
+    if (currentDate < noonDate) {
+      // Morning: Map from sunrise (-90°) to noon (0°)
+      const morningProgress = (currentDate.getTime() - sunriseDate.getTime()) / (noonDate.getTime() - sunriseDate.getTime());
+      sunPosition = -90 + (morningProgress * 90);
+    } else {
+      // Afternoon: Map from noon (0°) to sunset (90°)
+      const afternoonProgress = (currentDate.getTime() - noonDate.getTime()) / (sunsetDate.getTime() - noonDate.getTime());
+      sunPosition = 0 + (afternoonProgress * 90);
+    }
+  } else {
+    // Night time
+    if (currentDate < sunriseDate) {
+      // Before sunrise
+      // Calculate position from midnight (-180°) to sunrise (-90°)
+      const midnightDate = new Date(currentDate.toDateString() + ' 00:00');
+      
+      // If we're closer to midnight
+      if (currentHour < 6) {
+        const nightProgress = currentHour / 6; // 0 at midnight, 1 at 6am
+        sunPosition = -180 + (nightProgress * 90); // -180° at midnight to -90° approaching sunrise
+      } else {
+        // Approaching sunrise
+        const dawnProgress = (currentDate.getTime() - midnightDate.getTime()) / 
+                           (sunriseDate.getTime() - midnightDate.getTime());
+        sunPosition = -180 + (dawnProgress * 90);
+      }
+    } else {
+      // After sunset
+      // Calculate position from sunset (90°) to midnight (180°)
+      const midnightDate = new Date(currentDate.toDateString());
+      midnightDate.setDate(midnightDate.getDate() + 1); // Next day midnight
+      midnightDate.setHours(0, 0, 0, 0);
+      
+      const nightProgress = (currentDate.getTime() - sunsetDate.getTime()) / (midnightDate.getTime() - sunsetDate.getTime());
+      sunPosition = 90 + (nightProgress * 90); // 90° at sunset to 180° at midnight
+    }
+  }
+  
+  return sunPosition;
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Popover } from 'antd';
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
-import { getMusicWeather, getMusicTime, getTimeUsingTimezone } from '../../utilities/utils';
+import { getMusicWeather, getMusicTime, getTimeUsingTimezone, calculateSunPosition, getDayOrNight } from '../../utilities/utils';
 
 import sunIcon from '../../assets/icons/sun.png';
 import moonIcon from '../../assets/icons/moon.png';
@@ -21,7 +21,9 @@ export default function TimeWeather({
   piTime,
   piTemperature,
   piLightLevel,
-  timezone,
+  piTimezone,
+  piSunrise,
+  piSunset,
   isAuto,
   setIsAuto,
   setManualWeather,
@@ -31,7 +33,9 @@ export default function TimeWeather({
   piTime: string;
   piTemperature: string;
   piLightLevel: string;
-  timezone: string;
+  piTimezone: string;
+  piSunrise: string;
+  piSunset: string;
   isAuto: boolean;
   setIsAuto: (isAuto: boolean) => void;
   setManualWeather: (weather: string) => void;
@@ -43,14 +47,8 @@ export default function TimeWeather({
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [isHoveringWeather, setIsHoveringWeather] = useState(false);
   const [isHoveringTime, setIsHoveringTime] = useState(false);
-
+  const [sunAngle, setSunAngle] = useState(-90); // Default to sunrise position
   const [time, setTime] = useState(new Date());
-  const [prevSeconds, setPrevSeconds] = useState(0);
-  const [rotationCount, setRotationCount] = useState({
-    seconds: 0,
-    minutes: 0,
-    hours: 0
-  });
 
 
 
@@ -58,38 +56,36 @@ export default function TimeWeather({
     /**
      * Sets up an interval that updates the time every second.
      *
-     * @param {string | undefined} timezone - Optional timezone to use for time calculation
+     * @param {string | undefined} piTimezone - Optional timezone to use for time calculation
      * @returns {NodeJS.Timeout} Interval ID that can be used with clearInterval
      */
     const interval = setInterval(() => {
-      const newTime = timezone ? getTimeUsingTimezone(timezone) : new Date();
-      const newSeconds = newTime.getSeconds();
-
-      // Check if we've completed a full rotation
-      if (prevSeconds > 50 && newSeconds < 10) {
-        setRotationCount(prev => ({
-          ...prev,
-          seconds: prev.seconds + 1
-        }));
-      }
-
-      setPrevSeconds(newSeconds);
+      const newTime = piTimezone ? getTimeUsingTimezone(piTimezone) : new Date();
       setTime(newTime);
     }, 1000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [prevSeconds]);
+  }, [piTimezone]);
+
+
+  // Update the sun angle based on the current time and sunrise/sunset times
+  useEffect(() => {
+    // Update the sun position every time the current time changes
+    if (piSunrise && piSunset) {
+      const angle = calculateSunPosition(piTimezone, piSunrise, piSunset);
+      setSunAngle(angle);
+    }
+  }, [piTimezone, piSunrise, piSunset]);
 
   // Calculate hand positions with more precision
   const currentTime = time;
   const seconds = currentTime.getSeconds();
   const minutes = currentTime.getMinutes() + seconds / 60;
 
-  // Format the time for 12-hour display
+  // Format the time for 24-hour display
   const hoursDisplay = currentTime.getHours().toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
-  const secondRotation = seconds * 6 + rotationCount.seconds * 360;
+  // const secondRotation = seconds * 6 + rotationCount.seconds * 360;
 
 
   /**
@@ -283,20 +279,50 @@ export default function TimeWeather({
       </div>
 
       {/* Time */}
-      <div className={classes.time}>
-        {/* Toggle Chip */}
-        {isAuto ?
-          <Popover
-            content={
-              <>
-                <p>Music played based on {useTime ? '"time"' : '"light level"'}</p>
-                <p style={{ 'color': 'var(--black)' }}>Click to switch to {!useTime ? '"time"' : '"light level"'}</p>
-              </>
-            }
-            trigger="hover"
-            placement="right"
-            mouseEnterDelay={0.2}
-          >
+      <Popover
+        content={
+          <>
+            <h3 style={{ 'color': 'black' }}>
+            Sunrise: {piSunrise} / Sunset: {piSunset} 
+            </h3>
+            <p style={{ 'color': 'var(--black)' }}>
+              Currently the sun is {getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'above' : 'below'} the horizon
+            </p>
+          </>
+        }
+        trigger="hover"
+        placement="bottom"
+        mouseEnterDelay={0.4}
+      >
+        <div
+          className={classes.time}
+          style={{ backgroundColor: getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'var(--day1)' : 'var(--night1)' }}
+        >
+          {/* Toggle Chip */}
+          {isAuto ?
+            <Popover
+              content={
+                <>
+                  <p>Music played based on {useTime ? '"time"' : '"light level"'}</p>
+                  <p style={{ 'color': 'var(--black)' }}>Click to switch to {!useTime ? '"time"' : '"light level"'}</p>
+                </>
+              }
+              trigger="hover"
+              placement="right"
+              mouseEnterDelay={0.2}
+            >
+              <div
+                className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
+                onClick={() => {
+                  // Toggle whether to use time or lightsensor
+                  if (!isAuto) return;
+                  setUseTime(!useTime);
+                }}
+              >
+                <img src={useTime ? clocktime : lightsensor} alt="Time" className={classes.toggleChipIcon} />
+              </div>
+            </Popover>
+            :
             <div
               className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
               onClick={() => {
@@ -307,69 +333,64 @@ export default function TimeWeather({
             >
               <img src={useTime ? clocktime : lightsensor} alt="Time" className={classes.toggleChipIcon} />
             </div>
-          </Popover>
-          :
-          <div
-            className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
-            onClick={() => {
-              // Toggle whether to use time or lightsensor
-              if (!isAuto) return;
-              setUseTime(!useTime);
-            }}
-          >
-            <img src={useTime ? clocktime : lightsensor} alt="Time" className={classes.toggleChipIcon} />
-          </div>
-        }
+          }
 
-        <div className={classes.clock}>
-          <div className={classes.secondRing} style={{ transform: `rotate(${secondRotation}deg)` }}></div>
-        </div>
-        <Popover
-          title={
-            <span style={{ display: 'inline-flex' }}>
-              {isAuto ?
-                <>
-                  <h3 style={{ opacity: useTime ? 1 : 0.5 }}>{piTime==='day' ? 'Day' : piTime==='night' ? 'Night' : 'Unknown'}</h3>
-                  <h3 style={{ padding: '0 0.2rem' }}>/</h3>
-                  <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>{piLightLevel ? (Number(piLightLevel)/1.2).toFixed(2) : '--'}%</h3>
-                </>
-                :
-                <h3>Manual Mode</h3>
-              }
-            </span>
-          }
-          content={isAuto ?
-            <p style={{ 'color': 'var(--black)' }}>You are using "{useTime ? 'time' : 'light level'}" for playing music</p>
-            :
-            <p style={{ 'color': 'var(--black)' }}>Click to toggle day/night</p>
-          }
-          trigger="hover"
-          placement="right"
-        >
-          <div className={classes.digitalTime}>
-            <p className={classes.digitalTimeText} style={{ opacity: !useTime ? 0.3 : 1 }}>
-              {hoursDisplay}<span className={classes.blinkingColon}>:</span>{minutesDisplay}
-            </p>
-            <hr />
-            <span
-              className={classes.dayOrNight}
-              onClick={toggleDayNight}
-              onMouseEnter={() => setIsHoveringTime(true)}
-              onMouseLeave={() => setIsHoveringTime(false)}
+          <div className={classes.clock}>
+            <div
+              className={classes.secondRing}
               style={{
-                opacity: !isAuto && isHoveringTime ? 0.5 : 1,
-                transition: 'opacity 0.2s ease-in-out'
-              }}
-            >
-              {
-                getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
-                getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
-                <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
-              }
-            </span>
+                transform: `rotate(${sunAngle}deg)`,
+                borderColor: getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'var(--yellow)' : 'var(--lightblue)',
+              }}>
+            </div>
           </div>
-        </Popover>
-      </div>
+          <Popover
+            title={
+              <span style={{ display: 'inline-flex' }}>
+                {isAuto ?
+                  <>
+                    <h3 style={{ opacity: useTime ? 1 : 0.5 }}>{piTime==='day' ? 'Day' : piTime==='night' ? 'Night' : 'Unknown'}</h3>
+                    <h3 style={{ padding: '0 0.2rem' }}>/</h3>
+                    <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>{piLightLevel ? (Number(piLightLevel)/1.2).toFixed(2) : '--'}%</h3>
+                  </>
+                  :
+                  <h3>Manual Mode</h3>
+                }
+              </span>
+            }
+            content={isAuto ?
+              <p style={{ 'color': 'var(--black)' }}>You are using "{useTime ? 'time' : 'light level'}" for playing music</p>
+              :
+              <p style={{ 'color': 'var(--black)' }}>Click to toggle day/night</p>
+            }
+            trigger="hover"
+            placement="right"
+          >
+            <div className={classes.digitalTime}>
+              <p className={classes.digitalTimeText} style={{ opacity: !useTime ? 0.3 : 1 }}>
+                {hoursDisplay}<span className={classes.blinkingColon}>:</span>{minutesDisplay}
+              </p>
+              <hr />
+              <span
+                className={classes.dayOrNight}
+                onClick={toggleDayNight}
+                onMouseEnter={() => setIsHoveringTime(true)}
+                onMouseLeave={() => setIsHoveringTime(false)}
+                style={{
+                  opacity: !isAuto && isHoveringTime ? 0.5 : 1,
+                  transition: 'opacity 0.2s ease-in-out'
+                }}
+              >
+                {
+                  getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
+                  getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
+                  <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
+                }
+              </span>
+            </div>
+          </Popover>
+        </div>
+      </Popover>
 
     </div>
   )

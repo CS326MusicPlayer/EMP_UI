@@ -1,6 +1,7 @@
 import { ConfigProvider } from 'antd';
 import React from 'react';
 import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
+import { PiSelectionProvider } from './contexts/PiSelectionContext';
 import AppContent from './AppContent';
 import './App.css';
 
@@ -15,7 +16,9 @@ function App(): React.ReactElement {
       }}
     >
       <SensorPreferencesProvider>
-        <AppContent />
+        <PiSelectionProvider>
+          <AppContent />
+        </PiSelectionProvider>
       </SensorPreferencesProvider>
     </ConfigProvider>
   )

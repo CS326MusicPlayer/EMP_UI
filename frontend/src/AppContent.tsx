@@ -5,6 +5,7 @@ import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
 import mqttClient from './services/mqttService';
 import { useSensorPreferences } from './contexts/SensorPreferencesContext';
+import { usePiSelection } from './contexts/PiSelectionContext';
 import { getTimeUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
 
 import sunIcon from './assets/icons/sun.png';
@@ -18,6 +19,8 @@ import unknownIcon from './assets/icons/unknown.png';
 const DAY_COLOR = '#b3e6ff';
 const NIGHT_COLOR = '#3a3a5c';
 
+
+
 function AppContent(): React.ReactElement {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [mqttData, setMqttData] = useState<Record<string, any>>({});
@@ -27,14 +30,16 @@ function AppContent(): React.ReactElement {
   const [manualWeather, setManualWeather] = useState('none');
   const [manualTime, setManualTime] = useState('day');
 
+  const { useTime } = useSensorPreferences();
+  const { selectedPiId, setSelectedPiId, piList, setPiList } = usePiSelection();
+  const currentHour = new Date().getHours();  // just for setting initial background color
+
   const prevManualWeatherRef = useRef(manualWeather);
   const prevManualTimeRef = useRef(manualTime);
   const [messageApi, contextHolder] = message.useMessage();
   const hasConnected = useRef(false);    // To track if the initial connection has been made
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
-
-  const { useTime } = useSensorPreferences();
-  const currentHour = new Date().getHours();  // just for setting initial background color
+  const selectedPiIdRef = useRef(selectedPiId);
 
   // Update the last connected time of the MQTT client and save it to local storage
   const lastConnectedTime = useRef<string | null>(
@@ -49,6 +54,12 @@ function AppContent(): React.ReactElement {
   };
 
 
+  // Update the selected Pi ID when it changes
+  useEffect(() => {
+    selectedPiIdRef.current = selectedPiId;
+  }, [selectedPiId]);
+
+
   // Update the last connected time when the connection status changes
   useEffect(() => {
     if (isConnected) {
@@ -61,6 +72,35 @@ function AppContent(): React.ReactElement {
       console.log('Not connected to mqtt server. Last seen: ', lastConnectedTime.current);
     }
   }, [isConnected]);
+
+
+  // Update the list of available Pis
+  useEffect(() => {
+    if (mqttClient && mqttData.pid) {
+      // Use the functional update pattern to safely update without dependencies
+      setPiList(prevList => {
+        if (!prevList.includes(mqttData.pid)) {
+          console.log(`Added new Pi ID ${mqttData.pid} to the list`);
+          return [...prevList, mqttData.pid];
+        }
+        return prevList;
+      });
+    }
+  }, [mqttData.pid]);
+
+
+  // If the selected Pi changes, show a toast message
+  useEffect(() => {
+    // Return if the piList is empty
+    if (piList.length === 0) return;
+
+    if (selectedPiId) {
+      messageApi.info({
+        content: `Selected Pi ID: ${selectedPiId}`,
+        duration: 3,
+      });
+    }
+  }, [selectedPiId, messageApi]);
 
 
   // Toast message according to the connection status
@@ -151,17 +191,14 @@ function AppContent(): React.ReactElement {
 
     // Make sure the client exists before setting up handlers
     if (mqttClient) {
-      // Set up MQTT event handlers
       mqttClient.on('connect', function () {
         setIsConnected(true);
         hasConnected.current = true;
         console.log('Connected to MQTT broker');
-
+  
         // Subscribe to the topic
         if (!hasSubscribed.current) {
           hasSubscribed.current = true;
-
-          // Subscribe to topics
           mqttClient.subscribe('emp/environment', (err) => {
             if (!err) {
               console.log('Subscribed to topic: emp/environment');
@@ -198,52 +235,91 @@ function AppContent(): React.ReactElement {
       // Message handler
       const messageHandler = function (topic: string, message: Buffer) {
         console.log('Received message:', topic, message.toString());
-
+      
         if (topic === 'emp/environment') {
           try {
             const data = JSON.parse(message.toString());
-
-            // Set day/night status based on the current time and sunrise/sunset times
-            const currentTime = getTimeUsingTimezone(data.timezone);
-            const dayOrNight = getDayOrNight(currentTime, data.sunrise, data.sunset);
-
-            // Create a data object to store the new values
-            const newData = {
-              weather: data.precipitation_status,
-              time: dayOrNight,
-              timezone: data.timezone,
-              temperature: data.temperature,
-              light_level: data.light_level,
-              sunrise: data.sunrise,
-              sunset: data.sunset,
-              hasUpdated: false // Flag to track if data was updated
-            };
-
-            // Update if the data is not the same as the previous one
-            setMqttData(prevData => {
-              // Only update if there are actual changes
-              if (
-                prevData.weather !== data.precipitation_status ||
-                prevData.time !== dayOrNight ||
-                prevData.temperature !== data.temperature ||
-                prevData.light_level !== data.light_level ||
-                prevData.timezone !== data.timezone ||
-                prevData.sunrise !== data.sunrise ||
-                prevData.sunset !== data.sunset
-              ) {
-                return {
-                  ...newData,
-                  hasUpdated: true
-                };
+      
+            // Add to piList if new
+            if (data.pid) {
+              setPiList(prevList => {
+                if (!prevList.includes(data.pid)) {
+                  console.log(`Added new Pi ID ${data.pid} to the list`);
+                  return [...prevList, data.pid];
+                }
+                return prevList;
+              });
+            }
+      
+            // Auto-select the first Pi if we're still using the placeholder "0"
+            const isFirstMessage = selectedPiIdRef.current === "0";
+            if (isFirstMessage && data.pid) {
+              setSelectedPiId(data.pid);
+              console.log(`Initially selected Pi ID: ${data.pid}`);
+              
+              // Force process this message even though selectedPiId hasn't updated yet
+              // This ensures we process the first message immediately
+              processMessage(data);
+            } else {
+              // For subsequent messages, only process if it's from the selected Pi
+              const currentSelectedPiId = selectedPiIdRef.current;
+              if (data.pid !== currentSelectedPiId) {
+                console.log(`Skipping message from Pi ${data.pid} - selected Pi is ${currentSelectedPiId}`);
+                return;
               }
-              return prevData; // Return unchanged state
-            });
-
+              
+              processMessage(data);
+            }
           } catch (err) {
             console.error('Error parsing message:', err);
           }
         }
       };
+
+
+      function processMessage(data: { timezone: string; sunrise: string; sunset: string; pid: any; precipitation_status: any; temperature: any; light_level: any; }) {
+        // Set day/night status based on the current time and sunrise/sunset times
+        const currentTime = getTimeUsingTimezone(data.timezone);
+        const dayOrNight = getDayOrNight(currentTime, data.sunrise, data.sunset);
+
+        // Create a data object to store the new values
+        const newData = {
+          pid: data.pid,
+          weather: data.precipitation_status,
+          time: dayOrNight,
+          timezone: data.timezone,
+          temperature: data.temperature,
+          light_level: data.light_level,
+          sunrise: data.sunrise,
+          sunset: data.sunset,
+          hasUpdated: false // Flag to track if data was updated
+        };
+
+        // Update if the data is not the same as the previous one
+        setMqttData(prevData => {
+          // Force update on first message
+          const isFirstMessage = Object.keys(prevData).length === 0;
+          
+          // Only update if first message or there are actual changes
+          if (
+            isFirstMessage ||
+            prevData.pid !== data.pid ||
+            prevData.weather !== data.precipitation_status ||
+            prevData.time !== dayOrNight ||
+            prevData.temperature !== data.temperature ||
+            prevData.light_level !== data.light_level ||
+            prevData.timezone !== data.timezone ||
+            prevData.sunrise !== data.sunrise ||
+            prevData.sunset !== data.sunset
+          ) {
+            return {
+              ...newData,
+              hasUpdated: true
+            };
+          }
+          return prevData; // Return unchanged state
+        });
+      }
 
       mqttClient.on('message', messageHandler);
 
@@ -259,7 +335,7 @@ function AppContent(): React.ReactElement {
         setIsConnected(false);
       };
     }
-  }, [currentHour]);
+  }, []);
 
 
   // Change the background color based on the time or light level

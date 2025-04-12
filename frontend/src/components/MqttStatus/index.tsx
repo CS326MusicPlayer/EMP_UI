@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
 import { Popover, Spin } from "antd";
+import { SwapOutlined } from '@ant-design/icons';
+import { usePiSelection } from "../../contexts/PiSelectionContext";
 import { formatTimeAgo } from '../../utilities/utils';
 import classes from './styles.module.css';
 
@@ -19,6 +21,7 @@ export default function MqttStatus({
   onDisconnect: () => void;
 }
 ): React.ReactElement {
+  const { selectedPiId, setSelectedPiId, piList } = usePiSelection();
   const [timeDisplay, setTimeDisplay] = useState<string>('');
 
   // Update the time display initially and when lastConnectedTime changes
@@ -29,6 +32,14 @@ export default function MqttStatus({
   // Handle mouse enter to refresh the time display
   const handleMouseEnter = () => {
     setTimeDisplay(formatTimeAgo(lastConnectedTime));
+  };
+
+
+  // Rotate the pi
+  const getNextPiId = (currentPiId: string, piList: string[]) => {
+    const currentIndex = piList.indexOf(currentPiId);
+    const nextIndex = (currentIndex + 1) % piList.length;
+    return piList[nextIndex];
   };
 
 
@@ -62,6 +73,43 @@ export default function MqttStatus({
           </div>
         </Popover>
         <p className={classes.statusText}>{mqttConnected ? 'Online' : 'Offline'}</p>
+        {/* Pi Swap button */}
+        { mqttConnected &&
+          <>
+            <Popover
+              content={
+                piList.length > 1 ?
+                  <div>
+                    <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
+                    <p style={{ color: 'var(--black)' }}>Click to switch to another Pi</p>
+                    <p style={{ color: 'var(--gray)' }}>Current Pi: {selectedPiId}</p>
+                    <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
+                  </div>
+                  :
+                  <div>
+                    <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
+                    <p style={{ color: 'var(--black)' }}>Only one Pi available</p>
+                  </div>
+              }
+              trigger="hover"
+              placement="top"
+            >
+              <div
+                className={piList.length > 1 && !musicIsFading ? classes.piSwitchButton : classes.piSwitchButtonDisabled}
+                onClick={() => {
+                  // Only rotate if there are multiple Pis
+                  if (piList.length > 1 && !musicIsFading) {
+                    const nextPiId = getNextPiId(selectedPiId, piList);
+                    setSelectedPiId(nextPiId);
+                  }
+                }}
+              >
+                <SwapOutlined style={{ color: 'var(--black)' }} />
+              </div>
+            </Popover>
+            <p className={classes.statusText}>Pi: {selectedPiId}</p>
+          </>
+        }
       </span>
       {musicIsFading && (<Spin className={classes.musicStatusSpinner} />)}
       <span className={classes.connection}>

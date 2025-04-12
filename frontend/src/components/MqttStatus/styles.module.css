@@ -43,6 +43,54 @@
   margin: 0 0.6rem;
 }
 
+.piSwitchButton {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--lightgray1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.2rem solid var(--lightgray0);
+  transition: all 0.2s ease-in-out;
+}
+.piSwitchButton:hover {
+  background-color: var(--emerald);
+  border: 0.2rem solid var(--emerald0);
+  animation: rotate 0.45s ease-in-out;
+}
+.piSwitchButton:not(:hover) {
+  animation: rotateReverse 0.45s ease-in-out;
+}
+
+.piSwitchButtonDisabled {
+  background-color: var(--lightgray1);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.2rem solid var(--lightgray0);
+  color: var(--gray);
+  transition: all 0.2s ease-in-out;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotateZ(-180deg);
+  }
+}
+
+@keyframes rotateReverse {
+  from {
+    transform: rotateZ(-180deg);
+  }
+  to {
+    transform: rotateZ(0deg);
+  }
+}
+
 .musicStatusSpinner {
   display: flex;
   flex-direction: row;
@@ -54,7 +102,6 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
-
 
 .connButton {
   width: 8rem;

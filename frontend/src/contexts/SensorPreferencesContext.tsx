@@ -16,7 +16,6 @@ const defaultContextValue: SensorPreferencesContextType = {
 
 const SensorPreferencesContext = createContext<SensorPreferencesContextType>(defaultContextValue);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useSensorPreferences = () => useContext(SensorPreferencesContext);
 
 

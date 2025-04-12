@@ -1,3 +1,6 @@
+// Music player component
+// Play music based on the provided weather and time condition
+
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
 import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff, LuRotateCcw } from "react-icons/lu";

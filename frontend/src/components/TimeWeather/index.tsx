@@ -1,3 +1,5 @@
+// Display panel of weather and time
+
 import React, { useState, useEffect } from "react";
 import { Popover } from 'antd';
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';

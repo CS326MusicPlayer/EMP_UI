@@ -1,3 +1,5 @@
+// Context for managing sensor preferences in the application
+
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface SensorPreferencesContextType {

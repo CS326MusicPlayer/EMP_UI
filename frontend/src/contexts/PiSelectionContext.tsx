@@ -1,3 +1,5 @@
+// Context for managing the selected Raspberry Pi and the list of available Pis
+
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface PiSelectionContextType {

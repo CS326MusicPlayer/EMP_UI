@@ -1,6 +1,6 @@
 # EMP_UI
-- Daniel Kim, Jason Chew
 > CS326 Final Project
+- Daniel Kim, Jason Chew
 
 ---
 ## Description
@@ -13,6 +13,14 @@
 - `cd frontend`
 - `npm install`
 - `npm run dev`
+
+---
+## Testing
+- install `mosquitto-client`
+- Example message: (replace `<BROKER>`, `<PASSWORD>`, and `<USERNAME>` with your own values)
+```sh
+mosquitto_pub -h <BROKER> -P <PASSWORD> -u <USERNAME> -p 8883 -t "emp/environment" -m '{"pid": "0", "precipitation_status": "snow", "sunrise": "07:23", "sunset": "20:14", "timezone": "America/Detroit", "temperature": "25", "light_level": 0.5}'
+```   
 
 ---
 ## Credit

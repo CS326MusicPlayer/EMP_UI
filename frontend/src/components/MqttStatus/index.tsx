@@ -1,3 +1,6 @@
+// Display and manage the MQTT connection status
+// and the selected Raspberry Pi device.
+
 import React, { useState, useEffect } from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
 import { Popover, Spin } from "antd";

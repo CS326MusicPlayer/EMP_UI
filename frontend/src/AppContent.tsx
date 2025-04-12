@@ -50,7 +50,6 @@ function AppContent(): React.ReactElement {
   // This sets the CSS variable on the :root element (document.documentElement)
   const changeBackgroundColor = (newColor: string) => {
     document.documentElement.style.setProperty('--background-color', newColor);
-    // console.log('Background color changed to:', newColor);
   };
 
 
@@ -72,21 +71,6 @@ function AppContent(): React.ReactElement {
       console.log('Not connected to mqtt server. Last seen: ', lastConnectedTime.current);
     }
   }, [isConnected]);
-
-
-  // Update the list of available Pis
-  useEffect(() => {
-    if (mqttClient && mqttData.pid) {
-      // Use the functional update pattern to safely update without dependencies
-      setPiList(prevList => {
-        if (!prevList.includes(mqttData.pid)) {
-          console.log(`Added new Pi ID ${mqttData.pid} to the list`);
-          return [...prevList, mqttData.pid];
-        }
-        return prevList;
-      });
-    }
-  }, [mqttData.pid]);
 
 
   // If the selected Pi changes, show a toast message
@@ -119,6 +103,21 @@ function AppContent(): React.ReactElement {
       });
     }
   }, [isConnected, messageApi]);
+  
+
+  // Update the list of available Pis
+  useEffect(() => {
+    if (mqttClient && mqttData.pid) {
+      // Use the functional update pattern to safely update without dependencies
+      setPiList(prevList => {
+        if (!prevList.includes(mqttData.pid)) {
+          console.log(`Added new Pi ID ${mqttData.pid} to the list`);
+          return [...prevList, mqttData.pid];
+        }
+        return prevList;
+      });
+    }
+  }, [mqttData.pid]);
 
 
   // Show notification when data is updated
@@ -276,7 +275,7 @@ function AppContent(): React.ReactElement {
         }
       };
 
-
+      // Function to process incoming messages
       function processMessage(data: { timezone: string; sunrise: string; sunset: string; pid: any; precipitation_status: any; temperature: any; light_level: any; }) {
         // Set day/night status based on the current time and sunrise/sunset times
         const currentTime = getTimeUsingTimezone(data.timezone);

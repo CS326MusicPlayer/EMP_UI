@@ -53,6 +53,7 @@ export const getMusicTime = (piTime: string, piLightLevel: string, useTime: bool
   }
 }
 
+
 /**
  * Determines if it's day or night based on sunrise and sunset times.
  *
@@ -65,6 +66,7 @@ export const getDayOrNight = (currentTime: Date, sunrise: string, sunset: string
   const sunsetTime = new Date(currentTime.toDateString() + ' ' + sunset);
   return currentTime.getHours() >= sunriseTime.getHours() && currentTime.getHours() < sunsetTime.getHours() ? 'day' : 'night';
 }
+
 
 /**
  * Converts a timestamp to a human-readable format.
@@ -121,6 +123,7 @@ export const formatTimeAgo = (timestamp: string | null): string => {
   }
 };
 
+
 /**
  * Calculates the sun position in a circular display based on the current time, sunrise, and sunset times.
  * Written with the help of Copilot
@@ -172,8 +175,7 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
         sunPosition = -180 + (nightProgress * 90); // -180° at midnight to -90° approaching sunrise
       } else {
         // Approaching sunrise
-        const dawnProgress = (currentDate.getTime() - midnightDate.getTime()) / 
-                           (sunriseDate.getTime() - midnightDate.getTime());
+        const dawnProgress = (currentDate.getTime() - midnightDate.getTime()) / (sunriseDate.getTime() - midnightDate.getTime());
         sunPosition = -180 + (dawnProgress * 90);
       }
     } else {
@@ -189,4 +191,47 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
   }
   
   return sunPosition;
+};
+
+
+/**
+ * Converts temperature value between Celsius and Fahrenheit based on the current temperature unit setting.
+ *
+ * @param temp - The temperature value as a string or null
+ * @returns The converted temperature as a string with no decimal places, or "--" if the input is invalid
+ *
+ * If the current unit is Celsius (tempUnit === 'C'), returns the original temperature.
+ * If the current unit is Fahrenheit, converts from Celsius to Fahrenheit
+ * Returns "--" in case of null, empty string, invalid number format, or error during conversion.
+ */
+export const convertTemp = (temp: string | null, tempunit: string): string => {
+  if (!temp || temp === "--") return "--";
+
+  try {
+    const tempValue = parseFloat(temp);
+    if (isNaN(tempValue)) return "--";
+
+    if (tempunit === 'C') {
+      return tempValue.toFixed(0);
+    } else {
+      // Convert Celsius to Fahrenheit: (C × 9/5) + 32
+      return (tempValue * 9 / 5 + 32).toFixed(0);
+    }
+  } catch (error) {
+    console.error('Error converting temperature:', error);
+    return "--";
+  }
+};
+
+
+/**
+ * Formats a time value in seconds to a human-readable string in "MM:SS" format.
+ *
+ * @param time - The time value in seconds
+ * @returns A formatted string representing the time in "MM:SS" format
+ */
+export const formatTime = (time: number) => {
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };

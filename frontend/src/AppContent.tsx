@@ -5,7 +5,7 @@ import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
 import mqttClient from './services/mqttService';
 import { useSensorPreferences } from './contexts/SensorPreferencesContext';
-import { getTimeUsingTimezone, getMusicTime } from './utilities/utils';
+import { getTimeUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
 
 import sunIcon from './assets/icons/sun.png';
 import moonIcon from './assets/icons/moon.png';
@@ -13,6 +13,10 @@ import sunnyIcon from './assets/icons/brightness.png';
 import rainyIcon from './assets/icons/storm.png';
 import snowyIcon from './assets/icons/snowflakes.png';
 import unknownIcon from './assets/icons/unknown.png';
+
+// Color constants
+const DAY_COLOR = '#b3e6ff';
+const NIGHT_COLOR = '#3a3a5c';
 
 function AppContent(): React.ReactElement {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,10 +33,8 @@ function AppContent(): React.ReactElement {
   const hasConnected = useRef(false);    // To track if the initial connection has been made
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
 
-  // Important: Now this will work since we're inside the provider
   const { useTime } = useSensorPreferences();
-
-  const currentHour = new Date().getHours();
+  const currentHour = new Date().getHours();  // just for setting initial background color
 
   // Update the last connected time of the MQTT client and save it to local storage
   const lastConnectedTime = useRef<string | null>(
@@ -40,30 +42,12 @@ function AppContent(): React.ReactElement {
   );
 
   // Function to change the background color based on the time of day
+  // This sets the CSS variable on the :root element (document.documentElement)
   const changeBackgroundColor = (newColor: string) => {
-    // This sets the CSS variable on the :root element (document.documentElement)
-    // which will affect the body background color as defined in your CSS
     document.documentElement.style.setProperty('--background-color', newColor);
-    console.log('Background color changed to:', newColor);
+    // console.log('Background color changed to:', newColor);
   };
 
-  // Log when useTime changes - this will help debug
-  useEffect(() => {
-    // Immediately force a background update when useTime changes
-    if (Object.keys(mqttData).length > 0 && isAuto) {
-      const calculatedTime = getMusicTime(mqttData.time, mqttData.light_level, useTime);
-      console.log('Recalculating time based on useTime change:', calculatedTime);
-
-      if (calculatedTime === 'day') {
-        changeBackgroundColor('#b3e6ff');
-        console.log('useTime change: setting day background');
-      } else if (calculatedTime === 'night') {
-        changeBackgroundColor('#3a3a5c');
-        console.log('useTime change: setting night background');
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [useTime]); // Only depend on useTime here
 
   // Update the last connected time when the connection status changes
   useEffect(() => {
@@ -77,6 +61,7 @@ function AppContent(): React.ReactElement {
       console.log('Not connected to mqtt server. Last seen: ', lastConnectedTime.current);
     }
   }, [isConnected]);
+
 
   // Toast message according to the connection status
   useEffect(() => {
@@ -94,6 +79,7 @@ function AppContent(): React.ReactElement {
       });
     }
   }, [isConnected, messageApi]);
+
 
   // Show notification when data is updated
   // Also, if the user manually sets the weather/time, show a notification
@@ -113,7 +99,6 @@ function AppContent(): React.ReactElement {
             mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
           }
-          {/* <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>Light: {(Number(mqttData.light_level)/1.2).toFixed(2)}%</p> */}
           <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
             {
               getMusicTime(mqttData.time, mqttData.light_level, false) === 'day' ? 'Bright' :
@@ -151,6 +136,7 @@ function AppContent(): React.ReactElement {
     prevManualTimeRef.current = manualTime;
   }, [mqttData, messageApi, isAuto, manualWeather, manualTime]);
 
+
   // Initialize MQTT service
   useEffect(() => {
     // Initially set the auto mode to true
@@ -158,9 +144,9 @@ function AppContent(): React.ReactElement {
 
     // Initially set the background color based on the time
     if (currentHour >= 6 && currentHour < 18) {
-      changeBackgroundColor('#b3e6ff');
+      changeBackgroundColor(DAY_COLOR);
     } else {
-      changeBackgroundColor('#3a3a5c');
+      changeBackgroundColor(NIGHT_COLOR);
     }
 
     // Make sure the client exists before setting up handlers
@@ -219,7 +205,7 @@ function AppContent(): React.ReactElement {
 
             // Set day/night status based on the current time and sunrise/sunset times
             const currentTime = getTimeUsingTimezone(data.timezone);
-            const dayOrNight = currentTime.getHours() >= parseInt(data.sunrise.split(':')[0]) && currentTime.getHours() < parseInt(data.sunset.split(':')[0]) ? 'day' : 'night';
+            const dayOrNight = getDayOrNight(currentTime, data.sunrise, data.sunset);
 
             // Create a data object to store the new values
             const newData = {
@@ -228,6 +214,8 @@ function AppContent(): React.ReactElement {
               timezone: data.timezone,
               temperature: data.temperature,
               light_level: data.light_level,
+              sunrise: data.sunrise,
+              sunset: data.sunset,
               hasUpdated: false // Flag to track if data was updated
             };
 
@@ -238,7 +226,10 @@ function AppContent(): React.ReactElement {
                 prevData.weather !== data.precipitation_status ||
                 prevData.time !== dayOrNight ||
                 prevData.temperature !== data.temperature ||
-                prevData.light_level !== data.light_level
+                prevData.light_level !== data.light_level ||
+                prevData.timezone !== data.timezone ||
+                prevData.sunrise !== data.sunrise ||
+                prevData.sunset !== data.sunset
               ) {
                 return {
                   ...newData,
@@ -270,23 +261,24 @@ function AppContent(): React.ReactElement {
     }
   }, [currentHour]);
 
+
   // Change the background color based on the time or light level
   useEffect(() => {
     if (Object.keys(mqttData).length > 0 && isAuto) {
       const calculatedTime = getMusicTime(mqttData.time, mqttData.light_level, useTime);
 
       if (calculatedTime === 'day') {
-        changeBackgroundColor('#b3e6ff');
+        changeBackgroundColor(DAY_COLOR);
       } else if (calculatedTime === 'night') {
-        changeBackgroundColor('#3a3a5c');
+        changeBackgroundColor(NIGHT_COLOR);
       }
     }
     else if (!isAuto) {
       // If auto mode is disabled, set the background color based on manual time
       if (manualTime === 'day') {
-        changeBackgroundColor('#b3e6ff');
+        changeBackgroundColor(DAY_COLOR);
       } else if (manualTime === 'night') {
-        changeBackgroundColor('#3a3a5c');
+        changeBackgroundColor(NIGHT_COLOR);
       }
     }
 
@@ -316,6 +308,7 @@ function AppContent(): React.ReactElement {
     }
   };
 
+
   return (
     <div className="App">
       {contextHolder}
@@ -331,7 +324,9 @@ function AppContent(): React.ReactElement {
         piTime={isAuto ? mqttData.time : manualTime}
         piTemperature={mqttData.temperature}
         piLightLevel={mqttData.light_level}
-        timezone={mqttData.timezone}
+        piTimezone={mqttData.timezone}
+        piSunrise={mqttData.sunrise}
+        piSunset={mqttData.sunset}
         isAuto={isAuto}
         setIsAuto={setIsAuto}
         setManualWeather={setManualWeather}

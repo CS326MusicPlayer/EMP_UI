@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Popover } from 'antd';
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
-import { getMusicWeather, getMusicTime, getTimeUsingTimezone, calculateSunPosition, getDayOrNight } from '../../utilities/utils';
+import {
+  getMusicWeather,
+  getMusicTime,
+  getTimeUsingTimezone,
+  calculateSunPosition,
+  getDayOrNight,
+  convertTemp
+} from '../../utilities/utils';
 
 import sunIcon from '../../assets/icons/sun.png';
 import moonIcon from '../../assets/icons/moon.png';
@@ -51,14 +58,8 @@ export default function TimeWeather({
   const [time, setTime] = useState(new Date());
 
 
-
+  // Update the time every second
   useEffect(() => {
-    /**
-     * Sets up an interval that updates the time every second.
-     *
-     * @param {string | undefined} piTimezone - Optional timezone to use for time calculation
-     * @returns {NodeJS.Timeout} Interval ID that can be used with clearInterval
-     */
     const interval = setInterval(() => {
       const newTime = piTimezone ? getTimeUsingTimezone(piTimezone) : new Date();
       setTime(newTime);
@@ -77,6 +78,7 @@ export default function TimeWeather({
     }
   }, [piTimezone, piSunrise, piSunset]);
 
+
   // Calculate hand positions with more precision
   const currentTime = time;
   const seconds = currentTime.getSeconds();
@@ -85,37 +87,7 @@ export default function TimeWeather({
   // Format the time for 24-hour display
   const hoursDisplay = currentTime.getHours().toString().padStart(2, '0');
   const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
-  // const secondRotation = seconds * 6 + rotationCount.seconds * 360;
 
-
-  /**
-   * Converts temperature value between Celsius and Fahrenheit based on the current temperature unit setting.
-   *
-   * @param temp - The temperature value as a string or null
-   * @returns The converted temperature as a string with no decimal places, or "--" if the input is invalid
-   *
-   * If the current unit is Celsius (tempUnit === 'C'), returns the original temperature.
-   * If the current unit is Fahrenheit, converts from Celsius to Fahrenheit
-   * Returns "--" in case of null, empty string, invalid number format, or error during conversion.
-   */
-  const convertTemp = (temp: string | null): string => {
-    if (!temp || temp === "--") return "--";
-
-    try {
-      const tempValue = parseFloat(temp);
-      if (isNaN(tempValue)) return "--";
-
-      if (tempUnit === 'C') {
-        return tempValue.toFixed(0);
-      } else {
-        // Convert Celsius to Fahrenheit: (C × 9/5) + 32
-        return (tempValue * 9 / 5 + 32).toFixed(0);
-      }
-    } catch (error) {
-      console.error('Error converting temperature:', error);
-      return "--";
-    }
-  };
 
   // Toggle between Celsius and Fahrenheit
   const toggleTempUnit = () => {
@@ -127,7 +99,7 @@ export default function TimeWeather({
     setIsAuto(!isAuto);
   };
 
-  // Define the button style based on the mode
+  // Button style based on the mode
   const buttonStyle = {
     backgroundColor: isAuto ? '#52c597' : '#a5a5a5',
   };
@@ -144,9 +116,6 @@ export default function TimeWeather({
     // Safe return if the mode is not manual
     if (isAuto) return;
 
-    // console.log('Toggling weather condition...');
-    // console.log('Current weather condition:', piWeather);
-
     // Toggle-rotate the weather condition using the setter function from props
     if (piWeather === 'none') {
       setManualWeather('rain');
@@ -161,9 +130,6 @@ export default function TimeWeather({
   const toggleDayNight = () => {
     // Safe return if the mode is not manual
     if (isAuto) return;
-
-    // console.log('Toggling day/night condition...');
-    // console.log('Current day/night condition:', piTime);
 
     // Toggle-rotate the day/night condition using the setter function from props
     if (piTime === 'day') {
@@ -185,7 +151,9 @@ export default function TimeWeather({
             content={
               <>
                 <p>Music played based on {useWeather ? '"precipitation"' : '"temperature"'}</p>
-                <p style={{ 'color': 'var(--black)' }}>Click to switch to {!useWeather ? '"precipitation"' : '"temperature"'}</p>
+                <p style={{ 'color': 'var(--black)' }}>
+                  Click to switch to {!useWeather ? '"precipitation"' : '"temperature"'}
+                </p>
               </>
             }
             trigger="hover"
@@ -223,9 +191,17 @@ export default function TimeWeather({
               <span style={{ display: 'inline-flex' }}>
                 {isAuto ? 
                   <>
-                    <h3 style={{ opacity: useWeather ? 1 : 0.5 }}>{piWeather==='none' ? 'Sunny or Overcast' : piWeather==='rain' ? 'Rainy' : piWeather==='snow' ? 'Snowy' : 'Unknown'}</h3>
+                    <h3 style={{opacity: useWeather ? 1 : 0.5 }}>
+                      {
+                        piWeather==='none' ? 'Sunny or Overcast' :
+                        piWeather==='rain' ? 'Rainy' :
+                        piWeather==='snow' ? 'Snowy' : 'Unknown'
+                      }
+                    </h3>
                     <h3 style={{ padding: '0 0.2rem' }}>/</h3>
-                    <h3 style={{ opacity: !useWeather ? 1 : 0.5 }}>{convertTemp(piTemperature)}°{tempUnit}</h3>
+                    <h3 style={{ opacity: !useWeather ? 1 : 0.5 }}>
+                      {convertTemp(piTemperature, tempUnit)}°{tempUnit}
+                    </h3>
                   </>
                   :
                   <h3>Manual Mode</h3>
@@ -233,15 +209,23 @@ export default function TimeWeather({
               </span>
             }
             content={isAuto ?
-              <p style={{ 'color': 'var(--black)' }}>You are using "{useWeather ? 'weather' : 'temperature'}" for playing music</p>
+              <p style={{ 'color': 'var(--black)' }}>
+                You are using "{useWeather ? 'weather' : 'temperature'}" for playing music
+              </p>
               :
-              <p style={{ 'color': 'var(--black)' }}>Click to toggle sunny/rainy/snowy</p>
+              <p style={{ 'color': 'var(--black)' }}>
+                Click to toggle sunny/rainy/snowy
+              </p>
             }
             trigger="hover"
             placement="left"
           >
             <div className={classes.forecastData}>
-              <p className={classes.temperature} style={{ opacity: useWeather ? 0.3 : 1 }} onClick={toggleTempUnit}>{convertTemp(piTemperature)}°{tempUnit}</p>
+              <p
+                className={classes.temperature}
+                style={{ opacity: useWeather ? 0.3 : 1 }}
+                onClick={toggleTempUnit}>{convertTemp(piTemperature, tempUnit)}°{tempUnit}
+              </p>
               <hr />
               <span
                 className={classes.condition}

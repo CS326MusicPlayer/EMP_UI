@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
 import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff, LuRotateCcw } from "react-icons/lu";
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
-import { getMusicWeather, getMusicTime } from '../../utilities/utils';
+import { getMusicWeather, getMusicTime, formatTime } from '../../utilities/utils';
 import classes from './styles.module.css';
 
 // Import icons
@@ -484,12 +484,6 @@ export default function MusicPlayer({
     }
   };
 
-  // Format time in MM:SS
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
 
   // Update audio when song changes
   useEffect(() => {

@@ -1,5 +1,5 @@
 // originally has 0 to 1023, and currently taking 20 samples
-const LIGHT_LEVEL_THRESHOLD = 0.2;  // Below 0.2 is dark
+const LIGHT_LEVEL_THRESHOLD = 100;  // Below 100 is dark (data ranges between 0 and 65535)
 const SNOW_TEMPC_THRESHOLD = 0;    // below 0°C is snowing
 const RAIN_TEMPC_THRESHOLD = 20;   // below 20°C is raining
 

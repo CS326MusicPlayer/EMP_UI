@@ -348,7 +348,11 @@ export default function TimeWeather({
                   <>
                     <h3 style={{ opacity: useTime ? 1 : 0.5 }}>{piTime==='day' ? 'Day' : piTime==='night' ? 'Night' : 'Unknown'}</h3>
                     <h3 style={{ padding: '0 0.2rem' }}>/</h3>
-                    <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>{piLightLevel ? (Number(piLightLevel)/1.2).toFixed(2) : '--'}%</h3>
+                    <h3 style={{ opacity: !useTime ? 1 : 0.5 }}>
+                      {getMusicTime(piTime, piLightLevel, false)==='day' ? 'Bright' :
+                      getMusicTime(piTime, piLightLevel, false)==='night' ? 'Dark' : '--'
+                      }
+                    </h3>
                   </>
                   :
                   <h3>Manual Mode</h3>

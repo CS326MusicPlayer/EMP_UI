@@ -217,4 +217,8 @@ input[type="range"]::-moz-range-thumb {
     top: auto;
     left: 1rem;
   }
+
+  .progressBarContainer {
+    width: 14rem;
+  }
 }

@@ -133,3 +133,11 @@
   background-color: var(--emerald);
   border: 0.2rem solid var(--emerald0);
 }
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0.4rem;
+  }
+}

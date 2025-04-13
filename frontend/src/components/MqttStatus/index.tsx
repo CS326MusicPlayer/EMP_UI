@@ -44,14 +44,6 @@ export default function MqttStatus({
   };
 
 
-  // Rotate the pi
-  const getNextPiId = (currentPiId: string, piList: string[]) => {
-    const currentIndex = piList.indexOf(currentPiId);
-    const nextIndex = (currentIndex + 1) % piList.length;
-    return piList[nextIndex];
-  };
-
-
   const onlineContent = (
     <div>
       <h3 style={{ color: '#616161' }}>Your device seems to be online!</h3>

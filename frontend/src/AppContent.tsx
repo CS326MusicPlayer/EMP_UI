@@ -36,6 +36,7 @@ function AppContent(): React.ReactElement {
   // Cache data for all Pis, keyed by Pi ID
   const [mqttDataCache, setMqttDataCache] = useState<Record<string, PiData>>({});
   // Current Pi data derived from cache based on selectedPiId
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [currentPiData, setCurrentPiData] = useState<PiData | Record<string, any>>({});
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -307,6 +308,7 @@ function AppContent(): React.ReactElement {
       };
 
       // Function to process incoming messages
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function processMessage(data: { timezone: string; sunrise: string; sunset: string; pid: any; precipitation_status: any; temperature: any; light_level: any; }) {
         // Set day/night status based on the current time and sunrise/sunset times
         const currentTime = getTimeUsingTimezone(data.timezone);
@@ -355,6 +357,52 @@ function AppContent(): React.ReactElement {
       };
     }
   }, []);
+
+
+  // Add polling interval to request data from selected Pi every 10 seconds
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout | null = null;
+
+    // Only start polling if connected and a Pi is selected
+    if (isConnected && selectedPiId && selectedPiId !== "?") {
+      console.log('Starting polling for Pi data');
+
+      // Initial request immediately upon connection
+      requestPiData();
+
+      // Set up regular polling interval
+      pollInterval = setInterval(() => {
+        requestPiData();
+      }, 10000); // Poll every 10 seconds
+    }
+
+    // Function to request data from the selected Pi
+    function requestPiData() {
+      if (mqttClient && mqttClient.connected && selectedPiId) {
+        const message = JSON.stringify({
+          "target": selectedPiId
+        });
+
+        mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+          if (error) {
+            console.error('Error publishing data request:', error);
+          } else {
+            console.log(`Data request sent to Pi ${selectedPiId}`);
+          }
+        });
+      }
+    }
+
+    // Clean up interval when component unmounts or connection state changes
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        console.log('Stopped polling for Pi data');
+      }
+    };
+  }, [isConnected, selectedPiId]); // Re-establish polling when connection status or selected Pi changes
+
+
 
   // Change the background color based on the time or light level
   useEffect(() => {

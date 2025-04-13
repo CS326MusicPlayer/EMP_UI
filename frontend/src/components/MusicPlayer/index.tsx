@@ -602,7 +602,7 @@ export default function MusicPlayer({
         </div> */}
 
         <div className={classes.volumeControl}>
-          <Popover content={<p style={{ 'color': 'var(--black)' }}>Press "m" to toggle mute</p>} placement="left" mouseEnterDelay={0.5}>
+          <Popover content={<p style={{ 'color': 'var(--black)' }}>Press "m" to toggle mute</p>} placement="left">
             {
               volume === 0 ? (
                 <LuVolumeOff />

@@ -56,8 +56,17 @@ export default function TimeWeather({
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [isHoveringWeather, setIsHoveringWeather] = useState(false);
   const [isHoveringTime, setIsHoveringTime] = useState(false);
-  const [sunAngle, setSunAngle] = useState(-90); // Default to sunrise position
+  const [sunAngle, setSunAngle] = useState(0); // Default to sunrise position
   const [time, setTime] = useState(new Date());
+
+  
+  // Initially set the sun angle based on the current time and sunrise/sunset times
+  useEffect(() => {
+    const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+    // Temporary sunrise and sunset times
+    const angle = calculateSunPosition(currentTimezone, '06:00', '18:00');
+    setSunAngle(angle);
+  }, []);
 
 
   // Update the time every second
@@ -326,7 +335,9 @@ export default function TimeWeather({
               className={classes.secondRing}
               style={{
                 transform: `rotate(${sunAngle}deg)`,
-                borderColor: getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'var(--yellow)' : 'var(--lightblue)',
+                borderColor:
+                  getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'var(--yellow)' :
+                  getDayOrNight(time, piSunrise, piSunset) === 'night' ? 'var(--lightblue)' : 'var(--white)'
               }}>
             </div>
           </div>

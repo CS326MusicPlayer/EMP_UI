@@ -37,6 +37,17 @@
   transition: all 0.2s ease-in-out;
 }
 
+.statusIcon {
+  transition: all 0.2s ease-in-out;
+}
+
+.piStatusContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
 .statusText {
   font-size: 1rem;
   color: var(--black);

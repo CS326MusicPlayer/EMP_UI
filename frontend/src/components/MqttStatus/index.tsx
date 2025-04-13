@@ -132,7 +132,7 @@ export default function MqttStatus({
                     })),
                     onClick: ({ key }) => setSelectedPiId(key),
                   }}
-                  placement="bottomRight"
+                  placement="top"
                   disabled={piList.length <= 1 || musicIsFading}
                   trigger={['hover']}
                 >

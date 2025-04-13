@@ -13,6 +13,8 @@
 - `cd frontend`
 - `npm install`
 - `npm run dev`
+  - `npm test` to run tests
+  - `npm run build` to build the project
 
 ---
 ## Testing

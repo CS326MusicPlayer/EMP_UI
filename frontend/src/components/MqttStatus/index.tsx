@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
 import { Popover, Spin } from "antd";
+import { LuPower, LuPowerOff } from "react-icons/lu";
 import { SwapOutlined } from '@ant-design/icons';
 import { usePiSelection } from "../../contexts/PiSelectionContext";
 import { formatTimeAgo } from '../../utilities/utils';
@@ -116,11 +117,24 @@ export default function MqttStatus({
       </span>
       {musicIsFading && (<Spin className={classes.musicStatusSpinner} />)}
       <span className={classes.connection}>
-        {mqttConnected ? (
-          <button className={classes.connButton} onClick={onDisconnect}>Disconnect</button>
-        ) : (
-          <button className={classes.connButton} onClick={onConnect}>Connect</button>
-        )}
+        <Popover
+          content={
+            <div>
+              <h3 style={{ color: 'var(--black)' }}>{mqttConnected ? 'Disconnect' : 'Connect'}</h3>
+              <p style={{ color: 'var(--black)' }}>
+                {mqttConnected ? 'Click to disconnect from the MQTT server' : 'Click to connect to the MQTT server'}
+              </p>
+            </div>
+          }
+          trigger="hover"
+          placement="top"
+        >
+          {mqttConnected ? (
+            <button className={classes.connButton} onClick={onDisconnect}><LuPowerOff /></button>
+          ) : (
+            <button className={classes.connButton} onClick={onConnect}><LuPower /></button>
+          )}
+        </Popover>
       </span>
     </div>
   );

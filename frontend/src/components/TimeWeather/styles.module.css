@@ -259,3 +259,40 @@ hr {
     opacity: 0.3;
   }
 }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .time,
+  .weather {
+    width: 12rem;
+    height: 12rem;
+  }
+  .forecast,
+  .clock {
+    width: 12rem;
+    height: 12rem;
+  }
+
+  .toggleWeatherTemperature,
+  .toggleWeatherTemperatureDisabled {
+    bottom: -5rem;
+    top: auto;
+    left: -1.6rem;
+  }
+
+  .toggleTimeLightsensor,
+  .toggleTimeLightsensorDisabled {
+    top: -5rem;
+    bototm: auto;
+    right: -1.6rem;
+  }
+
+  .toggleButton {
+    width: 5rem;
+    height: 5rem;
+  }
+}

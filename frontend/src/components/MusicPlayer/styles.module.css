@@ -208,3 +208,13 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 50%;
   background: var(--emerald2);
 }
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .resetMusicButton {
+    bottom: 1rem;
+    top: auto;
+    left: 1rem;
+  }
+}

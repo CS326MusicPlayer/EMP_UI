@@ -9,8 +9,7 @@ import {
   getTimeUsingTimezone,
   calculateSunPosition,
   getDayOrNight,
-  convertTemp,
-  useResponsivePlacement
+  convertTemp
 } from '../../utilities/utils';
 
 import sunIcon from '../../assets/icons/sun.png';
@@ -60,13 +59,6 @@ export default function TimeWeather({
   const [sunAngle, setSunAngle] = useState(0); // Default to sunrise position
   const [time, setTime] = useState(new Date());
 
-  // Use the responsive placement hook for different popovers
-  const weatherChipPlacement = useResponsivePlacement('right', 'left');
-  const forecastPlacement = useResponsivePlacement('left', 'right');
-  const modeButtonPlacement = useResponsivePlacement('top');
-  const timeInfoPlacement = useResponsivePlacement('bottom');
-  const timeChipPlacement = useResponsivePlacement('right');
-  const timeDisplayPlacement = useResponsivePlacement('right');
 
   // Initially set the sun angle based on the current time and sunrise/sunset times
   useEffect(() => {
@@ -176,7 +168,7 @@ export default function TimeWeather({
               </>
             }
             trigger="hover"
-            placement={weatherChipPlacement}
+            placement="left"
             mouseEnterDelay={0.2}
           >
             <div
@@ -237,7 +229,7 @@ export default function TimeWeather({
               </p>
             }
             trigger="hover"
-            placement={forecastPlacement}
+            placement="left"
           >
             <div className={classes.forecastData}>
               <p
@@ -270,7 +262,7 @@ export default function TimeWeather({
 
       {/* Control */}
       <div className={classes.control}>
-        <Popover content={modeSwitchContent} trigger="hover" placement={modeButtonPlacement}>
+        <Popover content={modeSwitchContent} trigger="hover" placement="top">
           <button
             style={buttonStyle}
             className={classes.toggleButton}
@@ -294,7 +286,7 @@ export default function TimeWeather({
           </>
         }
         trigger="hover"
-        placement={timeInfoPlacement}
+        placement="bottom"
         mouseEnterDelay={0.4}
       >
         <div
@@ -311,7 +303,7 @@ export default function TimeWeather({
                 </>
               }
               trigger="hover"
-              placement={timeChipPlacement}
+              placement="left"
               mouseEnterDelay={0.2}
             >
               <div
@@ -369,7 +361,7 @@ export default function TimeWeather({
               <p style={{ 'color': 'var(--black)' }}>Click to toggle day/night</p>
             }
             trigger="hover"
-            placement={timeDisplayPlacement}
+            placement="right"
           >
             <div className={classes.digitalTime}>
               <p className={classes.digitalTimeText} style={{ opacity: !useTime ? 0.3 : 1 }}>

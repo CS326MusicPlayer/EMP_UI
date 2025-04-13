@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
-import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack,*/ LuVolume1, LuVolume2, LuVolumeOff, LuRotateCcw } from "react-icons/lu";
+import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack, LuRotateCcw,*/ LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
 import { getMusicWeather, getMusicTime, formatTime } from '../../utilities/utils';
 import classes from './styles.module.css';
@@ -425,28 +425,28 @@ export default function MusicPlayer({
   };
 
   // Reset Player
-  const resetPlayer = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-      setIsPlaying(false);
-      setCurrentTime(0);
-      // setDuration(0);
-      setVolume(1);
-      setIsFading(false);
-      if (fadeIntervalRef.current.fadeOut) {
-        clearInterval(fadeIntervalRef.current.fadeOut);
-        fadeIntervalRef.current.fadeOut = null;
-      }
-      if (fadeIntervalRef.current.fadeIn) {
-        clearInterval(fadeIntervalRef.current.fadeIn);
-        fadeIntervalRef.current.fadeIn = null;
-      }
-      if (onFadingChange) {
-        onFadingChange(false);
-      }
-    }
-  }
+  // const resetPlayer = () => {
+  //   if (audioRef.current) {
+  //     audioRef.current.pause();
+  //     audioRef.current.currentTime = 0;
+  //     setIsPlaying(false);
+  //     setCurrentTime(0);
+  //     // setDuration(0);
+  //     setVolume(1);
+  //     setIsFading(false);
+  //     if (fadeIntervalRef.current.fadeOut) {
+  //       clearInterval(fadeIntervalRef.current.fadeOut);
+  //       fadeIntervalRef.current.fadeOut = null;
+  //     }
+  //     if (fadeIntervalRef.current.fadeIn) {
+  //       clearInterval(fadeIntervalRef.current.fadeIn);
+  //       fadeIntervalRef.current.fadeIn = null;
+  //     }
+  //     if (onFadingChange) {
+  //       onFadingChange(false);
+  //     }
+  //   }
+  // }
 
   // Progress bar control
   const handleTimeUpdate = () => {

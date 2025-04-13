@@ -1,5 +1,3 @@
-import React from 'react';
-
 // originally has 0 to 1023, and currently taking 20 samples
 const LIGHT_LEVEL_THRESHOLD = 0.2;  // Below 0.2 is dark
 const SNOW_TEMPC_THRESHOLD = 0;    // below 0°C is snowing
@@ -243,30 +241,4 @@ export const getResponsivePlacement = (defaultPlacement: string, largePlacement:
     return window.innerWidth > 768 ? largePlacement : defaultPlacement;
   }
   return defaultPlacement;
-};
-
-
-/**
- * A custom hook that returns the appropriate placement based on screen size
- * and updates when the window is resized.
- *
- * @param defaultPlacement - The placement to use for smaller screens (<= 768px)
- * @param largePlacement - The placement to use for larger screens (> 768px)
- * @returns The current placement based on screen size
- */
-export const useResponsivePlacement = (defaultPlacement: string, largePlacement: string = 'right'): string => {
-  const [placement, setPlacement] = React.useState(() => getResponsivePlacement(defaultPlacement, largePlacement));
-
-  React.useEffect(() => {
-    const handleResize = () => {
-      setPlacement(getResponsivePlacement(defaultPlacement, largePlacement));
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [defaultPlacement, largePlacement]);
-
-  return placement;
 };

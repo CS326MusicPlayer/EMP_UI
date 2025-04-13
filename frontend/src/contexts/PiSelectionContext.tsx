@@ -12,9 +12,9 @@ interface PiSelectionContextType {
 const PiSelectionContext = createContext<PiSelectionContextType | undefined>(undefined);
 
 export function PiSelectionProvider({ children }: { children: ReactNode }) {
-  const [selectedPiId, setSelectedPiId] = useState<string>("0"); // Default to Pi 0
+  const [selectedPiId, setSelectedPiId] = useState<string>("?"); // Default to unknown Pi
   const [piList, setPiList] = useState<string[]>([]); // List of available Pis (initially empty)
-  
+
   return (
     <PiSelectionContext.Provider value={{ selectedPiId, setSelectedPiId, piList, setPiList }}>
       {children}

@@ -1,3 +1,5 @@
+import React from 'react';
+
 // originally has 0 to 1023, and currently taking 20 samples
 const LIGHT_LEVEL_THRESHOLD = 0.2;  // Below 0.2 is dark
 const SNOW_TEMPC_THRESHOLD = 0;    // below 0°C is snowing
@@ -8,20 +10,18 @@ const RAIN_TEMPC_THRESHOLD = 20;   // below 20°C is raining
  * Determines the music weather condition based on weather preference and temperature.
  *
  * @param piWeather - Current weather condition string from Pi device
- * @param piTemperature - Temperature string from Pi device
+ * @param piTemperature - Temperature number from Pi device
  * @param useWeather - Boolean flag indicating whether to use actual weather or temperature-based condition
  * @returns The determined weather condition: 'snow', 'rain', or 'none' based on temperature thresholds
  *          or the actual weather condition if useWeather is true
  */
-export const getMusicWeather = (piWeather: string, piTemperature: string, useWeather: boolean) => {
+export const getMusicWeather = (piWeather: string, piTemperature: number, useWeather: boolean) => {
   if (useWeather) {
     return piWeather;
   } else {
-    // Convert temperature to number
-    const temperature = parseFloat(piTemperature);
-    if (temperature <= SNOW_TEMPC_THRESHOLD) {
+    if (piTemperature <= SNOW_TEMPC_THRESHOLD) {
       return 'snow';
-    } else if (temperature <= RAIN_TEMPC_THRESHOLD) {
+    } else if (piTemperature <= RAIN_TEMPC_THRESHOLD) {
       return 'rain';
     } else {
       return 'none';
@@ -138,18 +138,18 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
   const currentDate = getTimeUsingTimezone(timezone.toString());
   const sunriseDate = new Date(currentDate.toDateString() + ' ' + sunriseTime);
   const sunsetDate = new Date(currentDate.toDateString() + ' ' + sunsetTime);
-  
+
   // Create noon date
   const noonDate = new Date(currentDate.toDateString() + ' 12:00');
-  
+
   // Get the current hour as a decimal (e.g., 6.5 for 6:30)
   const currentHour = currentDate.getHours() + currentDate.getMinutes() / 60;
-  
+
   // Determine if it's day or night
   const isDaytime = currentDate >= sunriseDate && currentDate <= sunsetDate;
-  
+
   let sunPosition;
-  
+
   if (isDaytime) {
     // During daylight: position from -90° (sunrise) through 0° (noon) to 90° (sunset)
     // Calculate where we are in the day cycle
@@ -168,7 +168,7 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
       // Before sunrise
       // Calculate position from midnight (-180°) to sunrise (-90°)
       const midnightDate = new Date(currentDate.toDateString() + ' 00:00');
-      
+
       // If we're closer to midnight
       if (currentHour < 6) {
         const nightProgress = currentHour / 6; // 0 at midnight, 1 at 6am
@@ -184,12 +184,12 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
       const midnightDate = new Date(currentDate.toDateString());
       midnightDate.setDate(midnightDate.getDate() + 1); // Next day midnight
       midnightDate.setHours(0, 0, 0, 0);
-      
+
       const nightProgress = (currentDate.getTime() - sunsetDate.getTime()) / (midnightDate.getTime() - sunsetDate.getTime());
       sunPosition = 90 + (nightProgress * 90); // 90° at sunset to 180° at midnight
     }
   }
-  
+
   return sunPosition;
 };
 
@@ -197,29 +197,21 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
 /**
  * Converts temperature value between Celsius and Fahrenheit based on the current temperature unit setting.
  *
- * @param temp - The temperature value as a string or null
- * @returns The converted temperature as a string with no decimal places, or "--" if the input is invalid
+ * @param temp - The temperature value as a number
+ * @returns The converted temperature as a string with no decimal places
  *
  * If the current unit is Celsius (tempUnit === 'C'), returns the original temperature.
  * If the current unit is Fahrenheit, converts from Celsius to Fahrenheit
- * Returns "--" in case of null, empty string, invalid number format, or error during conversion.
  */
-export const convertTemp = (temp: string | null, tempunit: string): string => {
-  if (!temp || temp === "--") return "--";
-
-  try {
-    const tempValue = parseFloat(temp);
-    if (isNaN(tempValue)) return "--";
-
-    if (tempunit === 'C') {
-      return tempValue.toFixed(0);
-    } else {
-      // Convert Celsius to Fahrenheit: (C × 9/5) + 32
-      return (tempValue * 9 / 5 + 32).toFixed(0);
-    }
-  } catch (error) {
-    console.error('Error converting temperature:', error);
-    return "--";
+export const convertTemp = (temp: number, tempunit: string): string => {
+  if (!temp) {
+    return '--';
+  }
+  if (tempunit === 'C') {
+    return temp.toFixed(0);
+  } else {
+    // Convert Celsius to Fahrenheit: (C × 9/5) + 32
+    return (temp * 9 / 5 + 32).toFixed(0);
   }
 };
 
@@ -234,4 +226,47 @@ export const formatTime = (time: number) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60);
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
+
+/**
+ * Returns the appropriate placement based on screen size
+ * Used for components like Popover, Tooltip, etc. that have placement props
+ *
+ * @param defaultPlacement - The placement to use for smaller screens
+ * @param largePlacement - The placement to use for screens larger than 768px
+ * @returns The appropriate placement based on current screen size
+ */
+export const getResponsivePlacement = (defaultPlacement: string, largePlacement: string = 'right'): string => {
+  // Check if window is defined (for SSR)
+  if (typeof window !== 'undefined') {
+    return window.innerWidth > 768 ? largePlacement : defaultPlacement;
+  }
+  return defaultPlacement;
+};
+
+
+/**
+ * A custom hook that returns the appropriate placement based on screen size
+ * and updates when the window is resized.
+ *
+ * @param defaultPlacement - The placement to use for smaller screens (<= 768px)
+ * @param largePlacement - The placement to use for larger screens (> 768px)
+ * @returns The current placement based on screen size
+ */
+export const useResponsivePlacement = (defaultPlacement: string, largePlacement: string = 'right'): string => {
+  const [placement, setPlacement] = React.useState(() => getResponsivePlacement(defaultPlacement, largePlacement));
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setPlacement(getResponsivePlacement(defaultPlacement, largePlacement));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [defaultPlacement, largePlacement]);
+
+  return placement;
 };

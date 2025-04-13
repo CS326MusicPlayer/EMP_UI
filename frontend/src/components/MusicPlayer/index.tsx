@@ -39,7 +39,7 @@ export default function MusicPlayer({
   isAuto: boolean;
   piWeather: string;
   piTime: string;
-  piTemperature: string;
+  piTemperature: number;
   piLightLevel: string;
   onFadingChange?: (isFading: boolean) => void;
 }
@@ -131,6 +131,8 @@ export default function MusicPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [loopMode, setLoopMode] = useState('one'); // 'one', 'all'
   const [isFading, setIsFading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(true);  // New state to track initial load
+  const prevIsAutoRef = useRef(isAuto);  // New ref to track mode changes
 
   // Refs
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -237,7 +239,7 @@ export default function MusicPlayer({
         song => song.weather === musicWeatherToUse && song.time === musicTimeToUse
       );
 
-      if (matchingSongIndex !== -1 && matchingSongIndex !== currentSongIndex && audioRef.current) {
+      if (matchingSongIndex !== -1 && (matchingSongIndex !== currentSongIndex || initialLoad || prevIsAutoRef.current !== isAuto) && audioRef.current) {
         // console.log(`Changing song to match weather: ${piWeather}, time: ${piTime}`);
 
         // Only fade if currently playing
@@ -311,6 +313,10 @@ export default function MusicPlayer({
           setCurrentSongIndex(matchingSongIndex);
           setIsPlaying(true);
         }
+
+        // Reset initial load flag and update previous mode
+        setInitialLoad(false);
+        prevIsAutoRef.current = isAuto;
       }
     }
 

@@ -98,6 +98,12 @@ export default function MqttStatus({
               <p className={classes.statusText}>Pi: {selectedPiId}</p>
               <Popover
                 content={
+                  piList.length === 1 ?
+                    <div>
+                      <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
+                      <p style={{ color: 'var(--black)' }}>Only one Pi available</p>
+                    </div>
+                    :
                   piList.length > 1 ?
                     <div>
                       <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
@@ -106,9 +112,17 @@ export default function MqttStatus({
                       <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
                     </div>
                     :
+                  piList.length === 0 ?
                     <div>
                       <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
-                      <p style={{ color: 'var(--black)' }}>Only one Pi available</p>
+                      <p style={{ color: 'var(--black)' }}>No Pi available yet!</p>
+                    </div>
+                    :
+                    <div>
+                      <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
+                      <p style={{ color: 'var(--black)' }}>Click to switch to another Pi</p>
+                      <p style={{ color: 'var(--gray)' }}>Current Pi: {selectedPiId}</p>
+                      <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
                     </div>
                 }
                 trigger="hover"

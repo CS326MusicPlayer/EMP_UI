@@ -41,6 +41,9 @@ function AppContent(): React.ReactElement {
   const hasSubscribed = useRef(false);    // To track if the subscription has been made)
   const selectedPiIdRef = useRef(selectedPiId);
 
+  // Track previous music fading state
+  const prevMusicIsFadingRef = useRef(false);
+
   // Update the last connected time of the MQTT client and save it to local storage
   const lastConnectedTime = useRef<string | null>(
     localStorage.getItem('lastConnectedTime') || null
@@ -79,10 +82,27 @@ function AppContent(): React.ReactElement {
     if (piList.length === 0) return;
 
     if (selectedPiId) {
+      // Show toast message
       messageApi.info({
         content: `Selected Pi ID: ${selectedPiId}`,
         duration: 3,
       });
+
+      // Publish selection to MQTT topic
+      if (mqttClient && mqttClient.connected) {
+        const message = JSON.stringify({
+          "handshake": false,
+          "target": selectedPiId
+        });
+
+        mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+          if (error) {
+            console.error('Error publishing Pi selection:', error);
+          } else {
+            console.log(`Published Pi selection to emp/operations: ${selectedPiId}`);
+          }
+        });
+      }
     }
   }, [selectedPiId, messageApi]);
 
@@ -103,7 +123,7 @@ function AppContent(): React.ReactElement {
       });
     }
   }, [isConnected, messageApi]);
-  
+
 
   // Update the list of available Pis
   useEffect(() => {
@@ -120,36 +140,8 @@ function AppContent(): React.ReactElement {
   }, [mqttData.pid]);
 
 
-  // Show notification when data is updated
-  // Also, if the user manually sets the weather/time, show a notification
+  // Show notification only for manual mode changes or when music is changing (not for every MQTT update)
   useEffect(() => {
-    if (mqttData.hasUpdated && isAuto) {
-      messageApi.info({
-        content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{mqttData.temperature}°C</p>
-          {
-            mqttData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            mqttData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            mqttData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          }
-          {
-            mqttData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          }
-          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
-            {
-              getMusicTime(mqttData.time, mqttData.light_level, false) === 'day' ? 'Bright' :
-              getMusicTime(mqttData.time, mqttData.light_level, false) === 'night' ? 'Dark' :
-              'Unknown'
-            }
-            </p>
-        </div>,
-        duration: 5,
-      });
-    }
-
     // Show notification only when manual values change (not on initial render)
     if (!isAuto && (prevManualWeatherRef.current !== manualWeather || prevManualTimeRef.current !== manualTime)) {
       messageApi.info({
@@ -173,7 +165,42 @@ function AppContent(): React.ReactElement {
     // Update refs with current values for next comparison
     prevManualWeatherRef.current = manualWeather;
     prevManualTimeRef.current = manualTime;
-  }, [mqttData, messageApi, isAuto, manualWeather, manualTime]);
+  }, [messageApi, isAuto, manualWeather, manualTime]);
+
+
+  // Show notification when music is changing instead of on every data update
+  useEffect(() => {
+    // Only show notification when music starts fading (transition begins)
+    if (musicIsFading && !prevMusicIsFadingRef.current && isAuto && Object.keys(mqttData).length > 0) {
+      messageApi.info({
+        content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{mqttData.temperature}°C</p>
+          {
+            mqttData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            mqttData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            mqttData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+          }
+          {
+            mqttData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+          }
+          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
+            {
+              getMusicTime(mqttData.time, mqttData.light_level, false) === 'day' ? 'Bright' :
+              getMusicTime(mqttData.time, mqttData.light_level, false) === 'night' ? 'Dark' :
+              'Unknown'
+            }
+          </p>
+        </div>,
+        duration: 5,
+      });
+    }
+
+    // Update the ref for the next render
+    prevMusicIsFadingRef.current = musicIsFading;
+  }, [musicIsFading, isAuto, mqttData, messageApi]);
 
 
   // Initialize MQTT service
@@ -194,7 +221,7 @@ function AppContent(): React.ReactElement {
         setIsConnected(true);
         hasConnected.current = true;
         console.log('Connected to MQTT broker');
-  
+
         // Subscribe to the topic
         if (!hasSubscribed.current) {
           hasSubscribed.current = true;
@@ -234,39 +261,42 @@ function AppContent(): React.ReactElement {
       // Message handler
       const messageHandler = function (topic: string, message: Buffer) {
         console.log('Received message:', topic, message.toString());
-      
+
         if (topic === 'emp/environment') {
           try {
             const data = JSON.parse(message.toString());
-      
+
+            // Ensure pid is treated as a string for consistent comparisons
+            const pidString = String(data.pid);
+
             // Add to piList if new
-            if (data.pid) {
+            if (pidString) {
               setPiList(prevList => {
-                if (!prevList.includes(data.pid)) {
-                  console.log(`Added new Pi ID ${data.pid} to the list`);
-                  return [...prevList, data.pid];
+                if (!prevList.includes(pidString)) {
+                  console.log(`Added new Pi ID ${pidString} to the list`);
+                  return [...prevList, pidString];
                 }
                 return prevList;
               });
             }
-      
-            // Auto-select the first Pi if we're still using the placeholder "0"
-            const isFirstMessage = selectedPiIdRef.current === "0";
-            if (isFirstMessage && data.pid) {
-              setSelectedPiId(data.pid);
-              console.log(`Initially selected Pi ID: ${data.pid}`);
-              
+
+            // Auto-select the first Pi if we're still using the placeholder "?"
+            const isFirstMessage = selectedPiIdRef.current === "?";
+            if (isFirstMessage && pidString) {
+              console.log(`Initially selecting Pi ID: ${pidString}`);
+              setSelectedPiId(pidString);
+
               // Force process this message even though selectedPiId hasn't updated yet
               // This ensures we process the first message immediately
               processMessage(data);
             } else {
               // For subsequent messages, only process if it's from the selected Pi
               const currentSelectedPiId = selectedPiIdRef.current;
-              if (data.pid !== currentSelectedPiId) {
+              if (String(data.pid) !== currentSelectedPiId) {
                 console.log(`Skipping message from Pi ${data.pid} - selected Pi is ${currentSelectedPiId}`);
                 return;
               }
-              
+
               processMessage(data);
             }
           } catch (err) {
@@ -281,13 +311,16 @@ function AppContent(): React.ReactElement {
         const currentTime = getTimeUsingTimezone(data.timezone);
         const dayOrNight = getDayOrNight(currentTime, data.sunrise, data.sunset);
 
+        // Parse temperature as a number
+        const temperatureValue = parseFloat(data.temperature);
+
         // Create a data object to store the new values
         const newData = {
           pid: data.pid,
           weather: data.precipitation_status,
           time: dayOrNight,
           timezone: data.timezone,
-          temperature: data.temperature,
+          temperature: temperatureValue,
           light_level: data.light_level,
           sunrise: data.sunrise,
           sunset: data.sunset,
@@ -298,14 +331,20 @@ function AppContent(): React.ReactElement {
         setMqttData(prevData => {
           // Force update on first message
           const isFirstMessage = Object.keys(prevData).length === 0;
-          
-          // Only update if first message or there are actual changes
+
+          // Check for meaningful changes that require user notification
+          const hasSignificantChange =
+            prevData.weather !== data.precipitation_status ||
+            prevData.time !== dayOrNight ||
+            (prevData.temperature !== temperatureValue && Math.abs(prevData.temperature - temperatureValue) >= 1.0);
+
+          // Only update if there are actual changes
           if (
             isFirstMessage ||
             prevData.pid !== data.pid ||
             prevData.weather !== data.precipitation_status ||
             prevData.time !== dayOrNight ||
-            prevData.temperature !== data.temperature ||
+            prevData.temperature !== temperatureValue ||
             prevData.light_level !== data.light_level ||
             prevData.timezone !== data.timezone ||
             prevData.sunrise !== data.sunrise ||
@@ -313,7 +352,7 @@ function AppContent(): React.ReactElement {
           ) {
             return {
               ...newData,
-              hasUpdated: true
+              hasUpdated: hasSignificantChange // Only set to true for significant changes
             };
           }
           return prevData; // Return unchanged state

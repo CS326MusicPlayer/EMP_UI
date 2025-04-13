@@ -1,4 +1,5 @@
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, FloatButton } from 'antd';
+import { GithubOutlined } from '@ant-design/icons';
 import React from 'react';
 import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
 import { PiSelectionProvider } from './contexts/PiSelectionContext';
@@ -18,6 +19,12 @@ function App(): React.ReactElement {
       <SensorPreferencesProvider>
         <PiSelectionProvider>
           <AppContent />
+          <FloatButton
+            icon={<GithubOutlined />}
+            href="https://github.com/CS326MusicPlayer/EMP_UI" 
+            target="_blank"
+            tooltip="View project on GitHub"
+          />
         </PiSelectionProvider>
       </SensorPreferencesProvider>
     </ConfigProvider>

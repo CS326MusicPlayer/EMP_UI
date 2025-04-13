@@ -242,3 +242,17 @@ export const getResponsivePlacement = (defaultPlacement: string, largePlacement:
   }
   return defaultPlacement;
 };
+
+
+/**
+ * Returns the next Pi ID in the list, wrapping around to the start if necessary.
+ *
+ * @param currentPiId - The current Pi ID
+ * @param piList - The list of available Pi IDs
+ * @returns The next Pi ID in the list
+ */
+export const getNextPiId = (currentPiId: string, piList: string[]) => {
+  const currentIndex = piList.indexOf(currentPiId);
+  const nextIndex = (currentIndex + 1) % piList.length;
+  return piList[nextIndex];
+};

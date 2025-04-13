@@ -36,6 +36,7 @@ function AppContent(): React.ReactElement {
   // Cache data for all Pis, keyed by Pi ID
   const [mqttDataCache, setMqttDataCache] = useState<Record<string, PiData>>({});
   // Current Pi data derived from cache based on selectedPiId
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [currentPiData, setCurrentPiData] = useState<PiData | Record<string, any>>({});
 
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -307,6 +308,7 @@ function AppContent(): React.ReactElement {
       };
 
       // Function to process incoming messages
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       function processMessage(data: { timezone: string; sunrise: string; sunset: string; pid: any; precipitation_status: any; temperature: any; light_level: any; }) {
         // Set day/night status based on the current time and sunrise/sunset times
         const currentTime = getTimeUsingTimezone(data.timezone);

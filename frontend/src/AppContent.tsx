@@ -19,11 +19,25 @@ import unknownIcon from './assets/icons/unknown.png';
 const DAY_COLOR = '#b3e6ff';
 const NIGHT_COLOR = '#3a3a5c';
 
-
+// Define a type for the MQTT data structure
+interface PiData {
+  pid: string;
+  weather: string;
+  time: string;
+  timezone: string;
+  temperature: number;
+  light_level: string;
+  sunrise: string;
+  sunset: string;
+  hasUpdated: boolean;
+}
 
 function AppContent(): React.ReactElement {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [mqttData, setMqttData] = useState<Record<string, any>>({});
+  // Cache data for all Pis, keyed by Pi ID
+  const [mqttDataCache, setMqttDataCache] = useState<Record<string, PiData>>({});
+  // Current Pi data derived from cache based on selectedPiId
+  const [currentPiData, setCurrentPiData] = useState<PiData | Record<string, any>>({});
+
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
   const [musicIsFading, setMusicIsFading] = useState<boolean>(false);
@@ -55,12 +69,11 @@ function AppContent(): React.ReactElement {
     document.documentElement.style.setProperty('--background-color', newColor);
   };
 
-
   // Update the selected Pi ID when it changes
   useEffect(() => {
     selectedPiIdRef.current = selectedPiId;
-  }, [selectedPiId]);
-
+    setCurrentPiData(mqttDataCache[selectedPiId] || {});
+  }, [selectedPiId, mqttDataCache]);
 
   // Update the last connected time when the connection status changes
   useEffect(() => {
@@ -74,7 +87,6 @@ function AppContent(): React.ReactElement {
       console.log('Not connected to mqtt server. Last seen: ', lastConnectedTime.current);
     }
   }, [isConnected]);
-
 
   // If the selected Pi changes, show a toast message
   useEffect(() => {
@@ -91,7 +103,7 @@ function AppContent(): React.ReactElement {
       // Publish selection to MQTT topic
       if (mqttClient && mqttClient.connected) {
         const message = JSON.stringify({
-          "handshake": false,
+          "discovery": false,
           "target": selectedPiId
         });
 
@@ -105,7 +117,6 @@ function AppContent(): React.ReactElement {
       }
     }
   }, [selectedPiId, messageApi]);
-
 
   // Toast message according to the connection status
   useEffect(() => {
@@ -124,21 +135,19 @@ function AppContent(): React.ReactElement {
     }
   }, [isConnected, messageApi]);
 
-
   // Update the list of available Pis
   useEffect(() => {
-    if (mqttClient && mqttData.pid) {
+    if (mqttClient && currentPiData.pid) {
       // Use the functional update pattern to safely update without dependencies
       setPiList(prevList => {
-        if (!prevList.includes(mqttData.pid)) {
-          console.log(`Added new Pi ID ${mqttData.pid} to the list`);
-          return [...prevList, mqttData.pid];
+        if (!prevList.includes(currentPiData.pid)) {
+          console.log(`Added new Pi ID ${currentPiData.pid} to the list`);
+          return [...prevList, currentPiData.pid];
         }
         return prevList;
       });
     }
-  }, [mqttData.pid]);
-
+  }, [currentPiData.pid]);
 
   // Show notification only for manual mode changes or when music is changing (not for every MQTT update)
   useEffect(() => {
@@ -167,29 +176,28 @@ function AppContent(): React.ReactElement {
     prevManualTimeRef.current = manualTime;
   }, [messageApi, isAuto, manualWeather, manualTime]);
 
-
   // Show notification when music is changing instead of on every data update
   useEffect(() => {
     // Only show notification when music starts fading (transition begins)
-    if (musicIsFading && !prevMusicIsFadingRef.current && isAuto && Object.keys(mqttData).length > 0) {
+    if (musicIsFading && !prevMusicIsFadingRef.current && isAuto && Object.keys(currentPiData).length > 0) {
       messageApi.info({
         content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{mqttData.temperature}°C</p>
+          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{currentPiData.temperature}°C</p>
           {
-            mqttData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            mqttData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            mqttData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            currentPiData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            currentPiData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            currentPiData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
           }
           {
-            mqttData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            mqttData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            currentPiData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+            currentPiData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
           }
           <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
             {
-              getMusicTime(mqttData.time, mqttData.light_level, false) === 'day' ? 'Bright' :
-              getMusicTime(mqttData.time, mqttData.light_level, false) === 'night' ? 'Dark' :
+              getMusicTime(currentPiData.time, currentPiData.light_level, false) === 'day' ? 'Bright' :
+              getMusicTime(currentPiData.time, currentPiData.light_level, false) === 'night' ? 'Dark' :
               'Unknown'
             }
           </p>
@@ -200,8 +208,7 @@ function AppContent(): React.ReactElement {
 
     // Update the ref for the next render
     prevMusicIsFadingRef.current = musicIsFading;
-  }, [musicIsFading, isAuto, mqttData, messageApi]);
-
+  }, [musicIsFading, isAuto, currentPiData, messageApi]);
 
   // Initialize MQTT service
   useEffect(() => {
@@ -290,13 +297,7 @@ function AppContent(): React.ReactElement {
               // This ensures we process the first message immediately
               processMessage(data);
             } else {
-              // For subsequent messages, only process if it's from the selected Pi
-              const currentSelectedPiId = selectedPiIdRef.current;
-              if (String(data.pid) !== currentSelectedPiId) {
-                console.log(`Skipping message from Pi ${data.pid} - selected Pi is ${currentSelectedPiId}`);
-                return;
-              }
-
+              // For subsequent messages, process and cache data for all Pis
               processMessage(data);
             }
           } catch (err) {
@@ -315,7 +316,7 @@ function AppContent(): React.ReactElement {
         const temperatureValue = parseFloat(data.temperature);
 
         // Create a data object to store the new values
-        const newData = {
+        const newData: PiData = {
           pid: data.pid,
           weather: data.precipitation_status,
           time: dayOrNight,
@@ -327,36 +328,16 @@ function AppContent(): React.ReactElement {
           hasUpdated: false // Flag to track if data was updated
         };
 
-        // Update if the data is not the same as the previous one
-        setMqttData(prevData => {
-          // Force update on first message
-          const isFirstMessage = Object.keys(prevData).length === 0;
+        // Update cache for all Pis
+        setMqttDataCache(prevCache => ({
+          ...prevCache,
+          [data.pid]: newData
+        }));
 
-          // Check for meaningful changes that require user notification
-          const hasSignificantChange =
-            prevData.weather !== data.precipitation_status ||
-            prevData.time !== dayOrNight ||
-            (prevData.temperature !== temperatureValue && Math.abs(prevData.temperature - temperatureValue) >= 1.0);
-
-          // Only update if there are actual changes
-          if (
-            isFirstMessage ||
-            prevData.pid !== data.pid ||
-            prevData.weather !== data.precipitation_status ||
-            prevData.time !== dayOrNight ||
-            prevData.temperature !== temperatureValue ||
-            prevData.light_level !== data.light_level ||
-            prevData.timezone !== data.timezone ||
-            prevData.sunrise !== data.sunrise ||
-            prevData.sunset !== data.sunset
-          ) {
-            return {
-              ...newData,
-              hasUpdated: hasSignificantChange // Only set to true for significant changes
-            };
-          }
-          return prevData; // Return unchanged state
-        });
+        // Update current Pi data if the message is from the selected Pi
+        if (data.pid === selectedPiIdRef.current) {
+          setCurrentPiData(newData);
+        }
       }
 
       mqttClient.on('message', messageHandler);
@@ -375,11 +356,10 @@ function AppContent(): React.ReactElement {
     }
   }, []);
 
-
   // Change the background color based on the time or light level
   useEffect(() => {
-    if (Object.keys(mqttData).length > 0 && isAuto) {
-      const calculatedTime = getMusicTime(mqttData.time, mqttData.light_level, useTime);
+    if (Object.keys(currentPiData).length > 0 && isAuto) {
+      const calculatedTime = getMusicTime(currentPiData.time, currentPiData.light_level, useTime);
 
       if (calculatedTime === 'day') {
         changeBackgroundColor(DAY_COLOR);
@@ -397,13 +377,13 @@ function AppContent(): React.ReactElement {
     }
 
     // Reset the hasUpdated flag after processing
-    if (mqttData.hasUpdated) {
-      setMqttData(prevData => ({
+    if (currentPiData.hasUpdated) {
+      setCurrentPiData(prevData => ({
         ...prevData,
         hasUpdated: false  // Reset the flag
       }));
     }
-  }, [mqttData, isAuto, useTime, manualTime]);
+  }, [currentPiData, isAuto, useTime, manualTime]);
 
   // Manual connect/disconnect function
   const handleConnect = () => {
@@ -426,8 +406,8 @@ function AppContent(): React.ReactElement {
   const handleBroadcast = () => {
     if (mqttClient && mqttClient.connected) {
       const message = JSON.stringify({
-        "handshake": true,
-        "target": "all"
+        "discovery": true,
+        "target": "all"   // Actually this field is not being read in the RPi
       });
 
       mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
@@ -444,7 +424,6 @@ function AppContent(): React.ReactElement {
     }
   };
 
-
   return (
     <div className="App">
       {contextHolder}
@@ -457,13 +436,13 @@ function AppContent(): React.ReactElement {
         onBroadcast={handleBroadcast}
       />
       <TimeWeather
-        piWeather={isAuto ? mqttData.weather : manualWeather}
-        piTime={isAuto ? mqttData.time : manualTime}
-        piTemperature={mqttData.temperature}
-        piLightLevel={mqttData.light_level}
-        piTimezone={mqttData.timezone}
-        piSunrise={mqttData.sunrise}
-        piSunset={mqttData.sunset}
+        piWeather={isAuto ? currentPiData.weather : manualWeather}
+        piTime={isAuto ? currentPiData.time : manualTime}
+        piTemperature={currentPiData.temperature}
+        piLightLevel={currentPiData.light_level}
+        piTimezone={currentPiData.timezone}
+        piSunrise={currentPiData.sunrise}
+        piSunset={currentPiData.sunset}
         isAuto={isAuto}
         setIsAuto={setIsAuto}
         setManualWeather={setManualWeather}
@@ -471,10 +450,10 @@ function AppContent(): React.ReactElement {
       />
       <MusicPlayer
         isAuto={isAuto}
-        piWeather={isAuto ? mqttData.weather : manualWeather}
-        piTime={isAuto ? mqttData.time : manualTime}
-        piTemperature={mqttData.temperature}
-        piLightLevel={mqttData.light_level}
+        piWeather={isAuto ? currentPiData.weather : manualWeather}
+        piTime={isAuto ? currentPiData.time : manualTime}
+        piTemperature={currentPiData.temperature}
+        piLightLevel={currentPiData.light_level}
         onFadingChange={setMusicIsFading}
       />
     </div>

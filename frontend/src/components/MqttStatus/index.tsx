@@ -3,9 +3,9 @@
 
 import React, { useState, useEffect } from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
-import { Popover, Spin } from "antd";
+import { Popover, Spin, Dropdown, Typography } from "antd";
 import { LuPower, LuPowerOff } from "react-icons/lu";
-import { SwapOutlined } from '@ant-design/icons';
+import { DownOutlined } from '@ant-design/icons';
 import { RiBroadcastFill } from "react-icons/ri";
 import { usePiSelection } from "../../contexts/PiSelectionContext";
 import { formatTimeAgo } from '../../utilities/utils';
@@ -103,6 +103,8 @@ export default function MqttStatus({
               <div>
                 <h3 style={{ color: 'var(--black)' }}>Pi Discovery</h3>
                 <p style={{ color: 'var(--black)' }}>Click to discover all available Pis!</p>
+                <p style={{ color: 'var(--gray)' }}>Current Pi: {selectedPiId}</p>
+                <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
               </div>
             }
             trigger="hover"
@@ -123,56 +125,39 @@ export default function MqttStatus({
         </span>
       )}
 
-      {/* Pi Swap button */}
+      {/* Pi Swap button - replaced with dropdown */}
       <span className={classes.piStatusContainer}>
         { mqttConnected &&
             <>
-              <p className={classes.statusText}>Pi: {selectedPiId}</p>
-              <Popover
-                content={
-                  piList.length === 1 ?
-                    <div>
-                      <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
-                      <p style={{ color: 'var(--black)' }}>Only one Pi available</p>
-                    </div>
-                    :
-                  piList.length > 1 ?
-                    <div>
-                      <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
-                      <p style={{ color: 'var(--black)' }}>Click to switch to another Pi</p>
-                      <p style={{ color: 'var(--gray)' }}>Current Pi: {selectedPiId}</p>
-                      <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
-                    </div>
-                    :
-                  piList.length === 0 ?
-                    <div>
-                      <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
-                      <p style={{ color: 'var(--black)' }}>No Pi available yet!</p>
-                    </div>
-                    :
-                    <div>
-                      <h3 style={{ color: 'var(--black)' }}>Switch Pi</h3>
-                      <p style={{ color: 'var(--black)' }}>Click to switch to another Pi</p>
-                      <p style={{ color: 'var(--gray)' }}>Current Pi: {selectedPiId}</p>
-                      <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
-                    </div>
-                }
-                trigger="hover"
-                placement="top"
-              >
-                <div
-                  className={piList.length > 1 && !musicIsFading ? classes.piSwitchButton : classes.piSwitchButtonDisabled}
-                  onClick={() => {
-                    // Only rotate if there are multiple Pis
-                    if (piList.length > 1 && !musicIsFading) {
-                      const nextPiId = getNextPiId(selectedPiId, piList);
-                      setSelectedPiId(nextPiId);
-                    }
+              <p className={classes.statusText}>Pi:</p>
+              {piList.length > 0 ? (
+                <Dropdown
+                  menu={{
+                    items: piList.map(id => ({
+                      key: id,
+                      label: `Pi ${id}`,
+                      disabled: musicIsFading || id === selectedPiId
+                    })),
+                    onClick: ({ key }) => setSelectedPiId(key),
                   }}
+                  placement="bottomRight"
+                  disabled={piList.length <= 1 || musicIsFading}
+                  trigger={['hover']}
                 >
-                  <SwapOutlined style={{ color: 'var(--black)' }} />
+                  <div className={piList.length > 1 && !musicIsFading ? classes.piDropdownButton : classes.piDropdownButtonDisabled}>
+                    <Typography.Text strong style={{ marginRight: '5px', color: 'var(--black)' }}>
+                      {selectedPiId}
+                    </Typography.Text>
+                    <DownOutlined style={{ color: 'var(--black)', fontSize: '10px' }} />
+                  </div>
+                </Dropdown>
+              ) : (
+                <div className={classes.piDropdownButtonDisabled}>
+                  <Typography.Text strong style={{ marginRight: '5px', color: 'var(--gray)' }}>
+                    {selectedPiId}
+                  </Typography.Text>
                 </div>
-              </Popover>
+              )}
             </>
         }
       </span>

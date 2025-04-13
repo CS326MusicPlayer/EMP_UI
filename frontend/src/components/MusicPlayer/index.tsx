@@ -537,12 +537,12 @@ export default function MusicPlayer({
 
   return (
     <div className={classes.musicPlayer}>
-      <Popover content={<p style={{ 'color': 'var(--black)' }}>Click to reset the player</p>} placement="top" mouseEnterDelay={0.5}>
+      {/* <Popover content={<p style={{ 'color': 'var(--black)' }}>Click to reset the player</p>} placement="top" mouseEnterDelay={0.5}>
         <LuRotateCcw
           onClick={resetPlayer}
           className={classes.resetMusicButton}
         />
-      </Popover>
+      </Popover> */}
       <span className={classes.musicTitleContainer}>
         <img
           src={currentSong.weatherIcon}

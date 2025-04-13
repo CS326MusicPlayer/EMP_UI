@@ -422,6 +422,28 @@ function AppContent(): React.ReactElement {
     }
   };
 
+  // Broadcast to all Pis
+  const handleBroadcast = () => {
+    if (mqttClient && mqttClient.connected) {
+      const message = JSON.stringify({
+        "handshake": true,
+        "target": "all"
+      });
+
+      mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+        if (error) {
+          console.error('Error broadcasting to all Pis:', error);
+        } else {
+          console.log('Broadcast message sent to all Pis');
+          messageApi.info({
+            content: 'Broadcast message sent to all Pis',
+            duration: 3,
+          });
+        }
+      });
+    }
+  };
+
 
   return (
     <div className="App">
@@ -432,6 +454,7 @@ function AppContent(): React.ReactElement {
         lastConnectedTime={lastConnectedTime.current}
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
+        onBroadcast={handleBroadcast}
       />
       <TimeWeather
         piWeather={isAuto ? mqttData.weather : manualWeather}

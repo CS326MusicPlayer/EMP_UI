@@ -6,6 +6,7 @@ import { LuCheck, LuEllipsis } from "react-icons/lu";
 import { Popover, Spin } from "antd";
 import { LuPower, LuPowerOff } from "react-icons/lu";
 import { SwapOutlined } from '@ant-design/icons';
+import { RiBroadcastFill } from "react-icons/ri";
 import { usePiSelection } from "../../contexts/PiSelectionContext";
 import { formatTimeAgo } from '../../utilities/utils';
 import classes from './styles.module.css';
@@ -16,13 +17,15 @@ export default function MqttStatus({
   musicIsFading,
   lastConnectedTime,
   onConnect,
-  onDisconnect
+  onDisconnect,
+  onBroadcast
 }: {
   mqttConnected: boolean;
   musicIsFading: boolean;
   lastConnectedTime: string | null;
   onConnect: () => void;
   onDisconnect: () => void;
+  onBroadcast: () => void;
 }
 ): React.ReactElement {
   const { selectedPiId, setSelectedPiId, piList } = usePiSelection();
@@ -91,6 +94,35 @@ export default function MqttStatus({
         <p className={classes.statusText}>{mqttConnected ? 'Online' : 'Offline'}</p>
       </span>
       {musicIsFading && (<Spin className={classes.musicStatusSpinner} />)}
+
+      {/* Pi Broadcast button */}
+      {mqttConnected && (
+        <span className={classes.piBroadcast}>
+          <Popover
+            content={
+              <div>
+                <h3 style={{ color: 'var(--black)' }}>Pi Discovery</h3>
+                <p style={{ color: 'var(--black)' }}>Click to discover all available Pis!</p>
+              </div>
+            }
+            trigger="hover"
+            placement="top"
+          >
+            <div
+              className={classes.piBroadcastButton}
+              onClick={() => {
+                // Broadcast to all Pis
+                if (mqttConnected) {
+                  onBroadcast();
+                }
+              }}
+            >
+              <RiBroadcastFill style={{ color: 'var(--black)' }} />
+            </div>
+          </Popover>
+        </span>
+      )}
+
       {/* Pi Swap button */}
       <span className={classes.piStatusContainer}>
         { mqttConnected &&

@@ -114,6 +114,53 @@
   transform: translate(-50%, -50%);
 }
 
+.piBroadcast {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease-in-out;
+}
+
+.piBroadcastButton {
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--lightgray1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.2rem solid var(--lightgray0);
+  transition: all 0.2s ease-in-out;
+}
+
+.piBroadcastButton:hover {
+  background-color: var(--emerald);
+  border: 0.2rem solid var(--emerald0);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(82, 195, 151, 0.7);
+  }
+
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(82, 195, 151, 0);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(82, 195, 151, 0);
+  }
+}
+
 .connButton {
   width: 2rem;
   height: 2rem;

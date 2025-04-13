@@ -358,6 +358,52 @@ function AppContent(): React.ReactElement {
     }
   }, []);
 
+
+  // Add polling interval to request data from selected Pi every 10 seconds
+  useEffect(() => {
+    let pollInterval: NodeJS.Timeout | null = null;
+
+    // Only start polling if connected and a Pi is selected
+    if (isConnected && selectedPiId && selectedPiId !== "?") {
+      console.log('Starting polling for Pi data');
+
+      // Initial request immediately upon connection
+      requestPiData();
+
+      // Set up regular polling interval
+      pollInterval = setInterval(() => {
+        requestPiData();
+      }, 10000); // Poll every 10 seconds
+    }
+
+    // Function to request data from the selected Pi
+    function requestPiData() {
+      if (mqttClient && mqttClient.connected && selectedPiId) {
+        const message = JSON.stringify({
+          "target": selectedPiId
+        });
+
+        mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+          if (error) {
+            console.error('Error publishing data request:', error);
+          } else {
+            console.log(`Data request sent to Pi ${selectedPiId}`);
+          }
+        });
+      }
+    }
+
+    // Clean up interval when component unmounts or connection state changes
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        console.log('Stopped polling for Pi data');
+      }
+    };
+  }, [isConnected, selectedPiId]); // Re-establish polling when connection status or selected Pi changes
+
+
+
   // Change the background color based on the time or light level
   useEffect(() => {
     if (Object.keys(currentPiData).length > 0 && isAuto) {

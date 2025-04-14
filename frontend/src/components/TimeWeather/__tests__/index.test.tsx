@@ -5,9 +5,8 @@ import * as utils from '../../../utilities/utils';
 
 // Mock the utility functions
 vi.mock('../../../utilities/utils', () => ({
-  // Fix lint errors by removing unused parameters from the mock functions
-  getMusicWeather: vi.fn((weather) => weather),
-  getMusicTime: vi.fn((time) => time),
+  getMusicWeather: vi.fn((weather, _temperature, _useWeather) => weather),
+  getMusicTime: vi.fn((time, _lightLevel, _useTime) => time),
   getTimeUsingTimezone: vi.fn(() => new Date('2023-04-13T12:00:00')),
   calculateSunPosition: vi.fn(() => 0),
   getDayOrNight: vi.fn(() => 'day'),
@@ -70,7 +69,7 @@ describe('TimeWeather Component', () => {
   const defaultProps = {
     piWeather: 'none',
     piTime: 'day',
-    piTemperature: '25',
+    piTemperature: 25, // Changed from string to number
     piLightLevel: '80',
     piTimezone: 'America/New_York',
     piSunrise: '06:00',

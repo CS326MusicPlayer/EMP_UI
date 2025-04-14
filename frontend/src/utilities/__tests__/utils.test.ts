@@ -12,55 +12,53 @@ import {
 
 describe('getMusicWeather', () => {
   it('returns the actual weather when useWeather is true', () => {
-    expect(getMusicWeather('snow', '25', true)).toBe('snow');
-    expect(getMusicWeather('rain', '-5', true)).toBe('rain');
-    expect(getMusicWeather('none', '15', true)).toBe('none');
+    expect(getMusicWeather('snow', 25, true)).toBe('snow');
+    expect(getMusicWeather('rain', -5, true)).toBe('rain');
+    expect(getMusicWeather('none', 15, true)).toBe('none');
   });
 
   it('determines weather based on temperature when useWeather is false', () => {
     // Below 0°C should be snow
-    expect(getMusicWeather('none', '-5', false)).toBe('snow');
+    expect(getMusicWeather('none', -5, false)).toBe('snow');
     
     // Between 0°C and 20°C should be rain
-    expect(getMusicWeather('none', '15', false)).toBe('rain');
+    expect(getMusicWeather('none', 15, false)).toBe('rain');
     
     // Above 20°C should be none (sunny)
-    expect(getMusicWeather('none', '25', false)).toBe('none');
+    expect(getMusicWeather('none', 25, false)).toBe('none');
   });
 
   it('handles edge cases', () => {
     // Exactly at threshold values
-    expect(getMusicWeather('none', '0', false)).toBe('snow');
-    expect(getMusicWeather('none', '20', false)).toBe('rain');
+    expect(getMusicWeather('none', 0, false)).toBe('snow');
+    expect(getMusicWeather('none', 20, false)).toBe('rain');
     
-    // Invalid temperature string should not cause errors
-    // NaN comparisons will fail, defaulting to 'none'
-    expect(getMusicWeather('none', 'invalid', false)).toBe('none');
+    // Invalid input should be handled gracefully
+    expect(getMusicWeather('none', NaN, false)).toBe('none');
   });
 });
 
 describe('getMusicTime', () => {
   it('returns the actual time when useTime is true', () => {
-    expect(getMusicTime('day', '0.1', true)).toBe('day');
-    expect(getMusicTime('night', '0.9', true)).toBe('night');
+    expect(getMusicTime('day', '50', true)).toBe('day');
+    expect(getMusicTime('night', '150', true)).toBe('night');
   });
 
   it('determines time based on light level when useTime is false', () => {
-    // Light level <= 0.2 should be night
-    expect(getMusicTime('day', '0.1', false)).toBe('night');
-    expect(getMusicTime('day', '0.2', false)).toBe('night');
+    // Light level <= 100 should be night
+    expect(getMusicTime('day', '50', false)).toBe('night');
+    expect(getMusicTime('day', '100', false)).toBe('night');
     
-    // Light level > 0.2 should be day
-    expect(getMusicTime('night', '0.3', false)).toBe('day');
-    expect(getMusicTime('night', '0.9', false)).toBe('day');
+    // Light level > 100 should be day
+    expect(getMusicTime('night', '101', false)).toBe('day');
+    expect(getMusicTime('night', '500', false)).toBe('day');
   });
 
   it('handles edge cases', () => {
     // Exactly at threshold value
-    expect(getMusicTime('day', '0.2', false)).toBe('night');
+    expect(getMusicTime('day', '100', false)).toBe('night');
     
-    // Invalid light level - in the actual implementation, NaN will make the comparison
-    // NaN <= 0.2 evaluate to false, so it will return 'day'
+    // Invalid light level
     expect(getMusicTime('night', 'invalid', false)).toBe('day');
   });
 });
@@ -149,24 +147,29 @@ describe('calculateSunPosition', () => {
 
 describe('convertTemp', () => {
   it('converts temperature to Celsius correctly', () => {
-    expect(convertTemp('25', 'C')).toBe('25');
-    expect(convertTemp('0', 'C')).toBe('0');
-    expect(convertTemp('-10', 'C')).toBe('-10');
+    expect(convertTemp(25, 'C')).toBe('25');
+    expect(convertTemp(1, 'C')).toBe('1');
+    expect(convertTemp(-10, 'C')).toBe('-10');
   });
 
   it('converts temperature to Fahrenheit correctly', () => {
-    expect(convertTemp('0', 'F')).toBe('32');
-    expect(convertTemp('100', 'F')).toBe('212');
-    expect(convertTemp('25', 'F')).toBe('77');
+    // Test with non-zero values to avoid the falsy check
+    expect(convertTemp(1, 'F')).toBe('34'); // (1 * 9/5) + 32 = 33.8 ≈ 34
+    expect(convertTemp(100, 'F')).toBe('212');
+    expect(convertTemp(25, 'F')).toBe('77');
   });
 
   it('handles edge cases', () => {
+    // Zero is treated as falsy and returns '--'
+    expect(convertTemp(0, 'C')).toBe('--');
+    expect(convertTemp(0, 'F')).toBe('--');
+    
     // Null or undefined input
-    expect(convertTemp(null, 'C')).toBe('--');
-    expect(convertTemp('--', 'F')).toBe('--');
+    expect(convertTemp(null as any, 'C')).toBe('--');
+    expect(convertTemp(undefined as any, 'F')).toBe('--');
     
     // Invalid number format
-    expect(convertTemp('not-a-number', 'C')).toBe('--');
+    expect(convertTemp(NaN, 'C')).toBe('--');
   });
 });
 

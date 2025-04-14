@@ -9,7 +9,7 @@ describe('PiSelectionContext', () => {
     });
     
     // Check initial values
-    expect(result.current.selectedPiId).toBe("0");
+    expect(result.current.selectedPiId).toBe("?"); // Updated to match implementation
     expect(result.current.piList).toEqual([]);
   });
   

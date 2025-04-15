@@ -198,7 +198,7 @@ export default function TimeWeather({
             </>
           }
           trigger="hover"
-          placement="left"
+          placement="right"
           mouseEnterDelay={0.2}
         >
           <div
@@ -240,8 +240,9 @@ export default function TimeWeather({
             content={
               <p style={{ 'color': 'var(--black)' }}>
                 {
-                  isAuto ? `You are using "{useWeather ? 'weather' : 'temperature'}" for playing music` :
-                  `Click to toggle sunny/rainy/snowy`
+                  isAuto ? 
+                    <>You are using "{useWeather ? 'weather' : 'temperature'}"<br />for playing music</> :
+                    'Click to toggle sunny/rainy/snowy'
                 }
               </p>
             }
@@ -363,10 +364,13 @@ export default function TimeWeather({
                 }
               </span>
             }
-            content={isAuto ?
-              <p style={{ 'color': 'var(--black)' }}>You are using "{useTime ? 'time' : 'light level'}" for playing music</p>
-              :
-              <p style={{ 'color': 'var(--black)' }}>Click to toggle day/night</p>
+            content={
+              <p style={{ 'color': 'var(--black)' }}>
+                {isAuto ?
+                  <>You are using "{useTime ? 'time' : 'light level'}"<br />for playing music</> :
+                  'Click to toggle day/night'
+                }
+              </p>
             }
             trigger="hover"
             placement="right"

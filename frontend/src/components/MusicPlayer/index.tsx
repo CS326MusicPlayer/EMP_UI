@@ -126,7 +126,11 @@ export default function MusicPlayer({
   // State variables
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(() => {
+    // Try to get saved volume from localStorage, default to 1 if not found
+    const savedVolume = localStorage.getItem('musicPlayerVolume');
+    return savedVolume ? parseFloat(savedVolume) : 1;
+  });
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [loopMode, setLoopMode] = useState('one'); // 'one', 'all'
@@ -364,6 +368,7 @@ export default function MusicPlayer({
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
+    localStorage.setItem('musicPlayerVolume', newVolume.toString());
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
     }

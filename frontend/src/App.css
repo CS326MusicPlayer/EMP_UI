@@ -31,6 +31,30 @@ body {
   justify-content: center;
 }
 
+.floatSettingsButton:hover {
+  transition: all 0.3s ease;
+  animation: rotate 0.45s ease-in-out;
+}
+.floatSettingsButton:not(:hover) {
+  animation: rotateReverse 0.45s ease-in-out;
+}
+
+
+@keyframes rotate {
+  to {
+    transform: rotateZ(-180deg);
+  }
+}
+
+@keyframes rotateReverse {
+  from {
+    transform: rotateZ(-180deg);
+  }
+  to {
+    transform: rotateZ(0deg);
+  }
+}
+
 
 @media (max-width: 768px) {
   .App {

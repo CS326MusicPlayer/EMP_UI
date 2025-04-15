@@ -58,56 +58,75 @@ export default function TimeWeather({
   const [isHoveringTime, setIsHoveringTime] = useState(false);
   const [sunAngle, setSunAngle] = useState(0); // Default to sunrise position
   const [time, setTime] = useState(new Date());
+  // Add a ref to track animation frame ID for cleanup
+  const animationFrameId = React.useRef<number | undefined>(undefined);
+  // Use ref to track last update time to optimize frame rate
+  const lastUpdateRef = React.useRef<number>(0);
 
-
-  // Initially set the sun angle based on the current time and sunrise/sunset times
+  // Update time using requestAnimationFrame instead of setInterval
   useEffect(() => {
-    const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    // Temporary sunrise and sunset times
-    const angle = calculateSunPosition(currentTimezone, '06:00', '18:00');
-    setSunAngle(angle);
-  }, []);
+    // Function to update time using requestAnimationFrame
+    const updateClock = (timestamp: number) => {
+      // Only update every 1000ms (1 second) to match previous behavior
+      // using requestAnimationFrame's timing system
+      if (timestamp - lastUpdateRef.current >= 1000) {
+        const newTime = piTimezone ? getTimeUsingTimezone(piTimezone) : new Date();
+        setTime(newTime);
+        lastUpdateRef.current = timestamp;
+      }
 
+      // Schedule next frame
+      animationFrameId.current = requestAnimationFrame(updateClock);
+    };
 
-  // Update the time every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newTime = piTimezone ? getTimeUsingTimezone(piTimezone) : new Date();
-      setTime(newTime);
-    }, 1000);
+    // Start the animation loop
+    animationFrameId.current = requestAnimationFrame(updateClock);
 
-    return () => clearInterval(interval);
+    // Cleanup function to cancel animation frame
+    return () => {
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
   }, [piTimezone]);
 
-
   // Update the sun angle based on the current time and sunrise/sunset times
+  // Use useMemo to avoid recalculating sun angle on every render
   useEffect(() => {
-    // Update the sun position every time the current time changes
     if (piSunrise && piSunset) {
       const angle = calculateSunPosition(piTimezone, piSunrise, piSunset);
       setSunAngle(angle);
     }
-  }, [piTimezone, piSunrise, piSunset]);
+  }, [piTimezone, piSunrise, piSunset, time]);
 
+  // Use useMemo for time-related calculations to avoid unnecessary re-calculations
+  // These will only be recalculated when time changes
+  const timeDisplayValues = React.useMemo(() => {
+    const currentTime = time;
+    const seconds = currentTime.getSeconds();
+    const minutes = currentTime.getMinutes() + seconds / 60;
 
-  // Calculate hand positions with more precision
-  const currentTime = time;
-  const seconds = currentTime.getSeconds();
-  const minutes = currentTime.getMinutes() + seconds / 60;
+    // Format the time for 24-hour display
+    const hoursDisplay = currentTime.getHours().toString().padStart(2, '0');
+    const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
 
-  // Format the time for 24-hour display
-  const hoursDisplay = currentTime.getHours().toString().padStart(2, '0');
-  const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
+    // Calculate day or night once per second instead of on every render
+    const dayOrNightValue = piSunrise && piSunset ?
+      getDayOrNight(currentTime, piSunrise, piSunset) : 'day';
 
+    return {
+      hoursDisplay,
+      minutesDisplay,
+      dayOrNightValue
+    };
+  }, [time, piSunrise, piSunset]);
+
+  // Get the memoized values
+  const { hoursDisplay, minutesDisplay, dayOrNightValue } = timeDisplayValues;
 
   // Toggle between Celsius and Fahrenheit
   const toggleTempUnit = () => {
     setTempUnit(prev => prev === 'C' ? 'F' : 'C');
-  };
-
-  // Toggle between auto and manual mode
-  const toggleMode = () => {
-    setIsAuto(!isAuto);
   };
 
   // Button style based on the mode
@@ -181,7 +200,7 @@ export default function TimeWeather({
             <img src={useWeather ? precipitation : temperature} alt="Weather" className={classes.toggleChipIcon} />
           </div>
         </Popover>
-        
+
         {/* Weather Data */}
         <div className={classes.forecast}>
           <Popover
@@ -252,7 +271,7 @@ export default function TimeWeather({
           <button
             style={buttonStyle}
             className={classes.toggleButton}
-            onClick={toggleMode}
+            onClick={() => setIsAuto(!isAuto)}
           >
             <p className={classes.toggleButtonText}>{isAuto ? 'AUTO' : 'MANUAL'}</p>
           </button>
@@ -267,7 +286,7 @@ export default function TimeWeather({
             Sunrise: {piSunrise} / Sunset: {piSunset}
             </h3>
             <p style={{ 'color': 'var(--black)' }}>
-              Currently the sun is {getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'above' : 'below'} the horizon
+              Currently the sun is {dayOrNightValue === 'day' ? 'above' : 'below'} the horizon
             </p>
           </>
         }
@@ -277,7 +296,7 @@ export default function TimeWeather({
       >
         <div
           className={classes.time}
-          style={{ backgroundColor: getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'var(--day1)' : 'var(--night1)' }}
+          style={{ backgroundColor: dayOrNightValue === 'day' ? 'var(--day1)' : 'var(--night1)' }}
         >
           {/* Toggle Chip */}
           <Popover
@@ -309,8 +328,8 @@ export default function TimeWeather({
               style={{
                 transform: `rotate(${sunAngle}deg)`,
                 borderColor:
-                  getDayOrNight(time, piSunrise, piSunset) === 'day' ? 'var(--yellow)' :
-                  getDayOrNight(time, piSunrise, piSunset) === 'night' ? 'var(--lightblue)' : 'var(--white)'
+                  dayOrNightValue === 'day' ? 'var(--yellow)' :
+                  dayOrNightValue === 'night' ? 'var(--lightblue)' : 'var(--white)'
               }}>
             </div>
           </div>

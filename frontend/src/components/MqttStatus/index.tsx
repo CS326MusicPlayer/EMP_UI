@@ -85,13 +85,13 @@ export default function MqttStatus({
         </Popover>
         <p className={classes.statusText}>{mqttConnected ? 'Online' : 'Offline'}</p>
       </span>
-      {musicIsFading && (<Spin className={classes.musicStatusSpinner} />)}
+      {musicIsFading && (<Spin size="large" className={classes.musicStatusSpinner} />)}
 
       {/* Pi Broadcast button */}
       {mqttConnected && (
         <span className={classes.piBroadcast}>
           <Popover
-            content={
+            content={!musicIsFading &&
               <div>
                 <h3 style={{ color: 'var(--black)' }}>Pi Discovery</h3>
                 <p style={{ color: 'var(--black)' }}>Click to discover all available Pis!</p>
@@ -103,15 +103,15 @@ export default function MqttStatus({
             placement="top"
           >
             <div
-              className={classes.piBroadcastButton}
+              className={!musicIsFading ? classes.piBroadcastButton : classes.piBroadcastButtonDisabled}
               onClick={() => {
                 // Broadcast to all Pis
-                if (mqttConnected) {
+                if (mqttConnected && !musicIsFading) {
                   onBroadcast();
                 }
               }}
             >
-              <RiBroadcastFill style={{ color: 'var(--black)' }} />
+              <RiBroadcastFill />
             </div>
           </Popover>
         </span>

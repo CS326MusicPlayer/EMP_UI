@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   getMusicWeather,
   getMusicTime,
@@ -7,8 +7,15 @@ import {
   formatTimeAgo,
   calculateSunPosition,
   convertTemp,
-  formatTime
+  formatTime,
+  resetHysteresisState
 } from '../utils';
+
+// Reset module state before each test
+beforeEach(() => {
+  // Reset the hysteresis state
+  resetHysteresisState();
+});
 
 describe('getMusicWeather', () => {
   it('returns the actual weather when useWeather is true', () => {
@@ -21,8 +28,14 @@ describe('getMusicWeather', () => {
     // Below 0°C should be snow
     expect(getMusicWeather('none', -5, false)).toBe('snow');
     
+    // Reset state for next test
+    resetHysteresisState();
+    
     // Between 0°C and 20°C should be rain
     expect(getMusicWeather('none', 15, false)).toBe('rain');
+    
+    // Reset state for next test
+    resetHysteresisState();
     
     // Above 20°C should be none (sunny)
     expect(getMusicWeather('none', 25, false)).toBe('none');
@@ -30,11 +43,54 @@ describe('getMusicWeather', () => {
 
   it('handles edge cases', () => {
     // Exactly at threshold values
+    resetHysteresisState();
     expect(getMusicWeather('none', 0, false)).toBe('snow');
+    
+    // Reset and set to moderate temperature
+    resetHysteresisState();
     expect(getMusicWeather('none', 20, false)).toBe('rain');
     
     // Invalid input should be handled gracefully
+    resetHysteresisState();
     expect(getMusicWeather('none', NaN, false)).toBe('none');
+  });
+  
+  it('implements hysteresis correctly for snow-rain transition', () => {
+    // First call establishes state as snow (temperature below 0°C)
+    expect(getMusicWeather('none', -1, false)).toBe('snow');
+    
+    // Should stay snow even when temperature rises just above threshold (0°C)
+    // due to hysteresis (2°C band)
+    expect(getMusicWeather('none', 1, false)).toBe('snow');
+    
+    // Should switch to rain when temperature exceeds threshold + hysteresis (0°C + 2°C)
+    expect(getMusicWeather('none', 3, false)).toBe('rain');
+    
+    // Should stay rain even when temperature drops just below threshold (0°C)
+    // due to hysteresis (2°C band)
+    expect(getMusicWeather('none', -1, false)).toBe('rain');
+    
+    // Should switch back to snow when temperature drops below threshold - hysteresis (0°C - 2°C)
+    expect(getMusicWeather('none', -3, false)).toBe('snow');
+  });
+  
+  it('implements hysteresis correctly for rain-none transition', () => {
+    // First call establishes state as rain
+    expect(getMusicWeather('none', 15, false)).toBe('rain');
+    
+    // Should stay rain even when temperature rises just above threshold (20°C)
+    // due to hysteresis (2°C band)
+    expect(getMusicWeather('none', 21, false)).toBe('rain');
+    
+    // Should switch to none when temperature exceeds threshold + hysteresis (20°C + 2°C)
+    expect(getMusicWeather('none', 23, false)).toBe('none');
+    
+    // Should stay none even when temperature drops just below threshold (20°C)
+    // due to hysteresis (2°C band)
+    expect(getMusicWeather('none', 19, false)).toBe('none');
+    
+    // Should switch back to rain when temperature drops below threshold - hysteresis (20°C - 2°C)
+    expect(getMusicWeather('none', 17, false)).toBe('rain');
   });
 });
 
@@ -46,20 +102,43 @@ describe('getMusicTime', () => {
 
   it('determines time based on light level when useTime is false', () => {
     // Light level <= 100 should be night
+    resetHysteresisState();
     expect(getMusicTime('day', '50', false)).toBe('night');
     expect(getMusicTime('day', '100', false)).toBe('night');
     
     // Light level > 100 should be day
+    resetHysteresisState();
     expect(getMusicTime('night', '101', false)).toBe('day');
     expect(getMusicTime('night', '500', false)).toBe('day');
   });
 
   it('handles edge cases', () => {
     // Exactly at threshold value
+    resetHysteresisState();
     expect(getMusicTime('day', '100', false)).toBe('night');
     
     // Invalid light level
+    resetHysteresisState();
     expect(getMusicTime('night', 'invalid', false)).toBe('day');
+  });
+  
+  it('implements hysteresis correctly for night-day transition', () => {
+    // First call establishes state as night
+    expect(getMusicTime('night', '90', false)).toBe('night');
+    
+    // Should stay night even when light level rises just above threshold (100)
+    // due to hysteresis (20 unit band)
+    expect(getMusicTime('night', '110', false)).toBe('night');
+    
+    // Should switch to day when light level exceeds threshold + hysteresis (100 + 20)
+    expect(getMusicTime('night', '125', false)).toBe('day');
+    
+    // Should stay day even when light level drops just below threshold (100)
+    // due to hysteresis (20 unit band)
+    expect(getMusicTime('day', '90', false)).toBe('day');
+    
+    // Should switch back to night when light level drops below threshold - hysteresis (100 - 20)
+    expect(getMusicTime('day', '75', false)).toBe('night');
   });
 });
 

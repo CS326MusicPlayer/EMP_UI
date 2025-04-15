@@ -173,7 +173,7 @@ export default function MusicPlayer({
 
       if (progress >= 1) {
         clearInterval(fadeId);
-        audioElement.volume = targetVolume; // Ensure we end at exactly the target volume
+        audioElement.volume = targetVolume; // Ensure to end at exactly the target volume
       }
     }, 16); // ~60fps for smooth transition
 

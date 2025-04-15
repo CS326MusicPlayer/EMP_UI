@@ -1,11 +1,24 @@
 // originally has 0 to 1023, and currently taking 20 samples
 const LIGHT_LEVEL_THRESHOLD = 100;  // Below 100 is dark (data ranges between 0 and 65535)
+const LIGHT_LEVEL_HYSTERESIS = 20;  // Hysteresis band for light level transitions
+
 const SNOW_TEMPC_THRESHOLD = 0;    // below 0°C is snowing
 const RAIN_TEMPC_THRESHOLD = 20;   // below 20°C is raining
+const TEMP_HYSTERESIS = 2;         // 2°C hysteresis band for temperature transitions
 
+// Store previous weather and time states to implement hysteresis
+let prevWeather = '';
+let prevTime = '';
+
+// For test purposes
+export const resetHysteresisState = () => {
+  prevWeather = '';
+  prevTime = '';
+};
 
 /**
  * Determines the music weather condition based on weather preference and temperature.
+ * Uses bang-bang control with hysteresis to prevent frequent switching.
  *
  * @param piWeather - Current weather condition string from Pi device
  * @param piTemperature - Temperature number from Pi device
@@ -15,14 +28,48 @@ const RAIN_TEMPC_THRESHOLD = 20;   // below 20°C is raining
  */
 export const getMusicWeather = (piWeather: string, piTemperature: number, useWeather: boolean) => {
   if (useWeather) {
+    prevWeather = piWeather;
     return piWeather;
   } else {
-    if (piTemperature <= SNOW_TEMPC_THRESHOLD) {
+    // Bang-bang control with hysteresis for temperature-based weather
+    if (prevWeather === 'snow') {
+      // Currently snow, only switch to rain if temperature rises above threshold + hysteresis
+      if (piTemperature > SNOW_TEMPC_THRESHOLD + TEMP_HYSTERESIS) {
+        prevWeather = 'rain';
+        return 'rain';
+      }
       return 'snow';
-    } else if (piTemperature <= RAIN_TEMPC_THRESHOLD) {
+    } else if (prevWeather === 'rain') {
+      // Currently rain, switch to snow if temp falls below threshold - hysteresis
+      if (piTemperature <= SNOW_TEMPC_THRESHOLD - TEMP_HYSTERESIS) {
+        prevWeather = 'snow';
+        return 'snow';
+      }
+      // Switch to none if temp rises above threshold + hysteresis
+      else if (piTemperature > RAIN_TEMPC_THRESHOLD + TEMP_HYSTERESIS) {
+        prevWeather = 'none';
+        return 'none';
+      }
       return 'rain';
-    } else {
+    } else if (prevWeather === 'none') {
+      // Currently none, switch to rain if temp falls below threshold - hysteresis
+      if (piTemperature <= RAIN_TEMPC_THRESHOLD - TEMP_HYSTERESIS) {
+        prevWeather = 'rain';
+        return 'rain';
+      }
       return 'none';
+    } else {
+      // Currently undefined, set initial state based on temperature
+      if (piTemperature <= SNOW_TEMPC_THRESHOLD) {
+        prevWeather = 'snow';
+        return 'snow';
+      } else if (piTemperature <= RAIN_TEMPC_THRESHOLD) {
+        prevWeather = 'rain';
+        return 'rain';
+      } else {
+        prevWeather = 'none';
+        return 'none';
+      }
     }
   }
 }
@@ -30,6 +77,7 @@ export const getMusicWeather = (piWeather: string, piTemperature: number, useWea
 
 /**
  * Determines the music time condition based on light level and time preference.
+ * Uses bang-bang control with hysteresis to prevent frequent switching.
  *
  * @param piTime - Current time from Pi device
  * @param piLightLevel - Light level from Pi device
@@ -39,14 +87,36 @@ export const getMusicWeather = (piWeather: string, piTemperature: number, useWea
  */
 export const getMusicTime = (piTime: string, piLightLevel: string, useTime: boolean) => {
   if (useTime) {
+    prevTime = piTime;
     return piTime;
   } else {
     // Convert light level to number
     const lightLevel = parseFloat(piLightLevel);
-    if (lightLevel <= LIGHT_LEVEL_THRESHOLD) {
+    
+    // Bang-bang control with hysteresis for light level
+    if (prevTime === 'night') {
+      // Currently night, only switch to day if light rises above threshold + hysteresis
+      if (lightLevel > LIGHT_LEVEL_THRESHOLD + LIGHT_LEVEL_HYSTERESIS) {
+        prevTime = 'day';
+        return 'day';
+      }
       return 'night';
-    } else {
+    } else if (prevTime === 'day') {
+      // Currently day, switch to night if light falls below threshold - hysteresis
+      if (lightLevel <= LIGHT_LEVEL_THRESHOLD - LIGHT_LEVEL_HYSTERESIS) {
+        prevTime = 'night';
+        return 'night';
+      }
       return 'day';
+    } else {
+      // Initially undefined, set state based on current light level
+      if (lightLevel <= LIGHT_LEVEL_THRESHOLD) {
+        prevTime = 'night';
+        return 'night';
+      } else {
+        prevTime = 'day';
+        return 'day';
+      }
     }
   }
 }
@@ -150,7 +220,6 @@ export const calculateSunPosition = (timezone: string, sunriseTime: string, suns
 
   if (isDaytime) {
     // During daylight: position from -90° (sunrise) through 0° (noon) to 90° (sunset)
-    // Calculate where we are in the day cycle
     if (currentDate < noonDate) {
       // Morning: Map from sunrise (-90°) to noon (0°)
       const morningProgress = (currentDate.getTime() - sunriseDate.getTime()) / (noonDate.getTime() - sunriseDate.getTime());

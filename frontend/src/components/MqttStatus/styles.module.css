@@ -204,7 +204,6 @@
   justify-content: center;
   border: 0.2rem solid var(--lightgray0);
   transition: all 0.2s ease-in-out;
-  cursor: pointer;
 }
 
 .piDropdownButton:hover {
@@ -224,7 +223,6 @@
   border: 0.2rem solid var(--lightgray0);
   color: var(--gray);
   transition: all 0.2s ease-in-out;
-  cursor: default;
 }
 
 /* Responsive */

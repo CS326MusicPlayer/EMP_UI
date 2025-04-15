@@ -117,40 +117,52 @@ export default function MqttStatus({
         </span>
       )}
 
-      {/* Pi Swap button - replaced with dropdown */}
+      {/* Pi Swap dropdown */}
       <span className={classes.piStatusContainer}>
         { mqttConnected &&
-            <>
+          <>
+            <Popover
+              content={mqttConnected &&
+                <div>
+                  <h3 style={{ color: 'var(--black)' }}>Pi Selection</h3>
+                  <p style={{ color: 'var(--black)' }}>Current Pi: {selectedPiId}</p>
+                  <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
+                </div>
+              }
+              trigger="hover"
+              placement="top"
+            >
               <p className={classes.statusText}>Pi:</p>
-              {piList.length > 0 ? (
-                <Dropdown
-                  menu={{
-                    items: piList.map(id => ({
-                      key: id,
-                      label: `Pi ${id}`,
-                      disabled: musicIsFading || id === selectedPiId
-                    })),
-                    onClick: ({ key }) => setSelectedPiId(key),
-                  }}
-                  placement="top"
-                  disabled={piList.length <= 1 || musicIsFading}
-                  trigger={['hover']}
-                >
-                  <div className={piList.length > 1 && !musicIsFading ? classes.piDropdownButton : classes.piDropdownButtonDisabled}>
-                    <Typography.Text strong style={{ marginRight: '5px', color: 'var(--black)' }}>
-                      {selectedPiId}
-                    </Typography.Text>
-                    <DownOutlined style={{ color: 'var(--black)', fontSize: '10px' }} />
-                  </div>
-                </Dropdown>
-              ) : (
-                <div className={classes.piDropdownButtonDisabled}>
-                  <Typography.Text strong style={{ marginRight: '5px', color: 'var(--gray)' }}>
+            </Popover>
+            {piList.length > 0 ? (
+              <Dropdown
+                menu={{
+                  items: piList.map(id => ({
+                    key: id,
+                    label: `Pi ${id}`,
+                    disabled: musicIsFading || id === selectedPiId
+                  })),
+                  onClick: ({ key }) => setSelectedPiId(key),
+                }}
+                placement="top"
+                disabled={piList.length <= 1 || musicIsFading}
+                trigger={['hover']}
+              >
+                <div className={piList.length > 1 && !musicIsFading ? classes.piDropdownButton : classes.piDropdownButtonDisabled}>
+                  <Typography.Text strong style={{ marginRight: '5px', color: 'var(--black)' }}>
                     {selectedPiId}
                   </Typography.Text>
+                  <DownOutlined style={{ color: 'var(--black)', fontSize: '10px' }} />
                 </div>
-              )}
-            </>
+              </Dropdown>
+            ) : (
+              <div className={classes.piDropdownButtonDisabled}>
+                <Typography.Text strong style={{ marginRight: '5px', color: 'var(--gray)' }}>
+                  {selectedPiId}
+                </Typography.Text>
+              </div>
+            )}
+          </>
         }
       </span>
     </div>

@@ -56,7 +56,16 @@ export default function TimeWeather({
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [isHoveringWeather, setIsHoveringWeather] = useState(false);
   const [isHoveringTime, setIsHoveringTime] = useState(false);
-  const [sunAngle, setSunAngle] = useState(0); // Default to sunrise position
+  // Initialize with a calculated value based on temporary sunrise/sunset times
+  const [sunAngle, setSunAngle] = useState(() => {
+    // Default temporary values: 6am sunrise, 6pm sunset
+    const tempSunrise = "06:00";
+    const tempSunset = "18:00";
+    // Use current timezone or a default timezone if not available
+    const timezone = piTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return calculateSunPosition(timezone, tempSunrise, tempSunset);
+  });
+
   const [time, setTime] = useState(new Date());
   // Add a ref to track animation frame ID for cleanup
   const animationFrameId = React.useRef<number | undefined>(undefined);
@@ -110,9 +119,12 @@ export default function TimeWeather({
     const hoursDisplay = currentTime.getHours().toString().padStart(2, '0');
     const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
 
-    // Calculate day or night once per second instead of on every render
-    const dayOrNightValue = piSunrise && piSunset ?
-      getDayOrNight(currentTime, piSunrise, piSunset) : 'day';
+    // Calculate day or night using actual sunrise/sunset if available, otherwise use temp values
+    const tempSunrise = "06:00";
+    const tempSunset = "18:00";
+    const dayOrNightValue = piSunrise && piSunset
+      ? getDayOrNight(currentTime, piSunrise, piSunset)
+      : getDayOrNight(currentTime, tempSunrise, tempSunset);
 
     return {
       hoursDisplay,

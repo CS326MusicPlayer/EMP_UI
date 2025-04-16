@@ -7,6 +7,7 @@ import { Popover, Spin, Dropdown, Typography } from "antd";
 import { LuPower, LuPowerOff } from "react-icons/lu";
 import { DownOutlined } from '@ant-design/icons';
 import { RiBroadcastFill } from "react-icons/ri";
+import { useBrokerAuth } from '../../contexts/BrokerAuthContext';
 import { usePiSelection } from "../../contexts/PiSelectionContext";
 import { formatTimeAgo } from '../../utilities/utils';
 import classes from './styles.module.css';
@@ -31,6 +32,7 @@ export default function MqttStatus({
   const { selectedPiId, setSelectedPiId, piList } = usePiSelection();
   const [timeDisplay, setTimeDisplay] = useState<string>('');
   const [showStatus, setShowStatus] = useState<boolean>(true);
+  const { brokerAuth } = useBrokerAuth();
 
   // Update the time display initially and when lastConnectedTime changes
   useEffect(() => {
@@ -55,7 +57,9 @@ export default function MqttStatus({
   const offlineContent = (
     <div>
       <p style={{ color: '#616161' }}>Your device seems to be offline</p>
-      <p style={{ color: 'var(--black)' }}>Click to connect to the MQTT server</p>
+      <p style={{ color: 'var(--black)' }}>
+        {(brokerAuth.host && brokerAuth.port) ? 'Click to connect to the MQTT server' : 'Set up your MQTT server in the settings!'}
+      </p>
       <p style={{ color: 'var(--gray)' }}>Last seen: {timeDisplay}</p>
     </div>
   );

@@ -1,5 +1,5 @@
 // Settings modal to set up broker information
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input } from 'antd';
 import { useBrokerAuth } from '../../contexts/BrokerAuthContext';
 import classes from './styles.module.css';
@@ -18,38 +18,56 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
   const { brokerAuth, setBrokerAuth } = useBrokerAuth();
   const [warningMsg, setWarningMsg] = useState<string | null>(null);
 
-  // When form fields are updated, update the context
-  const handleHostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBrokerAuth({ host: e.target.value });
-  };
+  // Local form state
+  const [formValues, setFormValues] = useState({
+    host: brokerAuth.host || '',
+    port: brokerAuth.port || '',
+    username: brokerAuth.username || '',
+    password: brokerAuth.password || ''
+  });
 
-  const handlePortChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBrokerAuth({ port: e.target.value });
-  };
+  // When the modal opens, initialize form values with current brokerAuth values
+  useEffect(() => {
+    if (isOpen) {
+      setFormValues({
+        host: brokerAuth.host || '',
+        port: brokerAuth.port || '',
+        username: brokerAuth.username || '',
+        password: brokerAuth.password || ''
+      });
+      setWarningMsg(null);
+    }
+  }, [isOpen, brokerAuth]);
 
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBrokerAuth({ username: e.target.value });
+  // Handle form field changes locally
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+    setFormValues({
+      ...formValues,
+      [field]: e.target.value
+    });
   };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBrokerAuth({ password: e.target.value });
-  };
-
 
   const handleSave = async () => {
-    if (!brokerAuth.host || !brokerAuth.port) {
+    if (!formValues.host || !formValues.port) {
       setWarningMsg('Host and port are required!');
       return;
     }
 
-    // Pass the broker info to the parent component
-    onSave({
-      host: brokerAuth.host,
-      port: brokerAuth.port,
-      username: brokerAuth.username,
-      password: brokerAuth.password
+    // Update broker auth context with form values only on save
+    setBrokerAuth({
+      host: formValues.host,
+      port: formValues.port,
+      username: formValues.username || undefined,
+      password: formValues.password || undefined
     });
 
+    // Pass the broker info to the parent component
+    onSave({
+      host: formValues.host,
+      port: formValues.port,
+      username: formValues.username || undefined,
+      password: formValues.password || undefined
+    });
 
     onClose();
   };
@@ -61,15 +79,15 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       onCancel={onClose}
       footer={
         <div className={classes.modalFooter}>
-        <button key="cancel" onClick={onClose} className={classes.cancelButton}>
-          Cancel
-        </button>
-        {warningMsg && <p className={classes.warningMsg}>{warningMsg}</p>}
-        <button key="save" onClick={handleSave} className={classes.saveButton}>
-          Save
-        </button>
-      </div>
-}
+          <button key="cancel" onClick={onClose} className={classes.cancelButton}>
+            Cancel
+          </button>
+          {warningMsg && <p className={classes.warningMsg}>{warningMsg}</p>}
+          <button key="save" onClick={handleSave} className={classes.saveButton}>
+            Save
+          </button>
+        </div>
+      }
     >
       <Form layout="vertical">
         <Form.Item
@@ -77,8 +95,8 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
           required
         >
           <Input
-            value={brokerAuth.host}
-            onChange={handleHostChange}
+            value={formValues.host}
+            onChange={(e) => handleInputChange(e, 'host')}
             placeholder='e.g., test.mosquitto.org'
           />
         </Form.Item>
@@ -88,21 +106,25 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
           required
         >
           <Input
-            value={brokerAuth.port}
-            onChange={handlePortChange}
-            placeholder='e.g., 8083, or 1883' 
+            value={formValues.port}
+            onChange={(e) => handleInputChange(e, 'port')}
+            placeholder='e.g., 8083, or 1883'
           />
         </Form.Item>
 
         <Form.Item label={<p style={{ color: 'var(--black)' }}>Username</p>}>
-          <Input value={brokerAuth.username} onChange={handleUsernameChange}
+          <Input
+            value={formValues.username}
+            onChange={(e) => handleInputChange(e, 'username')}
             placeholder="Optional username for broker authentication"
             allowClear
             autoComplete="username"
-        />
+          />
         </Form.Item>
         <Form.Item label={<p style={{ color: 'var(--black)' }}>Password</p>}>
-          <Input.Password value={brokerAuth.password} onChange={handlePasswordChange}
+          <Input.Password
+            value={formValues.password}
+            onChange={(e) => handleInputChange(e, 'password')}
             autoComplete="current-password"
             placeholder="Optional password for broker authentication"
           />

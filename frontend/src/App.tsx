@@ -1,15 +1,58 @@
 import { ConfigProvider, FloatButton } from 'antd';
 import { GithubOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
 import { PiSelectionProvider } from './contexts/PiSelectionContext';
-import { BrokerAuthProvider } from './contexts/BrokerAuthContext';
+import { BrokerAuthProvider, useBrokerAuth } from './contexts/BrokerAuthContext';
 import AppContent from './AppContent';
 import SettingsModal from './components/SettingsModal';
+import { getMqttClient } from './services/mqttService';
+import type { MqttClient } from 'mqtt';
 import './App.css';
 
-function App(): React.ReactElement {
+function AppContainer(): React.ReactElement {
   const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
+  const { brokerAuth, setBrokerAuth } = useBrokerAuth();
+  const [mqttClient, setMqttClient] = useState<MqttClient | null>(null);
+
+  // Create MQTT client when broker info changes
+  useEffect(() => {
+    // Only create a client if we have the required host and port
+    if (brokerAuth.host && brokerAuth.port) {
+      const client = getMqttClient({
+        host: brokerAuth.host,
+        port: brokerAuth.port,
+        username: brokerAuth.username,
+        password: brokerAuth.password
+      });
+
+      setMqttClient(client);
+
+      // Clean up by ending the client connection when component unmounts
+      return () => {
+        if (client) {
+          client.end(true);
+        }
+      };
+    }
+  }, [brokerAuth]);
+
+  const handleSaveBrokerInfo = (brokerInfo: {
+    host: string;
+    port: string;
+    username?: string;
+    password?: string
+  }) => {
+    // Update broker auth with connection info
+    setBrokerAuth({
+      host: brokerInfo.host,
+      port: brokerInfo.port,
+      username: brokerInfo.username,
+      password: brokerInfo.password
+    });
+
+    console.log('Broker info saved!');
+  };
 
   return (
     <ConfigProvider
@@ -20,39 +63,43 @@ function App(): React.ReactElement {
         },
       }}
     >
-      <BrokerAuthProvider>
-        <SensorPreferencesProvider>
-          <PiSelectionProvider>
-            <AppContent />
-            <SettingsModal
-              isOpen={isSettingModalOpen}
-              onClose={() => setIsSettingModalOpen(false)}
-              onSave={() => {
-                console.log('Broker info saved!');
-              }}
-            />
-            <FloatButton.Group
-              shape="circle"
-              trigger='hover'
-              icon={<InfoCircleOutlined />}
-            >
-              <FloatButton
-                icon={<GithubOutlined />}
-                href="https://github.com/CS326MusicPlayer/EMP_UI"
-                target="_blank"
-                tooltip="View project on GitHub"
-              />
-              <FloatButton
-                icon={<SettingOutlined className="floatSettingsButton" />}
-                tooltip="Settings"
-                onClick={() => setIsSettingModalOpen(true)}
-              />
-            </FloatButton.Group>
-          </PiSelectionProvider>
-        </SensorPreferencesProvider>
-      </BrokerAuthProvider>
+      <AppContent mqttClient={mqttClient} />
+      <SettingsModal
+        isOpen={isSettingModalOpen}
+        onClose={() => setIsSettingModalOpen(false)}
+        onSave={handleSaveBrokerInfo}
+      />
+      <FloatButton.Group
+        shape="circle"
+        trigger='hover'
+        icon={<InfoCircleOutlined />}
+      >
+        <FloatButton
+          icon={<GithubOutlined />}
+          href="https://github.com/CS326MusicPlayer/EMP_UI"
+          target="_blank"
+          tooltip="View project on GitHub"
+        />
+        <FloatButton
+          icon={<SettingOutlined className="floatSettingsButton" />}
+          tooltip="Settings"
+          onClick={() => setIsSettingModalOpen(true)}
+        />
+      </FloatButton.Group>
     </ConfigProvider>
-  )
+  );
+}
+
+function App(): React.ReactElement {
+  return (
+    <BrokerAuthProvider>
+      <SensorPreferencesProvider>
+        <PiSelectionProvider>
+          <AppContainer />
+        </PiSelectionProvider>
+      </SensorPreferencesProvider>
+    </BrokerAuthProvider>
+  );
 }
 
 export default App;

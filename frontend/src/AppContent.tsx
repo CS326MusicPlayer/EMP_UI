@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import MqttStatus from './components/MqttStatus';
 import TimeWeather from './components/TimeWeather';
 import MusicPlayer from './components/MusicPlayer';
-import mqttClient from './services/mqttService';
+import type { MqttClient } from 'mqtt';
 import { useSensorPreferences } from './contexts/SensorPreferencesContext';
 import { usePiSelection } from './contexts/PiSelectionContext';
 import { getTimeUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
@@ -20,7 +20,11 @@ import unknownIcon from './assets/icons/unknown.png';
 const DAY_COLOR = '#b3e6ff';
 const NIGHT_COLOR = '#3a3a5c';
 
-function AppContent(): React.ReactElement {
+interface AppContentProps {
+  mqttClient: MqttClient | null;
+}
+
+function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   // Cache data for all Pis, keyed by Pi ID
   const [mqttDataCache, setMqttDataCache] = useState<Record<string, PiData>>({});
   // Current Pi data derived from cache based on selectedPiId
@@ -203,6 +207,11 @@ function AppContent(): React.ReactElement {
 
   // Initialize MQTT service
   useEffect(() => {
+    // Reset connection state when client changes
+    setIsConnected(false);
+    hasConnected.current = false;
+    hasSubscribed.current = false;
+
     // Initially set the auto mode to true
     setIsAuto(true);
 
@@ -333,7 +342,10 @@ function AppContent(): React.ReactElement {
 
       mqttClient.on('message', messageHandler);
 
-      // Clean up on unmount
+      // Attempt to connect automatically
+      mqttClient.connect();
+
+      // Clean up on unmount or when client changes
       return () => {
         if (mqttClient) {
           mqttClient.off('message', messageHandler);
@@ -346,8 +358,7 @@ function AppContent(): React.ReactElement {
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
+  }, [mqttClient]); // Run this effect when the mqttClient changes
 
   // Add polling interval to request data from selected Pi every 10 seconds
   useEffect(() => {

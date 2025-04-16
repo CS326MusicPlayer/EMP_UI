@@ -1,4 +1,4 @@
-import { ConfigProvider, FloatButton } from 'antd';
+import { ConfigProvider, FloatButton, Popover } from 'antd';
 import { GithubOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import { SensorPreferencesProvider } from './contexts/SensorPreferencesContext';
@@ -69,23 +69,37 @@ function AppContainer(): React.ReactElement {
         onClose={() => setIsSettingModalOpen(false)}
         onSave={handleSaveBrokerInfo}
       />
-      <FloatButton.Group
-        shape="circle"
-        trigger='hover'
-        icon={<InfoCircleOutlined />}
+      <Popover
+        content={!(brokerAuth.host && brokerAuth.port) && 
+          <div>
+            <p style={{ color: 'var(--black)' }}>It seems like you haven't set up the broker info yet!</p>
+            <p style={{ color: 'var(--gray)' }}>Click the settings button to configure</p>
+          </div>
+        }
+        trigger="hover"
+        placement="left"
       >
-        <FloatButton
-          icon={<GithubOutlined />}
-          href="https://github.com/CS326MusicPlayer/EMP_UI"
-          target="_blank"
-          tooltip="View project on GitHub"
-        />
-        <FloatButton
-          icon={<SettingOutlined className="floatSettingsButton" />}
-          tooltip="Settings"
-          onClick={() => setIsSettingModalOpen(true)}
-        />
+        <FloatButton.Group
+          shape="circle"
+          trigger='hover'
+          icon={<InfoCircleOutlined />}
+          badge={brokerAuth.host && brokerAuth.port ? undefined : { count: 1, color: 'var(--emerald2)' }}
+        >
+          <FloatButton
+            icon={<GithubOutlined />}
+            href="https://github.com/CS326MusicPlayer/EMP_UI"
+            target="_blank"
+            tooltip="View project on GitHub"
+          />
+          <FloatButton
+            icon={<SettingOutlined className="floatSettingsButton" />}
+            tooltip="Settings"
+            onClick={() => setIsSettingModalOpen(true)}
+            // Show the badge if the broker info is not set
+            badge={brokerAuth.host && brokerAuth.port ? undefined : { count: 1, color: 'var(--emerald2)' }}
+          />
       </FloatButton.Group>
+      </Popover>
     </ConfigProvider>
   );
 }

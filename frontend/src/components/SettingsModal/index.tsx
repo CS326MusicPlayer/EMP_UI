@@ -53,6 +53,17 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       return;
     }
 
+    // Close the modal if the new values are the same as the current values
+    if (
+      formValues.host === brokerAuth.host &&
+      formValues.port === brokerAuth.port &&
+      formValues.username === brokerAuth.username &&
+      formValues.password === brokerAuth.password
+    ) {
+      onClose();
+      return;
+    }
+
     // Update broker auth context with form values only on save
     setBrokerAuth({
       host: formValues.host,
@@ -98,6 +109,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
             value={formValues.host}
             onChange={(e) => handleInputChange(e, 'host')}
             placeholder='e.g., test.mosquitto.org'
+            allowClear
           />
         </Form.Item>
 
@@ -108,6 +120,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
           <Input
             value={formValues.port}
             onChange={(e) => handleInputChange(e, 'port')}
+            allowClear
             placeholder='e.g., 8083, or 1883'
           />
         </Form.Item>

@@ -7,6 +7,7 @@ import mqttClient from './services/mqttService';
 import { useSensorPreferences } from './contexts/SensorPreferencesContext';
 import { usePiSelection } from './contexts/PiSelectionContext';
 import { getTimeUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
+import { PiData, IncomingMqttMessage } from './types';
 
 import sunIcon from './assets/icons/sun.png';
 import moonIcon from './assets/icons/moon.png';
@@ -18,19 +19,6 @@ import unknownIcon from './assets/icons/unknown.png';
 // Color constants
 const DAY_COLOR = '#b3e6ff';
 const NIGHT_COLOR = '#3a3a5c';
-
-// Define a type for the MQTT data structure
-interface PiData {
-  pid: string;
-  weather: string;
-  time: string;
-  timezone: string;
-  temperature: number;
-  light_level: string;
-  sunrise: string;
-  sunset: string;
-  hasUpdated: boolean;
-}
 
 function AppContent(): React.ReactElement {
   // Cache data for all Pis, keyed by Pi ID
@@ -117,6 +105,7 @@ function AppContent(): React.ReactElement {
         });
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPiId, messageApi]);
 
   // Toast message according to the connection status
@@ -148,6 +137,7 @@ function AppContent(): React.ReactElement {
         return prevList;
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPiData.pid]);
 
   // Show notification only for manual mode changes or when music is changing (not for every MQTT update)
@@ -308,14 +298,13 @@ function AppContent(): React.ReactElement {
       };
 
       // Function to process incoming messages
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      function processMessage(data: { timezone: string; sunrise: string; sunset: string; pid: any; precipitation_status: any; temperature: any; light_level: any; }) {
+      function processMessage(data: IncomingMqttMessage) {
         // Set day/night status based on the current time and sunrise/sunset times
         const currentTime = getTimeUsingTimezone(data.timezone);
         const dayOrNight = getDayOrNight(currentTime, data.sunrise, data.sunset);
 
         // Parse temperature as a number
-        const temperatureValue = parseFloat(data.temperature);
+        const temperatureValue = typeof data.temperature === 'number' ? data.temperature : parseFloat(String(data.temperature));
 
         // Create a data object to store the new values
         const newData: PiData = {
@@ -356,6 +345,7 @@ function AppContent(): React.ReactElement {
         setIsConnected(false);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 

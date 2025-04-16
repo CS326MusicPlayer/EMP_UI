@@ -46,20 +46,20 @@ export const getMqttClient = (brokerInfo: {
 };
 
 // Create a default client with environment variables (for backward compatibility)
-const HOST = import.meta.env.VITE_HOST;
-const USERNAME = import.meta.env.VITE_USERNAME;
-const PASSWORD = import.meta.env.VITE_PASSWORD;
+// const HOST = import.meta.env.VITE_HOST;
+// const USERNAME = import.meta.env.VITE_USERNAME;
+// const PASSWORD = import.meta.env.VITE_PASSWORD;
 
 let defaultClient: mqtt.MqttClient | null = null;
 
-if (HOST) {
-  defaultClient = getMqttClient({
-    host: HOST,
-    port: '8083',
-    username: USERNAME,
-    password: PASSWORD
-  });
-}
+// if (HOST) {
+//   defaultClient = getMqttClient({
+//     host: HOST,
+//     port: '8083',
+//     username: USERNAME,
+//     password: PASSWORD
+//   });
+// }
 
 // Export the default client for backward compatibility
 export default defaultClient;

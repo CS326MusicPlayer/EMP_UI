@@ -1,5 +1,5 @@
 // Settings modal to set up broker information
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, KeyboardEvent } from 'react';
 import { Modal, Form, Input } from 'antd';
 import { useBrokerAuth } from '../../contexts/BrokerAuthContext';
 import classes from './styles.module.css';
@@ -45,6 +45,14 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       ...formValues,
       [field]: e.target.value
     });
+  };
+
+  // Handle key press event
+  const handleKeyDown = (e: KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSave();
+    }
   };
 
   const handleSave = async () => {
@@ -100,7 +108,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
         </div>
       }
     >
-      <Form layout="vertical">
+      <Form layout="vertical" onKeyDown={handleKeyDown}>
         <Form.Item
           label={<p style={{ color: 'var(--black)' }}>Host</p>}
           required

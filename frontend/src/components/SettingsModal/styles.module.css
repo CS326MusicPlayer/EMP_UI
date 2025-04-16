@@ -1,6 +1,9 @@
 
 
-
+.warningMsg {
+  color: var(--red);
+  font-size: 0.8rem;
+}
 
 hr {
   border: none;
@@ -39,9 +42,9 @@ hr {
   border: 2px solid var(--emerald0);
 }
 
-
 .modalFooter {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0.5rem 1rem;
 }

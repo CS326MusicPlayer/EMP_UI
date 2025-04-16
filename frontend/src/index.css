@@ -25,6 +25,20 @@
   --night: #3a3a5c;
 }
 
+@keyframes rotate {
+  to {
+    transform: rotateZ(-180deg);
+  }
+}
+
+@keyframes rotateReverse {
+  from {
+    transform: rotateZ(-180deg);
+  }
+  to {
+    transform: rotateZ(0deg);
+  }
+}
 
 /* For the default cursor */
 body {
@@ -70,4 +84,15 @@ button, a, [role="button"], .clickable, slider, input[type="range"] {
 .css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-24.ant-form-item-label,
 .css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-xl-24.ant-form-item-label {
   padding: 0;
+}
+
+/* Modal close button */
+.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-close {
+  border-radius: 2rem;
+}
+.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-close:hover {
+  animation: rotate 0.45s ease-in-out;
+}
+.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-close:not(:hover) {
+  animation: rotateReverse 0.45s ease-in-out;
 }

@@ -17,14 +17,14 @@ const DEFAULT_CLIENT_ID = import.meta.env.VITE_CLIENT_ID || generateClientId();
 // Create a function to get an MQTT client with the given broker info
 export const getMqttClient = (brokerInfo: {
   host: string;
-  port: number;
+  port: string;
   username?: string;
   password?: string;
 }) => {
   const { host, port, username, password } = brokerInfo;
 
   // Use wss for secure connection, ws for non-secure
-  const protocol = port === 8083 ? 'wss' : 'ws';
+  const protocol = port === '8083' ? 'wss' : 'ws';
   const url = `${protocol}://${host}:${port}/mqtt`;
 
   // Create client options
@@ -55,7 +55,7 @@ let defaultClient: mqtt.MqttClient | null = null;
 if (HOST) {
   defaultClient = getMqttClient({
     host: HOST,
-    port: 8083,
+    port: '8083',
     username: USERNAME,
     password: PASSWORD
   });

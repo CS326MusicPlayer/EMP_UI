@@ -231,7 +231,7 @@ function AppContent(): React.ReactElement {
         console.log('Connected to MQTT broker');
 
         // Subscribe to the topic
-        if (!hasSubscribed.current) {
+        if (!hasSubscribed.current && mqttClient) {
           hasSubscribed.current = true;
           mqttClient.subscribe('emp/environment', (err) => {
             if (!err) {

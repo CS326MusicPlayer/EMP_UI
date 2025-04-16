@@ -385,8 +385,9 @@ export default function MusicPlayer({
           audioRef.current.volume = 0;
           setVolume(0);
         } else {
-          audioRef.current.volume = 1;
-          setVolume(1);
+          // Use localStorage volume value
+          audioRef.current.volume = parseFloat(localStorage.getItem('musicPlayerVolume') || '1');
+          setVolume(parseFloat(localStorage.getItem('musicPlayerVolume') || '1'));
         }
       }
     }

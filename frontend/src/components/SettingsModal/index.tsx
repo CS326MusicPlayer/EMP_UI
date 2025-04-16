@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Modal, Form, Input, message, Checkbox } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { useBrokerAuth } from '../../contexts/BrokerAuthContext';
+import classes from './styles.module.css';
 
 interface BrokerInfoProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
   onClose,
   onSave
 }) => {
-  const { brokerAuth, setBrokerAuth, masterPassword, setMasterPassword, saveCredentials } = useBrokerAuth();
+  const { brokerAuth, setBrokerAuth, masterPassword, setMasterPassword, saveCredentials, handlePasswordBlur } = useBrokerAuth();
   const [savingToLocalStorage, setSavingToLocalStorage] = useState(false);
 
   // When form fields are updated, update the context
@@ -63,21 +64,57 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
 
   return (
     <Modal
-      title="Broker Information"
+      title={<h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--black)' }}>Broker Settings</h3>}
       open={isOpen}
       onCancel={onClose}
-      footer={[
-        <button key="cancel" onClick={onClose}>
+      footer={
+        <div className={classes.modalFooter}>
+        <button key="cancel" onClick={onClose} className={classes.cancelButton}>
           Cancel
-        </button>,
-        <button key="save" onClick={handleSave}>
+        </button>
+        <button key="save" onClick={handleSave} className={classes.saveButton}>
           Save
         </button>
-      ]}
+      </div>
+}
     >
       <Form layout="vertical">
+<Form.Item>
+          <div>
+            <h4 style={{ display: 'flex', alignItems: 'center', color: 'var(--black)' }}>
+              Load/Save Broker Credentials
+              <Checkbox
+                checked={savingToLocalStorage}
+                onChange={(e: CheckboxChangeEvent) => setSavingToLocalStorage(e.target.checked)}
+                data-testid="save-credentials-checkbox"
+                style={{ marginLeft: '0.2rem' }}
+              ></Checkbox>
+            </h4>
+            <p style={{ fontSize: '0.75rem', color: '#888' }}>
+              Load/Save your broker information securely to brower
+            </p>
+          </div>
+        </Form.Item>
+
+        {savingToLocalStorage && (
+          <Form.Item label={<p style={{ color: 'var(--black)' }}>Master Password</p>} required={savingToLocalStorage}>
+            <Input.Password
+              value={masterPassword}
+              onChange={handleMasterPasswordChange}
+              onBlur={handlePasswordBlur}
+              placeholder="Enter a master password to load or save credentials"
+              autoComplete="new-password"
+            />
+            <div style={{ fontSize: '0.75rem', color: '#ff4d4f' }}>
+              Remember this password! You'll need it to decrypt your saved information.
+            </div>
+          </Form.Item>
+        )}
+
+        <hr />
+
         <Form.Item
-          label="Host"
+          label={<p style={{ color: 'var(--black)' }}>Host</p>}
           required
           rules={[
             {
@@ -88,29 +125,21 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
         >
           <Input value={brokerAuth.host} onChange={handleHostChange} />
         </Form.Item>
-        <Form.Item label="Port" required>
+        <Form.Item label={<p style={{ color: 'var(--black)' }}>Port</p>} required>
           <Input value={brokerAuth.port} onChange={handlePortChange} />
         </Form.Item>
-        <Form.Item label="Username">
-          <Input value={brokerAuth.username} onChange={handleUsernameChange} />
+        <Form.Item label={<p style={{ color: 'var(--black)' }}>Username</p>}>
+          <Input value={brokerAuth.username} onChange={handleUsernameChange}
+            allowClear
+            autoComplete="username"
+            placeholder="Optional username for broker authentication"
+/>
         </Form.Item>
-        <Form.Item label="Password">
-          <Input.Password value={brokerAuth.password} onChange={handlePasswordChange} />
-        </Form.Item>
-
-        <Form.Item>
-          <div style={{ marginBottom: 16, borderTop: '1px solid #e8e8e8', paddingTop: 16 }}>
-            <h4>Secure Storage Options</h4>
-            <p style={{ fontSize: '12px', color: '#888' }}>
-              Save your broker information securely to local storage using encryption
-            </p>
-          </div>
-          <Checkbox
-            checked={savingToLocalStorage}
-            onChange={(e: CheckboxChangeEvent) => setSavingToLocalStorage(e.target.checked)}
-          >
-            Save broker information securely
-          </Checkbox>
+        <Form.Item label={<p style={{ color: 'var(--black)' }}>Password</p>}>
+          <Input.Password value={brokerAuth.password} onChange={handlePasswordChange}
+            autoComplete="current-password"
+            placeholder="Optional password for broker authentication"
+          />
         </Form.Item>
 
         {savingToLocalStorage && (
@@ -128,5 +157,6 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       </Form>
     </Modal>
   );
-}
+};
+
 export default BrokerInfoModal;

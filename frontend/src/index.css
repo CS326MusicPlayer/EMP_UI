@@ -14,7 +14,9 @@
   --white: #fdfdfd;
   --gray: #8e8e8e;
   --black: #616161;
+  --red0: #ffb3b3;
   --red: #FF8080;
+  --red2: #FF4D4D;
   --blue: #279EFF;
   --yellow: #fff4bb;
   --lightblue: #cee3f2;
@@ -46,4 +48,26 @@ body::-webkit-scrollbar {
 /* For pointer cursor (when hovering all hoverable elements) */
 button, a, [role="button"], .clickable, slider, input[type="range"] {
   cursor: url(./assets/cursors/pointer.png), pointer !important;
+}
+
+/* Modal style */
+.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-content {
+  border-radius: 2rem;
+}
+
+/* Input */
+.ant-input-outlined:hover {
+  border-color: var(--emerald) !important;
+}
+
+.ant-input-outlined:focus,
+.ant-input-outlined:focus-within {
+  outline: none !important;
+}
+
+/* Input Label */
+.css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-form-item-label,
+.css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-24.ant-form-item-label,
+.css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-xl-24.ant-form-item-label {
+  padding: 0;
 }

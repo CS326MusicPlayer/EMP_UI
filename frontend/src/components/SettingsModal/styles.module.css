@@ -1,0 +1,47 @@
+
+
+
+
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--lightgray1);
+  margin-bottom: 0.5rem;
+}
+
+.cancelButton {
+  background-color: var(--red);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 1.2rem;
+  font-family: inherit;
+  border: 2px solid var(--red0);
+  transition: all 0.2s;
+}
+.cancelButton:hover {
+  background-color: var(--red2);
+  border: 2px solid var(--red);
+}
+
+.saveButton {
+  background-color: var(--lightgray2);
+  color: var(--black);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 1.2rem;
+  font-family: inherit;
+  border: 2px solid var(--lightgray0);
+  transition: all 0.2s;
+}
+.saveButton:hover {
+  background-color: var(--emerald);
+  border: 2px solid var(--emerald0);
+}
+
+
+.modalFooter {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+}

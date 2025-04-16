@@ -27,8 +27,8 @@ function App(): React.ReactElement {
             <SettingsModal
               isOpen={isSettingModalOpen}
               onClose={() => setIsSettingModalOpen(false)}
-              onSave={(brokerInfo) => {
-                console.log('Broker info saved:', brokerInfo);
+              onSave={() => {
+                console.log('Broker info saved!');
               }}
             />
             <FloatButton.Group

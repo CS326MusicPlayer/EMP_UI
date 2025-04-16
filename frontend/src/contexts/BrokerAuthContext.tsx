@@ -1,3 +1,5 @@
+// Broker authentication context (written with the help of Copilot)
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { message } from 'antd';
 import { saveBrokerInfo, getBrokerInfo } from '../utilities/encryptionUtils';
@@ -5,7 +7,7 @@ import { saveBrokerInfo, getBrokerInfo } from '../utilities/encryptionUtils';
 // Define the shape of our broker information
 export interface BrokerAuth {
   host: string;
-  port: number;
+  port: string;
   username?: string;
   password?: string;
   isConnected: boolean;
@@ -15,28 +17,32 @@ export interface BrokerAuth {
 interface BrokerAuthContextType {
   brokerAuth: BrokerAuth;
   masterPassword: string;
+  passwordDirty: boolean;
   setBrokerAuth: (auth: Partial<BrokerAuth>) => void;
   setMasterPassword: (password: string) => void;
   saveCredentials: () => Promise<boolean>;
   loadCredentials: () => Promise<boolean>;
   clearCredentials: () => void;
+handlePasswordBlur: () => void;
 }
 
 // Create the context with default values
 const BrokerAuthContext = createContext<BrokerAuthContextType>({
   brokerAuth: {
     host: '',
-    port: 1883,
+    port: '',
     username: '',
     password: '',
     isConnected: false,
   },
   masterPassword: '',
+  passwordDirty: false,
   setBrokerAuth: () => {},
   setMasterPassword: () => {},
   saveCredentials: async () => false,
   loadCredentials: async () => false,
   clearCredentials: () => {},
+  handlePasswordBlur: () => {},
 });
 
 // Custom hook to use the broker auth context
@@ -46,33 +52,49 @@ export const useBrokerAuth = () => useContext(BrokerAuthContext);
 export const BrokerAuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [brokerAuth, setBrokerAuthState] = useState<BrokerAuth>({
     host: '',
-    port: 1883,
+    port: '',
     username: '',
     password: '',
     isConnected: false,
   });
 
   const [masterPassword, setMasterPasswordState] = useState<string>('');
+  const [passwordDirty, setPasswordDirty] = useState<boolean>(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   // Update broker auth state
   const setBrokerAuth = (auth: Partial<BrokerAuth>) => {
     setBrokerAuthState(prev => ({ ...prev, ...auth }));
   };
 
-  // Update master password
+  // Update master password and mark as dirty (changed but not yet validated)
   const setMasterPassword = (password: string) => {
     setMasterPasswordState(password);
+    setPasswordDirty(true);
+  };
+
+  // Handle when password field loses focus - attempt credential load if dirty
+  const handlePasswordBlur = () => {
+    if (passwordDirty && masterPassword && !brokerAuth.host) {
+      loadCredentials()
+        .then(() => {
+          setPasswordDirty(false); // Reset dirty flag after attempt
+        })
+        .catch(error => {
+          console.error('Error loading credentials on blur:', error);
+        });
+    }
   };
 
   // Save credentials to local storage with encryption
   const saveCredentials = async (): Promise<boolean> => {
     if (!masterPassword) {
-      message.warning('Master password required for saving credentials');
+      messageApi.warning('Master password required for saving credentials');
       return false;
     }
 
     if (!brokerAuth.host || !brokerAuth.port) {
-      message.error('Host and port are required');
+      messageApi.error('Host and port are required');
       return false;
     }
 
@@ -84,11 +106,11 @@ export const BrokerAuthProvider: React.FC<{ children: ReactNode }> = ({ children
         password: brokerAuth.password,
       }, masterPassword);
 
-      message.success('Broker credentials saved securely');
+      messageApi.success('Broker credentials saved securely');
       return true;
     } catch (error) {
       console.error('Failed to save broker credentials:', error);
-      message.error('Failed to save broker credentials');
+      messageApi.error('Failed to save broker credentials');
       return false;
     }
   };
@@ -96,7 +118,7 @@ export const BrokerAuthProvider: React.FC<{ children: ReactNode }> = ({ children
   // Load credentials from local storage with decryption
   const loadCredentials = async (): Promise<boolean> => {
     if (!masterPassword) {
-      message.warning('Master password required for loading credentials');
+      messageApi.warning('Master password required for loading credentials');
       return false;
     }
 
@@ -111,15 +133,15 @@ export const BrokerAuthProvider: React.FC<{ children: ReactNode }> = ({ children
           password: info.password || '',
         }));
 
-        message.success('Broker credentials loaded successfully');
+        messageApi.success('Broker credentials loaded successfully');
         return true;
       } else {
-        message.info('No stored broker credentials found');
+        messageApi.info('No stored broker credentials found');
         return false;
       }
     } catch (error) {
       console.error('Failed to load broker credentials:', error);
-      message.error('Incorrect master password or no saved data');
+      messageApi.error('Incorrect master password or no saved data');
       return false;
     }
   };
@@ -128,30 +150,29 @@ export const BrokerAuthProvider: React.FC<{ children: ReactNode }> = ({ children
   const clearCredentials = () => {
     setBrokerAuthState({
       host: '',
-      port: 1883,
+      port: '',
       username: '',
       password: '',
       isConnected: false,
     });
     setMasterPasswordState('');
-    message.info('Broker credentials cleared');
+    setPasswordDirty(false);
+    messageApi.info('Broker credentials cleared');
   };
 
-  // Try to load credentials when master password changes
-  useEffect(() => {
-    if (masterPassword && !brokerAuth.host) {
-      loadCredentials().catch(console.error);
-    }
-  }, [masterPassword]);
+  // Remove the automatic credential loading effect
+  // Only load credentials when the password field loses focus
 
   const value = {
     brokerAuth,
     masterPassword,
+    passwordDirty,
     setBrokerAuth,
     setMasterPassword,
     saveCredentials,
     loadCredentials,
     clearCredentials,
+    handlePasswordBlur,
   };
 
   return (

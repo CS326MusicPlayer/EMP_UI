@@ -1,4 +1,4 @@
-# EMP_UI
+# [EMP_UI](https://emp-webui.web.app/)
 > CS326 Final Project
 - Daniel Kim, Jason Chew
 

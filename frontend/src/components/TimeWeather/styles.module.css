@@ -293,7 +293,7 @@ hr {
   .toggleTimeLightsensor,
   .toggleTimeLightsensorDisabled {
     top: -5rem;
-    bototm: auto;
+    bottom: auto;
     right: -1.6rem;
   }
 

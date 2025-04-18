@@ -611,7 +611,21 @@ export default function MusicPlayer({
           <Popover content={<p style={{ 'color': 'var(--black)' }}>Press "m" to toggle mute</p>} placement="left">
             { volume === 0 ? <LuVolumeOff /> : <LuVolume1 /> }
           </Popover>
-          <Popover content={isFading && <p>Music is currently fading in/out!</p>} trigger="hover" placement="bottom">
+          {isFading ?
+            <Popover content={<p>Music is currently fading in/out!</p>} trigger="hover" placement="bottom">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={handleVolumeChange}
+                className={classes.volumeSlider}
+                disabled={isFading ? true : false}
+                style={{ opacity: 0.5 }}
+              />
+            </Popover>
+            :
             <input
               type="range"
               min="0"
@@ -623,7 +637,7 @@ export default function MusicPlayer({
               disabled={isFading ? true : false}
               style={{ opacity: 0.5 }}
             />
-          </Popover>
+          }
           <LuVolume2 />
         </div>
       </div>

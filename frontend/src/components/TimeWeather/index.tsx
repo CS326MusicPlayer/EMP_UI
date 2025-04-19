@@ -309,7 +309,7 @@ export default function TimeWeather({
       >
         <div
           className={classes.time}
-          style={{ backgroundColor: dayOrNightValue === 'day' ? 'var(--day1)' : 'var(--night1)' }}
+          style={{ backgroundColor: dayOrNightValue === 'day' ? 'var(--day0)' : 'var(--night0)' }}
         >
           {/* Toggle Chip */}
           <Popover

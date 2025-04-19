@@ -57,9 +57,17 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   );
 
   // Function to change the background color based on the time of day
-  // This sets the CSS variable on the :root element (document.documentElement)
-  const changeBackgroundColor = (newColor: string) => {
-    document.documentElement.style.setProperty('--background-color', newColor);
+  // This controls which portion of the background gradient is visible
+  const changeBackgroundColor = (time: string) => {
+    if (time === 'day') {
+      // Show the day portion of the gradient (0-30%)
+      document.documentElement.style.setProperty('--background-position', '0%');
+      document.documentElement.style.setProperty('--background-color', DAY_COLOR);
+    } else if (time === 'night') {
+      // Show the night portion of the gradient (70-100%)
+      document.documentElement.style.setProperty('--background-position', '85%');
+      document.documentElement.style.setProperty('--background-color', NIGHT_COLOR);
+    }
   };
 
   // Update the selected Pi ID when it changes
@@ -217,9 +225,9 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
 
     // Initially set the background color based on the time
     if (currentHour >= 6 && currentHour < 18) {
-      changeBackgroundColor(DAY_COLOR);
+      changeBackgroundColor('day');
     } else {
-      changeBackgroundColor(NIGHT_COLOR);
+      changeBackgroundColor('night');
     }
 
     // Make sure the client exists before setting up handlers
@@ -411,17 +419,17 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       const calculatedTime = getMusicTime(currentPiData.time, currentPiData.light_level, useTime);
 
       if (calculatedTime === 'day') {
-        changeBackgroundColor(DAY_COLOR);
+        changeBackgroundColor('day');
       } else if (calculatedTime === 'night') {
-        changeBackgroundColor(NIGHT_COLOR);
+        changeBackgroundColor('night');
       }
     }
     else if (!isAuto) {
       // If auto mode is disabled, set the background color based on manual time
       if (manualTime === 'day') {
-        changeBackgroundColor(DAY_COLOR);
+        changeBackgroundColor('day');
       } else if (manualTime === 'night') {
-        changeBackgroundColor(NIGHT_COLOR);
+        changeBackgroundColor('night');
       }
     }
 

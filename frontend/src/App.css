@@ -1,13 +1,30 @@
 :root {
   --background-color: #f0f0f0; /* Default background color */
   --lightgray0: #f5f5f5;
+  
+  --day0: #d9f2ff;
+  --day1: #b3e6ff;
+  --day2: #97d7ff;
+  --night0: #3a3a5c;
+  --night1: #2d2d4d;
+  --night2: #1a1a3a;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--background-color);
-  transition: background-color 0.5s ease;
+  background: linear-gradient(
+    180deg,
+    var(--day0) 0%,
+    var(--day1) 15%,
+    var(--day2) 30%,
+    var(--night0) 70%,
+    var(--night1) 85%,
+    var(--night2) 100%
+  );
+  background-size: 100% 300%;
+  background-position: 0% var(--background-position, 0%);
+  transition: background-position 3s ease-in-out;
 }
 
 #root {

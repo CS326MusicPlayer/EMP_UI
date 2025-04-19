@@ -284,7 +284,17 @@ export default function TimeWeather({
           <button
             style={buttonStyle}
             className={classes.toggleButton}
-            onClick={() => setIsAuto(!isAuto)}
+            onClick={() => {
+              // Toggle between auto and manual mode
+              const newAutoState = !isAuto;
+              setIsAuto(newAutoState);
+
+              // If switching to manual mode (isAuto is currently true but about to become false)
+              if (!newAutoState) {
+                setUseTime(true);
+                setUseWeather(true);
+              }
+            }}
           >
             <p className={classes.toggleButtonText}>{isAuto ? 'AUTO' : 'MANUAL'}</p>
           </button>

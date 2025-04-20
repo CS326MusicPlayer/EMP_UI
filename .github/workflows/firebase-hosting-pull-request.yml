@@ -43,3 +43,5 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_EMP_WEBUI }}
           projectId: emp-webui
           entryPoint: ./frontend
+          channelId: pr-${{ github.event.number }}
+          

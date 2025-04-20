@@ -1,3 +1,6 @@
+// Test for the TimeWeather component (written with the help of Copilot)
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import TimeWeather from '../index';
@@ -69,13 +72,13 @@ describe('TimeWeather Component', () => {
   const defaultProps = {
     piWeather: 'none',
     piTime: 'day',
-    piTemperature: 25, // Changed from string to number
+    piTemperature: 25,
     piLightLevel: '80',
     piTimezone: 'America/New_York',
     piSunrise: '06:00',
     piSunset: '18:00',
     isAuto: true,
-    musicIsFading: false, // Add missing musicIsFading prop
+    musicIsFading: false,
     setIsAuto: vi.fn(),
     setManualWeather: vi.fn(),
     setManualTime: vi.fn(),
@@ -129,9 +132,9 @@ describe('TimeWeather Component', () => {
   it('calls setManualWeather when weather is clicked in manual mode', () => {
     render(<TimeWeather {...defaultProps} isAuto={false} />);
     
-    // Since we're mocking getMusicWeather to return the first arg (piWeather),
+    // Since mocking getMusicWeather to return the first arg (piWeather),
     // and our default props has piWeather: 'none',
-    // we should find 'Sunny' as the alt text
+    // need to find 'Sunny' as the alt text
     const weatherIcon = screen.getByAltText('Sunny');
     fireEvent.click(weatherIcon);
     
@@ -194,19 +197,17 @@ describe('TimeWeather Component', () => {
     const temperatureDisplay = screen.getByText(/25/);
     fireEvent.click(temperatureDisplay);
     
-    // Since we mocked convertTemp to return the input, we'd need to check if it was called
-    // For a proper test, we'd need to mock the useState for tempUnit, but that's complex
-    // Instead, we'll check that the temperature is still displayed after click
+    // Since mocked convertTemp to return the input, need to check if it was called
+    // For a proper test, need to mock the useState for tempUnit, but that's complex
+    // Instead, check that the temperature is still displayed after click
     expect(screen.getByText(/25/)).toBeInTheDocument();
   });
 
   it('doesnt call setManualTime when time icon is clicked in auto mode', () => {
-    // Mock getMusicTime specifically for this test to ensure icon consistency
     vi.mocked(utils.getMusicTime).mockReturnValue('night');
     
     render(<TimeWeather {...defaultProps} />);
     
-    // Use PM instead of AM since our mock is returning "night"
     const timeIcon = screen.getByAltText('PM');
     fireEvent.click(timeIcon);
     
@@ -215,12 +216,10 @@ describe('TimeWeather Component', () => {
   });
 
   it('calls setManualTime when time icon is clicked in manual mode', () => {
-    // Mock getMusicTime specifically for this test to ensure icon consistency
     vi.mocked(utils.getMusicTime).mockReturnValue('night');
     
     render(<TimeWeather {...defaultProps} isAuto={false} />);
     
-    // Use PM instead of AM since our mock is returning "night"
     const timeIcon = screen.getByAltText('PM');
     fireEvent.click(timeIcon);
     

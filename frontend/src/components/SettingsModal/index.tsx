@@ -1,4 +1,7 @@
 // Settings modal to set up broker information
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
+
 import React, { useState, useEffect, KeyboardEvent } from 'react';
 import { Modal, Form, Input } from 'antd';
 import { useBrokerAuth } from '../../contexts/BrokerAuthContext';
@@ -10,21 +13,21 @@ interface BrokerInfoProps {
   onSave: (brokerInfo: { host: string; port: string; username?: string; password?: string }) => void;
 }
 
+
 const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
   isOpen,
   onClose,
   onSave
 }) => {
-  const { brokerAuth, setBrokerAuth } = useBrokerAuth();
-  const [warningMsg, setWarningMsg] = useState<string | null>(null);
-
-  // Local form state
+  const { brokerAuth, setBrokerAuth } = useBrokerAuth();              // Broker authentication context
+  const [warningMsg, setWarningMsg] = useState<string | null>(null);  // Warning message (when host or port is empty)
   const [formValues, setFormValues] = useState({
     host: brokerAuth.host || '',
     port: brokerAuth.port || '',
     username: brokerAuth.username || '',
     password: brokerAuth.password || ''
   });
+
 
   // When the modal opens, initialize form values with current brokerAuth values
   useEffect(() => {
@@ -39,6 +42,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
     }
   }, [isOpen, brokerAuth]);
 
+
   // Handle form field changes locally
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     setFormValues({
@@ -47,6 +51,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
     });
   };
 
+
   // Handle key press event
   const handleKeyDown = (e: KeyboardEvent<HTMLFormElement>) => {
     if (e.key === 'Enter') {
@@ -54,6 +59,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       handleSave();
     }
   };
+
 
   const handleSave = async () => {
     if (!formValues.host || !formValues.port) {
@@ -72,6 +78,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       return;
     }
 
+
     // Update broker auth context with form values only on save
     setBrokerAuth({
       host: formValues.host,
@@ -79,6 +86,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
       username: formValues.username || undefined,
       password: formValues.password || undefined
     });
+
 
     // Pass the broker info to the parent component
     onSave({
@@ -91,6 +99,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
     onClose();
   };
 
+  
   return (
     <Modal
       title={<h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--black)' }}>Broker Settings</h3>}

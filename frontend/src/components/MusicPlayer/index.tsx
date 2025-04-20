@@ -1,5 +1,6 @@
 // Music player component
 // Play music based on the provided weather and time condition
+// Daniel Kim (jk254), Jason Chew (jgc23)
 
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
@@ -120,27 +121,24 @@ export default function MusicPlayer({
     }
   ];
 
-  // Context
-  const { useWeather, useTime } = useSensorPreferences();
+  const { useWeather, useTime } = useSensorPreferences();   // Sensor preferences
 
-  // State variables
-  const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSongIndex, setCurrentSongIndex] = useState(0);  // Current song index
+  const [isPlaying, setIsPlaying] = useState(false);            // Is the music playing  
   const [volume, setVolume] = useState(() => {
     // Try to get saved volume from localStorage, default to 1 if not found
     const savedVolume = localStorage.getItem('musicPlayerVolume');
     return savedVolume ? parseFloat(savedVolume) : 1;
   });
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [loopMode, setLoopMode] = useState('one'); // 'one', 'all'
-  const [isFading, setIsFading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(true);  // New state to track initial load
-  const prevIsAutoRef = useRef(isAuto);  // New ref to track mode changes
+  const [duration, setDuration] = useState(0);            // Duration of the current song
+  const [currentTime, setCurrentTime] = useState(0);      // Current time of the current song
+  const [loopMode, setLoopMode] = useState('one');        // 'one', 'all'
+  const [isFading, setIsFading] = useState(false);        // Is the music fading in/out
+  const [initialLoad, setInitialLoad] = useState(true);   // To track initial load
 
-  // Refs
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const progressBarRef = useRef<HTMLDivElement>(null);
+  const prevIsAutoRef = useRef(isAuto);                   // To track mode changes
+  const audioRef = useRef<HTMLAudioElement>(null);        // Audio element reference
+  const progressBarRef = useRef<HTMLDivElement>(null);    // Progress bar reference
   const fadeIntervalRef = useRef<{
     fadeOut: number | null,
     fadeIn: number | null
@@ -149,7 +147,7 @@ export default function MusicPlayer({
     fadeIn: null
   });
 
-  // Current song
+  // Initialize current song
   const currentSong = musicList[currentSongIndex];
 
 
@@ -183,7 +181,7 @@ export default function MusicPlayer({
 
     return fadeId;
   }
-
+  // Fade out function
   function fadeOut(audioElement: HTMLAudioElement, duration: number = 1000): Promise<void> {
     return new Promise((resolve) => {
       const startVolume = audioElement.volume;
@@ -210,10 +208,9 @@ export default function MusicPlayer({
     // If auto mode is enabled, set loop mode to 'one'
     if (isAuto && loopMode !== 'one') {
       setLoopMode('one');
-      // console.log('Auto mode enabled, setting loop mode to: one');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuto]);
+
 
   // Effect to change song based on weather and time (and fade in/out)
   // Fade in/out only done when weather/time condition changes (music control will have no fade in/out)
@@ -235,20 +232,19 @@ export default function MusicPlayer({
 
       const musicWeatherToUse = getMusicWeather(piWeather, piTemperature, useWeather);
       const musicTimeToUse = getMusicTime(piTime, piLightLevel, useTime);
-      // console.log(`Music weather: ${musicWeatherToUse}, Music time: ${musicTimeToUse}`);
-      // console.log(`Currently using ${useWeather ? 'weather' : 'temperature'} and ${useTime ? 'time' : 'light level'}`);
 
       // Find the index of the song that matches the current weather/time, depending on the mode
       const matchingSongIndex = musicList.findIndex(
         song => song.weather === musicWeatherToUse && song.time === musicTimeToUse
       );
 
+      // If matching song is found and it's not the same as the current song, change the song
+      // Also check if the song is already playing and if it's not the same song
       if (matchingSongIndex !== -1 && (matchingSongIndex !== currentSongIndex || initialLoad || prevIsAutoRef.current !== isAuto) && audioRef.current) {
-        // console.log(`Changing song to match weather: ${piWeather}, time: ${piTime}`);
 
         // Only fade if currently playing
         if (isPlaying && !audioRef.current.paused) {
-          setIsFading(true);
+          setIsFading(true);  // Set fading state (to prevent other events)
           const initialVolume = volume;
 
           // Set safety timeout
@@ -337,12 +333,11 @@ export default function MusicPlayer({
       }
       if (fadeIntervalRef.current.fadeIn) {
         clearInterval(fadeIntervalRef.current.fadeIn);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         fadeIntervalRef.current.fadeIn = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSongIndex, volume, isFading, isPlaying, isAuto, piWeather, piTime, piTemperature, piLightLevel, useWeather, useTime]);
+
 
   // Event handlers
   // const togglePlay = () => {
@@ -364,19 +359,21 @@ export default function MusicPlayer({
   //   setIsPlaying(!isPlaying);
   // };
 
+
   // Volume control
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
+    const newVolume = parseFloat(e.target.value);   // Get new volume from input
     setVolume(newVolume);
-    localStorage.setItem('musicPlayerVolume', newVolume.toString());
+    localStorage.setItem('musicPlayerVolume', newVolume.toString());  // Save volume to localStorage
     if (audioRef.current) {
-      audioRef.current.volume = newVolume;
+      audioRef.current.volume = newVolume;  // Set volume to audio element
     }
   };
 
+
   // On keyboard event 'm' toggle mute
   const handleKeyDown = (e: KeyboardEvent) => {
-    // If is fading, ignore key events
+    // If music is fading, ignore key events
     if (isFading) return;
 
     if (e.key === 'm') {
@@ -392,6 +389,9 @@ export default function MusicPlayer({
       }
     }
   };
+
+
+  // Add event listener for keydown events
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -399,6 +399,7 @@ export default function MusicPlayer({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   // Loop mode control
   // const cycleLoopMode = () => {
@@ -410,6 +411,7 @@ export default function MusicPlayer({
   //   }
   // };
 
+
   // // Play previous song
   // const playPrevious = () => {
   //   if (isAuto || isFading) return; // Disable previous song in auto mode or during fade
@@ -420,6 +422,7 @@ export default function MusicPlayer({
   //   setCurrentSongIndex(newIndex);
   // };
 
+
   // Play next song
   const playNext = () => {
     if (isAuto || isFading) return; // Disable next song in auto mode or during fade
@@ -429,6 +432,7 @@ export default function MusicPlayer({
     }
     setCurrentSongIndex(newIndex);
   };
+
 
   // Reset Player
   // const resetPlayer = () => {
@@ -454,6 +458,7 @@ export default function MusicPlayer({
   //   }
   // }
 
+
   // Progress bar control
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -461,12 +466,16 @@ export default function MusicPlayer({
     }
   };
 
+
+  // Update duration when metadata is loaded
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
     }
   };
 
+
+  // Handle song end event
   const handleEnded = () => {
     if (loopMode === 'one') {
       // Restart the same song
@@ -486,7 +495,8 @@ export default function MusicPlayer({
     }
   };
 
-  // Handle progress bar click (only enabled for manual mode)
+
+  // Handle progress bar click
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (progressBarRef.current && audioRef.current && !isAuto && !isFading) {
       const progressBarRect = progressBarRef.current.getBoundingClientRect();
@@ -513,7 +523,7 @@ export default function MusicPlayer({
       }
 
       if (isPlaying) {
-        const playPromise = audioRef.current.play();
+        const playPromise = audioRef.current.play();  // Attempt to play the audio
 
         // Handle potential rejection due to browser autoplay policy
         if (playPromise !== undefined) {
@@ -531,8 +541,8 @@ export default function MusicPlayer({
         }
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentSongIndex, isPlaying]);
+
 
   // Set loop attribute
   useEffect(() => {
@@ -541,6 +551,7 @@ export default function MusicPlayer({
     }
   }, [loopMode]);
 
+  
   return (
     <div className={classes.musicPlayer}>
       {/* <Popover content={<p style={{ 'color': 'var(--black)' }}>Click to reset the player</p>} placement="top" mouseEnterDelay={0.5}>

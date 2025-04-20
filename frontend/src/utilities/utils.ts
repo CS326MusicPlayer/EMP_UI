@@ -1,20 +1,26 @@
-// originally has 0 to 1023, and currently taking 20 samples
+// Utility functions for various operations
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
+
+// Define constants
 const LIGHT_LEVEL_THRESHOLD = 100;  // Below 100 is dark (data ranges between 0 and 65535)
 const LIGHT_LEVEL_HYSTERESIS = 20;  // Hysteresis band for light level transitions
-
 const SNOW_TEMPC_THRESHOLD = 0;    // below 0°C is snowing
 const RAIN_TEMPC_THRESHOLD = 20;   // below 20°C is raining
 const TEMP_HYSTERESIS = 2;         // 2°C hysteresis band for temperature transitions
+
 
 // Store previous weather and time states to implement hysteresis
 let prevWeather = '';
 let prevTime = '';
 
-// For test purposes
+// For testing
 export const resetHysteresisState = () => {
   prevWeather = '';
   prevTime = '';
 };
+
+
 
 /**
  * Determines the music weather condition based on weather preference and temperature.

@@ -1,3 +1,6 @@
+/* Define color schema */
+/* Daniel Kim (jk254), Jason Chew (jgc23 */
+
 :root {
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -70,6 +73,8 @@ button, a, [role="button"], .clickable, slider, input[type="range"] {
   cursor: url(./assets/cursors/pointer.png), pointer !important;
 }
 
+
+/* ANT DESIGN CUSTOM STYLE */
 /* Modal style */
 .css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-content {
   border-radius: 2rem;

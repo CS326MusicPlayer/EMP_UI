@@ -1,5 +1,5 @@
-// Display and manage the MQTT connection status
-// and the selected Raspberry Pi device.
+// Component to display and manage the MQTT connection status, and select Raspberry Pi device
+// Daniel Kim (jk254), Jason Chew (jgc23)
 
 import React, { useState, useEffect } from "react";
 import { LuCheck, LuEllipsis } from "react-icons/lu";
@@ -29,16 +29,17 @@ export default function MqttStatus({
   onBroadcast: () => void;
 }
 ): React.ReactElement {
-  const { selectedPiId, setSelectedPiId, piList } = usePiSelection();
-  const [timeDisplay, setTimeDisplay] = useState<string>('');
-  const [showStatus, setShowStatus] = useState<boolean>(true);
-  const { brokerAuth } = useBrokerAuth();
+  const { selectedPiId, setSelectedPiId, piList } = usePiSelection(); // Pi selection
+  const [timeDisplay, setTimeDisplay] = useState<string>('');         // Time display for last seen
+  const [showStatus, setShowStatus] = useState<boolean>(true);        // Pi's last seen status
+  const { brokerAuth } = useBrokerAuth();                             // Broker information
 
   // Update the time display initially and when lastConnectedTime changes
   useEffect(() => {
     setTimeDisplay(formatTimeAgo(lastConnectedTime));
   }, [lastConnectedTime]);
 
+  
   // Handle mouse enter to refresh the time display
   const handleMouseEnter = () => {
     setTimeDisplay(formatTimeAgo(lastConnectedTime));

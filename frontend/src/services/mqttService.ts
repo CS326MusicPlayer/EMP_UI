@@ -5,12 +5,6 @@ import mqtt from 'mqtt';
 // Generate a random client ID if none is provided
 const generateClientId = () => `client_${Math.random().toString(16).substring(2, 8)}`;
 
-// const HOST = import.meta.env.VITE_HOST;
-// const USERNAME = import.meta.env.VITE_USERNAME;
-// const PASSWORD = import.meta.env.VITE_PASSWORD;
-// const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || `client_${Math.random().toString(16).substring(2, 8)}`;
-// const URL = `wss://${HOST}:8083/mqtt`;
-
 // Default client ID from env or generated
 const DEFAULT_CLIENT_ID = import.meta.env.VITE_CLIENT_ID || generateClientId();
 
@@ -45,21 +39,7 @@ export const getMqttClient = (brokerInfo: {
   return mqtt.connect(url, options);
 };
 
-// Create a default client with environment variables (for backward compatibility)
-// const HOST = import.meta.env.VITE_HOST;
-// const USERNAME = import.meta.env.VITE_USERNAME;
-// const PASSWORD = import.meta.env.VITE_PASSWORD;
 
 let defaultClient: mqtt.MqttClient | null = null;
 
-// if (HOST) {
-//   defaultClient = getMqttClient({
-//     host: HOST,
-//     port: '8083',
-//     username: USERNAME,
-//     password: PASSWORD
-//   });
-// }
-
-// Export the default client for backward compatibility
 export default defaultClient;

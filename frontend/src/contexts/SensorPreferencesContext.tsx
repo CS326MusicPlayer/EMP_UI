@@ -1,4 +1,5 @@
 // Context for managing sensor preferences in the application
+// Daniel Kim (jk254), Jason Chew (jgc23)
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 
@@ -19,7 +20,6 @@ const defaultContextValue: SensorPreferencesContextType = {
 const SensorPreferencesContext = createContext<SensorPreferencesContextType>(defaultContextValue);
 
 export const useSensorPreferences = () => useContext(SensorPreferencesContext);
-
 
 // Context for sensor preferences
 export const SensorPreferencesProvider = ({ children }: { children: ReactNode }) => {

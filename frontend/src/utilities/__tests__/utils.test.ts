@@ -1,3 +1,6 @@
+// Test for utility functions (written with the help of CoPilot)
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   getMusicWeather,
@@ -17,6 +20,7 @@ beforeEach(() => {
   resetHysteresisState();
 });
 
+// Mock the Date object for consistent testing
 describe('getMusicWeather', () => {
   it('returns the actual weather when useWeather is true', () => {
     expect(getMusicWeather('snow', 25, true)).toBe('snow');
@@ -94,6 +98,7 @@ describe('getMusicWeather', () => {
   });
 });
 
+// Test for getMusicTime function
 describe('getMusicTime', () => {
   it('returns the actual time when useTime is true', () => {
     expect(getMusicTime('day', '50', true)).toBe('day');
@@ -142,6 +147,7 @@ describe('getMusicTime', () => {
   });
 });
 
+// Test for getDayOrNight function
 describe('getDayOrNight', () => {
   it('returns day when current time is between sunrise and sunset', () => {
     // Current time at 12:00, sunrise at 6:00, sunset at 18:00
@@ -172,6 +178,7 @@ describe('getDayOrNight', () => {
   });
 });
 
+// Test for getTimeUsingTimezone function
 describe('getTimeUsingTimezone', () => {
   // This function is hard to test properly in a test environment
   // because it relies on the actual Date and timezone functionality
@@ -190,6 +197,7 @@ describe('getTimeUsingTimezone', () => {
   });
 });
 
+// Test for formatTimeAgo function
 describe('formatTimeAgo', () => {
   it('returns "Unknown" for null timestamp', () => {
     expect(formatTimeAgo(null)).toBe('Unknown');
@@ -201,6 +209,7 @@ describe('formatTimeAgo', () => {
   });
 });
 
+// Test for calculateSunPosition function
 describe('calculateSunPosition', () => {
   it('calculates positions correctly', () => {
     // Create a spy for getTimeUsingTimezone without fully mocking the module
@@ -224,6 +233,7 @@ describe('calculateSunPosition', () => {
   });
 });
 
+// Test for convertTemp function
 describe('convertTemp', () => {
   it('converts temperature to Celsius correctly', () => {
     expect(convertTemp(25, 'C')).toBe('25');
@@ -252,6 +262,7 @@ describe('convertTemp', () => {
   });
 });
 
+// Test for formatTime function
 describe('formatTime', () => {
   it('formats time correctly', () => {
     expect(formatTime(65)).toBe('1:05');

@@ -1,4 +1,6 @@
-// src/setupTests.ts
+// Setup file for Vitest and Testing Library
+// Daniel Kim (jk254), Jason Chew (jgc23
+
 import '@testing-library/jest-dom';
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';

@@ -1,3 +1,6 @@
+// Main App root component
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
 import { ConfigProvider, FloatButton, Popover } from 'antd';
 import { GithubOutlined, SettingOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
@@ -9,6 +12,7 @@ import SettingsModal from './components/SettingsModal';
 import { getMqttClient } from './services/mqttService';
 import type { MqttClient } from 'mqtt';
 import './App.css';
+
 
 function AppContainer(): React.ReactElement {
   const [isSettingModalOpen, setIsSettingModalOpen] = useState(false);
@@ -37,6 +41,7 @@ function AppContainer(): React.ReactElement {
     }
   }, [brokerAuth]);
 
+
   const handleSaveBrokerInfo = (brokerInfo: {
     host: string;
     port: string;
@@ -53,6 +58,7 @@ function AppContainer(): React.ReactElement {
 
     console.log('Broker info saved!');
   };
+
 
   return (
     <ConfigProvider

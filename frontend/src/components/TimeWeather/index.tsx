@@ -1,4 +1,5 @@
-// Display panel of weather and time
+// Display panel of weather and time, and auto/manual mode switch
+// Daniel Kim (jk254), Jason Chew (jgc23)
 
 import React, { useState, useEffect } from "react";
 import { Popover } from 'antd';
@@ -25,9 +26,10 @@ import precipitation from '../../assets/icons/precipitation.png';
 import classes from './styles.module.css';
 
 
-// Temporary values for sunrise and sunset
+// Temporary values for sunrise and sunset (on init)
 const TEMP_SUNRISE = "06:00";
 const TEMP_SUNSET = "18:00";
+
 
 export default function TimeWeather({
   piWeather,
@@ -62,6 +64,7 @@ export default function TimeWeather({
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
   const [isHoveringWeather, setIsHoveringWeather] = useState(false);
   const [isHoveringTime, setIsHoveringTime] = useState(false);
+
   // Initialize with a calculated value based on temporary sunrise/sunset times
   const [sunAngle, setSunAngle] = useState(() => {
     // Use current timezone or a default timezone if not available
@@ -76,12 +79,11 @@ export default function TimeWeather({
   // Use ref to track last update time to optimize frame rate
   const lastUpdateRef = React.useRef<number>(0);
 
-  // Update time using requestAnimationFrame instead of setInterval
+
+  // Update time using requestAnimationFrame
   useEffect(() => {
-    // Function to update time using requestAnimationFrame
     const updateClock = (timestamp: number) => {
       // Only update every 1000ms (1 second) to match previous behavior
-      // using requestAnimationFrame's timing system
       if (timestamp - lastUpdateRef.current >= 1000) {
         const newTime = piTimezone ? getTimeUsingTimezone(piTimezone) : new Date();
         setTime(newTime);
@@ -103,6 +105,7 @@ export default function TimeWeather({
     };
   }, [piTimezone]);
 
+
   // Update the sun angle based on the current time and sunrise/sunset times
   // Use useMemo to avoid recalculating sun angle on every render
   useEffect(() => {
@@ -112,8 +115,8 @@ export default function TimeWeather({
     }
   }, [piTimezone, piSunrise, piSunset, time]);
 
-  // Use useMemo for time-related calculations to avoid unnecessary re-calculations
-  // These will only be recalculated when time changes
+
+  // Update the sun angle when the time changes
   const timeDisplayValues = React.useMemo(() => {
     const currentTime = time;
     const seconds = currentTime.getSeconds();
@@ -135,25 +138,16 @@ export default function TimeWeather({
     };
   }, [time, piSunrise, piSunset]);
 
+
   // Get the memoized values
   const { hoursDisplay, minutesDisplay, dayOrNightValue } = timeDisplayValues;
+
 
   // Toggle between Celsius and Fahrenheit
   const toggleTempUnit = () => {
     setTempUnit(prev => prev === 'C' ? 'F' : 'C');
   };
 
-  // Button style based on the mode
-  const buttonStyle = {
-    backgroundColor: isAuto ? '#52c597' : '#a5a5a5',
-  };
-
-  const modeSwitchContent = (
-    <div style={{ textAlign: 'center' }}>
-      <p style={{ color: '#616161' }}>Click to switch to "{isAuto ? 'Manual' : 'Auto'}" mode</p>
-      <p style={{ color: '#8e8e8e' }}>"{isAuto ? 'Auto' : 'Manual'}" mode enabled</p>
-    </div>
-  );
 
   // In the manual mode, user can change the weather and day/night
   const toggleWeather = () => {
@@ -173,6 +167,7 @@ export default function TimeWeather({
     }
   };
 
+
   // Toggle between day and night
   const toggleDayNight = () => {
     // Safe return if the mode is not manual
@@ -190,6 +185,7 @@ export default function TimeWeather({
       setManualTime('day');
     }
   };
+
 
   return (
     <div className={classes.container}>
@@ -292,9 +288,18 @@ export default function TimeWeather({
 
       {/* Control */}
       <div className={classes.control}>
-        <Popover content={modeSwitchContent} trigger="hover" placement="top">
+        <Popover
+          content={
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ color: '#616161' }}>Click to switch to "{isAuto ? 'Manual' : 'Auto'}" mode</p>
+              <p style={{ color: '#8e8e8e' }}>"{isAuto ? 'Auto' : 'Manual'}" mode enabled</p>
+            </div>
+          }
+          trigger="hover"
+          placement="top"
+        >
           <button
-            style={buttonStyle}
+            style={{ backgroundColor: isAuto ? '#52c597' : '#a5a5a5' }}
             className={classes.toggleButton}
             onClick={() => {
               // Toggle between auto and manual mode
@@ -331,10 +336,10 @@ export default function TimeWeather({
       >
         <div
           className={classes.time}
-          style={{backgroundColor:
+          style={{ backgroundColor:
             !isAuto ? 'var(--lightgray2)' : (
-              dayOrNightValue === 'day' ? 'var(--yellow)' :
-              dayOrNightValue === 'night' ? 'var(--lightblue)' : 'var(--white)'
+              dayOrNightValue === 'day' ? 'var(--day0)' :
+              dayOrNightValue === 'night' ? 'var(--night0)' : 'var(--white)'
             ) 
           }}
         >

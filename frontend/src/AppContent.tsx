@@ -1,3 +1,6 @@
+// App inner component
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
 import { message } from 'antd';
 import React, { useEffect, useState, useRef } from 'react';
 import MqttStatus from './components/MqttStatus';
@@ -16,6 +19,7 @@ import rainyIcon from './assets/icons/storm.png';
 import snowyIcon from './assets/icons/snowflakes.png';
 import unknownIcon from './assets/icons/unknown.png';
 
+
 // Color constants
 const DAY_COLOR = '#b3e6ff';
 const NIGHT_COLOR = '#3a3a5c';
@@ -23,6 +27,7 @@ const NIGHT_COLOR = '#3a3a5c';
 interface AppContentProps {
   mqttClient: MqttClient | null;
 }
+
 
 function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   // Cache data for all Pis, keyed by Pi ID
@@ -39,25 +44,24 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
 
   const { useTime } = useSensorPreferences();
   const { selectedPiId, setSelectedPiId, piList, setPiList } = usePiSelection();
-  const currentHour = new Date().getHours();  // just for setting initial background color
+  const currentHour = new Date().getHours();    // just for setting initial background color
 
   const prevManualWeatherRef = useRef(manualWeather);
   const prevManualTimeRef = useRef(manualTime);
   const [messageApi, contextHolder] = message.useMessage();
-  const hasConnected = useRef(false);    // To track if the initial connection has been made
-  const hasSubscribed = useRef(false);    // To track if the subscription has been made)
+  const hasConnected = useRef(false);           // To track if the initial connection has been made
+  const hasSubscribed = useRef(false);          // To track if the subscription has been made)
   const selectedPiIdRef = useRef(selectedPiId);
-
-  // Track previous music fading state
-  const prevMusicIsFadingRef = useRef(false);
+  const prevMusicIsFadingRef = useRef(false);   // Track previous music fading state
 
   // Update the last connected time of the MQTT client and save it to local storage
   const lastConnectedTime = useRef<string | null>(
     localStorage.getItem('lastConnectedTime') || null
   );
 
+
   // Function to change the background color based on the time of day
-  // This controls which portion of the background gradient is visible
+  // This controls which portion of the background gradient is visible (see App.css)
   const changeBackgroundColor = (time: string) => {
     if (time === 'day') {
       // Show the day portion of the gradient (0-30%)
@@ -70,11 +74,13 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     }
   };
 
+
   // Update the selected Pi ID when it changes
   useEffect(() => {
     selectedPiIdRef.current = selectedPiId;
     setCurrentPiData(mqttDataCache[selectedPiId] || {});
   }, [selectedPiId, mqttDataCache]);
+
 
   // Update the last connected time when the connection status changes
   useEffect(() => {
@@ -88,6 +94,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       console.log('Not connected to mqtt server. Last seen: ', lastConnectedTime.current);
     }
   }, [isConnected]);
+
 
   // If the selected Pi changes, show a toast message
   useEffect(() => {
@@ -120,6 +127,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPiId, messageApi]);
 
+
   // Toast message according to the connection status
   useEffect(() => {
     if (isConnected) {
@@ -137,10 +145,10 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     }
   }, [isConnected, messageApi]);
 
+
   // Update the list of available Pis
   useEffect(() => {
     if (mqttClient && currentPiData.pid) {
-      // Use the functional update pattern to safely update without dependencies
       setPiList(prevList => {
         if (!prevList.includes(currentPiData.pid)) {
           console.log(`Added new Pi ID ${currentPiData.pid} to the list`);
@@ -151,6 +159,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPiData.pid]);
+
 
   // Show notification only for manual mode changes or when music is changing (not for every MQTT update)
   useEffect(() => {
@@ -178,6 +187,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     prevManualWeatherRef.current = manualWeather;
     prevManualTimeRef.current = manualTime;
   }, [messageApi, isAuto, manualWeather, manualTime]);
+
 
   // Show notification when music is changing instead of on every data update
   useEffect(() => {
@@ -212,6 +222,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     // Update the ref for the next render
     prevMusicIsFadingRef.current = musicIsFading;
   }, [musicIsFading, isAuto, currentPiData, messageApi]);
+
 
   // Initialize MQTT service
   useEffect(() => {
@@ -333,7 +344,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
           light_level: data.light_level,
           sunrise: data.sunrise,
           sunset: data.sunset,
-          hasUpdated: false // Flag to track if data was updated
+          hasUpdated: false
         };
 
         // Update cache for all Pis
@@ -367,6 +378,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mqttClient]); // Run this effect when the mqttClient changes
+
 
   // Add polling interval to request data from selected Pi every 10 seconds
   useEffect(() => {
@@ -412,7 +424,6 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   }, [isConnected, selectedPiId]); // Re-establish polling when connection status or selected Pi changes
 
 
-
   // Change the background color based on the time or light level
   useEffect(() => {
     if (Object.keys(currentPiData).length > 0 && isAuto) {
@@ -442,7 +453,8 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     }
   }, [currentPiData, isAuto, useTime, manualTime]);
 
-  // Manual connect/disconnect function
+
+  // Manual connect function
   const handleConnect = () => {
     if (mqttClient) {
       console.log('Connecting to MQTT broker...');
@@ -450,6 +462,8 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     }
   };
 
+
+  // Manual disconnect function
   const handleDisconnect = () => {
     if (mqttClient) {
       hasSubscribed.current = false;
@@ -458,6 +472,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       console.log('Manually disconnected from MQTT broker');
     }
   };
+
 
   // Broadcast to all Pis
   const handleBroadcast = () => {
@@ -480,6 +495,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       });
     }
   };
+
 
   return (
     <div className="App">

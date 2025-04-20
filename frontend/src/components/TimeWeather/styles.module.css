@@ -1,3 +1,5 @@
+/* Daniel Kim (jk254), Jason Chew (jgc23) */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,7 +15,6 @@
   padding: 2rem;
   border-radius: 2rem;
 }
-
 
 .time,
 .weather {

@@ -1,3 +1,6 @@
+// Test for PiSelectionContext (written with the help of CoPilot)
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { PiSelectionProvider, usePiSelection } from '../PiSelectionContext';

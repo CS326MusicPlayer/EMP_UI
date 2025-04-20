@@ -1,3 +1,6 @@
+// Test file for the MusicPlayer component (written with the help of Copilot)
+// Daniel Kim (jk254), Jason Chew (jgc23)
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import MusicPlayer from '../index';
@@ -213,7 +216,7 @@ describe('MusicPlayer Component', () => {
   });
   
   it('calls onFadingChange when initialized', () => {
-    // We'll verify that onFadingChange is properly registered with a useEffect
+    // Verify that onFadingChange is properly registered with a useEffect
     render(
       <SensorPreferencesProvider>
         <MusicPlayer {...defaultProps} />

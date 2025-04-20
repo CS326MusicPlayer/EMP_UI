@@ -1,8 +1,9 @@
 // Broker authentication context (written with the help of Copilot)
+// Daniel Kim (jk254), Jason Chew (jgc23)
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// Define the shape of our broker information
+// Broker information
 export interface BrokerAuth {
   host: string;
   port: string;
@@ -11,11 +12,11 @@ export interface BrokerAuth {
   isConnected: boolean;
 }
 
-// Define the shape of our context
 interface BrokerAuthContextType {
   brokerAuth: BrokerAuth;
   setBrokerAuth: (auth: Partial<BrokerAuth>) => void;
 }
+
 
 // Create the context with default values
 const BrokerAuthContext = createContext<BrokerAuthContextType>({
@@ -42,12 +43,10 @@ export const BrokerAuthProvider: React.FC<{ children: ReactNode }> = ({ children
     isConnected: false,
   });
 
-
   // Update broker auth state
   const setBrokerAuth = (auth: Partial<BrokerAuth>) => {
     setBrokerAuthState(prev => ({ ...prev, ...auth }));
   };
-
 
   const value = {
     brokerAuth,

@@ -9,7 +9,6 @@
 ---
 ## Running Locally
 - `git clone` this repository
-  - You will need `.env` file under `frontend` directory
 - `cd frontend`
 - `npm install`
 - `npm run dev`
@@ -25,11 +24,13 @@
 ---
 ## Testing
 - install `mosquitto-client`
-- Example message: (replace `<BROKER>`, `<PASSWORD>`, and `<USERNAME>` with your own values)
+- Example message: (replace `<BROKER>`, `<PASSWORD>`, and `<USERNAME>` with your broker credentials)
+  - Note that it should match with [RPi's mqtt broker](https://github.com/CS326MusicPlayer/MusicPlayer/blob/main/sensor/get_environment.py)
 ```sh
 mosquitto_pub -h <BROKER> -P <PASSWORD> -u <USERNAME> -p 8883 -t "emp/environment" -m '{"pid": "0", "precipitation_status": "snow", "sunrise": "07:23", "sunset": "20:14", "timezone": "America/Detroit", "temperature": "25", "light_level": 0.5}'
 ```   
 
 ---
-## Credit
-- Icons: created by [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
+## Assets Credit
+- Icons, cursor: created by [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
+- Music: Cobblestone5517

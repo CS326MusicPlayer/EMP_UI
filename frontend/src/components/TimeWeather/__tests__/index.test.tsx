@@ -188,7 +188,7 @@ describe('TimeWeather Component', () => {
   });
 
   it('toggles temperature unit when temperature is clicked', () => {
-    const { rerender } = render(<TimeWeather {...defaultProps} />);
+    render(<TimeWeather {...defaultProps} />);
     
     // Find and click the temperature display
     const temperatureDisplay = screen.getByText(/25/);

@@ -125,19 +125,7 @@ export default function MqttStatus({
       <span className={classes.piStatusContainer}>
         { mqttConnected &&
           <>
-            <Popover
-              content={mqttConnected &&
-                <div>
-                  <h3 style={{ color: 'var(--black)' }}>Pi Selection</h3>
-                  <p style={{ color: 'var(--black)' }}>Current Pi: {selectedPiId}</p>
-                  <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
-                </div>
-              }
-              trigger="hover"
-              placement="top"
-            >
-              <p className={classes.statusText}>Pi:</p>
-            </Popover>
+            <p className={classes.statusText}>Pi:</p>
             {piList.length > 0 ? (
               <Dropdown
                 menu={{

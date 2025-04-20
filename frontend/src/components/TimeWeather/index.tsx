@@ -178,6 +178,9 @@ export default function TimeWeather({
     // Safe return if the mode is not manual
     if (isAuto) return;
 
+    // Safe return if the music is fading
+    if (musicIsFading) return;
+
     // Toggle-rotate the day/night condition using the setter function from props
     if (piTime === 'day') {
       setManualTime('night');
@@ -354,7 +357,7 @@ export default function TimeWeather({
                 if (!isAuto) return;
                 // Safe return if the music is fading
                 if (musicIsFading) return;
-                
+
                 // Toggle whether to use time or lightsensor
                 setUseTime(!useTime);
               }}

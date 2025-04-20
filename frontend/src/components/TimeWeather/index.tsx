@@ -38,6 +38,7 @@ export default function TimeWeather({
   piSunrise,
   piSunset,
   isAuto,
+  musicIsFading,
   setIsAuto,
   setManualWeather,
   setManualTime
@@ -50,6 +51,7 @@ export default function TimeWeather({
   piSunrise: string;
   piSunset: string;
   isAuto: boolean;
+  musicIsFading: boolean;
   setIsAuto: (isAuto: boolean) => void;
   setManualWeather: (weather: string) => void;
   setManualTime: (time: string) => void;
@@ -157,6 +159,9 @@ export default function TimeWeather({
   const toggleWeather = () => {
     // Safe return if the mode is not manual
     if (isAuto) return;
+
+    // Safe return if the music is fading
+    if (musicIsFading) return;
 
     // Toggle-rotate the weather condition using the setter function from props
     if (piWeather === 'none') {

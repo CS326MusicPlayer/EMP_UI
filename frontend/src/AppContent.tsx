@@ -500,6 +500,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
         piTimezone={currentPiData.timezone}
         piSunrise={currentPiData.sunrise}
         piSunset={currentPiData.sunset}
+        musicIsFading={musicIsFading}
         isAuto={isAuto}
         setIsAuto={setIsAuto}
         setManualWeather={setManualWeather}

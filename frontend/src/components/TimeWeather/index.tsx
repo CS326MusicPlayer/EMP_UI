@@ -25,6 +25,10 @@ import precipitation from '../../assets/icons/precipitation.png';
 import classes from './styles.module.css';
 
 
+// Temporary values for sunrise and sunset
+const TEMP_SUNRISE = "06:00";
+const TEMP_SUNSET = "18:00";
+
 export default function TimeWeather({
   piWeather,
   piTime,
@@ -58,14 +62,12 @@ export default function TimeWeather({
   const [isHoveringTime, setIsHoveringTime] = useState(false);
   // Initialize with a calculated value based on temporary sunrise/sunset times
   const [sunAngle, setSunAngle] = useState(() => {
-    // Default temporary values: 6am sunrise, 6pm sunset
-    const tempSunrise = "06:00";
-    const tempSunset = "18:00";
     // Use current timezone or a default timezone if not available
     const timezone = piTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-    return calculateSunPosition(timezone, tempSunrise, tempSunset);
+    return calculateSunPosition(timezone, TEMP_SUNRISE, TEMP_SUNSET);
   });
 
+  // Initialize time with the current date
   const [time, setTime] = useState(new Date());
   // Add a ref to track animation frame ID for cleanup
   const animationFrameId = React.useRef<number | undefined>(undefined);
@@ -120,11 +122,9 @@ export default function TimeWeather({
     const minutesDisplay = Math.floor(minutes).toString().padStart(2, '0');
 
     // Calculate day or night using actual sunrise/sunset if available, otherwise use temp values
-    const tempSunrise = "06:00";
-    const tempSunset = "18:00";
-    const dayOrNightValue = piSunrise && piSunset
+    const dayOrNightValue = (piSunrise && piSunset)
       ? getDayOrNight(currentTime, piSunrise, piSunset)
-      : getDayOrNight(currentTime, tempSunrise, tempSunset);
+      : getDayOrNight(currentTime, TEMP_SUNRISE, TEMP_SUNSET);
 
     return {
       hoursDisplay,
@@ -319,7 +319,12 @@ export default function TimeWeather({
       >
         <div
           className={classes.time}
-          style={{ backgroundColor: dayOrNightValue === 'day' ? 'var(--day0)' : 'var(--night0)' }}
+          style={{backgroundColor:
+            !isAuto ? 'var(--lightgray2)' : (
+              dayOrNightValue === 'day' ? 'var(--yellow)' :
+              dayOrNightValue === 'night' ? 'var(--lightblue)' : 'var(--white)'
+            ) 
+          }}
         >
           {/* Toggle Chip */}
           <Popover
@@ -351,8 +356,10 @@ export default function TimeWeather({
               style={{
                 transform: `rotate(${sunAngle}deg)`,
                 borderColor:
-                  dayOrNightValue === 'day' ? 'var(--yellow)' :
-                  dayOrNightValue === 'night' ? 'var(--lightblue)' : 'var(--white)'
+                  !isAuto ? 'var(--lightgray2)' : (
+                    dayOrNightValue === 'day' ? 'var(--yellow)' :
+                    dayOrNightValue === 'night' ? 'var(--lightblue)' : 'var(--white)'
+                  )
               }}>
             </div>
           </div>

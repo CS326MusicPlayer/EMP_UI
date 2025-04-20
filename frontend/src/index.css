@@ -21,12 +21,14 @@
   --yellow: #fff4bb;
   --lightblue: #cee3f2;
   
-  --day0: #FFFFFF;
-  --day1: #b3e6ff;
-  --day2: #80ccff;
-  --night0: #47476b;
-  --night1: #3a3a5c;
-  --night2: #2d2d4d;
+  --day0: #C9F6FF;
+  --day1: #7AE5F5;
+  --day2: #80e1ff;
+  --sky0: #e7c376;
+  --sky1: #834945;
+  --night0: #2f2f59;
+  --night1: #0c1446;
+  --night2: #0D1130;
 }
 
 @keyframes rotate {

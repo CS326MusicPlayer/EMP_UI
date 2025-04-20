@@ -209,8 +209,12 @@ export default function TimeWeather({
           <div
             className={!isAuto ? classes.toggleWeatherTemperatureDisabled : classes.toggleWeatherTemperature}
             onClick={() => {
-              // Toggle whether to use weather or temperature
+              // Safe return if the mode is not auto
               if (!isAuto) return;
+              // Safe return if the music is fading
+              if (musicIsFading) return;
+
+              // Toggle whether to use weather or temperature
               setUseWeather(!useWeather);
             }}
           >
@@ -346,8 +350,12 @@ export default function TimeWeather({
             <div
               className={!isAuto ? classes.toggleTimeLightsensorDisabled : classes.toggleTimeLightsensor}
               onClick={() => {
-                // Toggle whether to use time or lightsensor
+                // Safe return if the mode is not auto
                 if (!isAuto) return;
+                // Safe return if the music is fading
+                if (musicIsFading) return;
+                
+                // Toggle whether to use time or lightsensor
                 setUseTime(!useTime);
               }}
             >

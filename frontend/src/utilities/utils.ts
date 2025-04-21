@@ -3,8 +3,8 @@
 
 
 // Define constants
-const LIGHT_LEVEL_THRESHOLD = 100;  // Below 100 is dark (data ranges between 0 and 65535)
-const LIGHT_LEVEL_HYSTERESIS = 20;  // Hysteresis band for light level transitions
+const LIGHT_LEVEL_THRESHOLD = 0.4;  // Below 0.4 is dark (data ranges between 0 and 1)
+const LIGHT_LEVEL_HYSTERESIS = 0.1;  // Hysteresis band for light level transitions
 const SNOW_TEMPC_THRESHOLD = 0;    // below 0°C is snowing
 const RAIN_TEMPC_THRESHOLD = 20;   // below 20°C is raining
 const TEMP_HYSTERESIS = 2;         // 2°C hysteresis band for temperature transitions

@@ -101,26 +101,26 @@ describe('getMusicWeather', () => {
 // Test for getMusicTime function
 describe('getMusicTime', () => {
   it('returns the actual time when useTime is true', () => {
-    expect(getMusicTime('day', '50', true)).toBe('day');
-    expect(getMusicTime('night', '150', true)).toBe('night');
+    expect(getMusicTime('day', '0.5', true)).toBe('day');
+    expect(getMusicTime('night', '0.3', true)).toBe('night');
   });
 
   it('determines time based on light level when useTime is false', () => {
-    // Light level <= 100 should be night
+    // Light level <= 0.4 should be night
     resetHysteresisState();
-    expect(getMusicTime('day', '50', false)).toBe('night');
-    expect(getMusicTime('day', '100', false)).toBe('night');
+    expect(getMusicTime('day', '0.3', false)).toBe('night');
+    expect(getMusicTime('day', '0.4', false)).toBe('night');
     
-    // Light level > 100 should be day
+    // Light level > 0.4 should be day
     resetHysteresisState();
-    expect(getMusicTime('night', '101', false)).toBe('day');
-    expect(getMusicTime('night', '500', false)).toBe('day');
+    expect(getMusicTime('night', '0.41', false)).toBe('day');
+    expect(getMusicTime('night', '0.8', false)).toBe('day');
   });
 
   it('handles edge cases', () => {
     // Exactly at threshold value
     resetHysteresisState();
-    expect(getMusicTime('day', '100', false)).toBe('night');
+    expect(getMusicTime('day', '0.4', false)).toBe('night');
     
     // Invalid light level
     resetHysteresisState();
@@ -129,21 +129,21 @@ describe('getMusicTime', () => {
   
   it('implements hysteresis correctly for night-day transition', () => {
     // First call establishes state as night
-    expect(getMusicTime('night', '90', false)).toBe('night');
+    expect(getMusicTime('night', '0.35', false)).toBe('night');
     
-    // Should stay night even when light level rises just above threshold (100)
-    // due to hysteresis (20 unit band)
-    expect(getMusicTime('night', '110', false)).toBe('night');
+    // Should stay night even when light level rises just above threshold (0.4)
+    // due to hysteresis (0.1 unit band)
+    expect(getMusicTime('night', '0.45', false)).toBe('night');
     
-    // Should switch to day when light level exceeds threshold + hysteresis (100 + 20)
-    expect(getMusicTime('night', '125', false)).toBe('day');
+    // Should switch to day when light level exceeds threshold + hysteresis (0.4 + 0.1)
+    expect(getMusicTime('night', '0.51', false)).toBe('day');
     
-    // Should stay day even when light level drops just below threshold (100)
-    // due to hysteresis (20 unit band)
-    expect(getMusicTime('day', '90', false)).toBe('day');
+    // Should stay day even when light level drops just below threshold (0.4)
+    // due to hysteresis (0.1 unit band)
+    expect(getMusicTime('day', '0.35', false)).toBe('day');
     
-    // Should switch back to night when light level drops below threshold - hysteresis (100 - 20)
-    expect(getMusicTime('day', '75', false)).toBe('night');
+    // Should switch back to night when light level drops below threshold - hysteresis (0.4 - 0.1)
+    expect(getMusicTime('day', '0.29', false)).toBe('night');
   });
 });
 

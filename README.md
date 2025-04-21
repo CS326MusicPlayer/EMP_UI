@@ -13,13 +13,6 @@
 - `npm install`
 - `npm run dev`
   - `npm test` to run tests
-  - `npm run build` to build the project
----
-## Deployment
-- `cd frontend`
-- `npm i`
-- `npm run build`
-- `firebase deploy`
 
 ---
 ## Testing

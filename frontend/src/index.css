@@ -76,8 +76,10 @@ button, a, [role="button"], .clickable, slider, input[type="range"] {
 
 /* ANT DESIGN CUSTOM STYLE */
 /* Modal style */
-.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-content {
-  border-radius: 2rem;
+.ant-modal .ant-modal-content,
+.ant-modal .ant-modal-content,
+.ant-modal {
+  border-radius: 2rem !important;
 }
 
 /* Input */
@@ -91,19 +93,19 @@ button, a, [role="button"], .clickable, slider, input[type="range"] {
 }
 
 /* Input Label */
-.css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-form-item-label,
-.css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-24.ant-form-item-label,
-.css-dev-only-do-not-override-ig5p6d.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-xl-24.ant-form-item-label {
-  padding: 0;
+.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-form-item-label,
+.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-24.ant-form-item-label,
+.ant-form-vertical .ant-form-item:not(.ant-form-item-horizontal) .ant-col-xl-24.ant-form-item-label {
+  padding: 0 !important;
 }
 
 /* Modal close button */
-.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-close {
-  border-radius: 2rem;
+.ant-modal .ant-modal-close {
+  border-radius: 2rem !important;
 }
-.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-close:hover {
-  animation: rotate 0.45s ease-in-out;
+.ant-modal .ant-modal-close:hover {
+  animation: rotate 0.45s ease-in-out !important;
 }
-.css-dev-only-do-not-override-ig5p6d .ant-modal .ant-modal-close:not(:hover) {
-  animation: rotateReverse 0.45s ease-in-out;
+.ant-modal .ant-modal-close:not(:hover) {
+  animation: rotateReverse 0.45s ease-in-out !important;
 }

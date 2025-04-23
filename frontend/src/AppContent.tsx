@@ -208,9 +208,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
           }
           <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
-            {
-              (currentPiData.light_level * 100).toFixed(0) || 'Unknown'
-            }
+            { currentPiData.light_level || 'Unknown' }
           </p>
         </div>,
         duration: 5,

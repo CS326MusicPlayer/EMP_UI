@@ -209,9 +209,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
           }
           <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
             {
-              getMusicTime(currentPiData.time, currentPiData.light_level, false) === 'day' ? 'Bright' :
-              getMusicTime(currentPiData.time, currentPiData.light_level, false) === 'night' ? 'Dark' :
-              'Unknown'
+              (currentPiData.light_level * 100).toFixed(0) || 'Unknown'
             }
           </p>
         </div>,

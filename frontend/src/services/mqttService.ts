@@ -2,7 +2,7 @@
 
 import mqtt from 'mqtt';
 
-// Generate a random client ID if none is provided
+// Generate a random client ID
 const generateClientId = () => `client_${Math.random().toString(16).substring(2, 8)}`;
 
 // Default client ID from env or generated
@@ -39,7 +39,7 @@ export const getMqttClient = (brokerInfo: {
   return mqtt.connect(url, options);
 };
 
-
-let defaultClient: mqtt.MqttClient | null = null;
+// Default client object
+const defaultClient: mqtt.MqttClient | null = null;
 
 export default defaultClient;

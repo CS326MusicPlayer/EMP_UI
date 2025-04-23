@@ -60,7 +60,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   );
 
 
-  // Function to change the background color based on the time of day
+  // Function to change the background color (slide the window) based on the time of day
   // This controls which portion of the background gradient is visible (see App.css)
   const changeBackgroundColor = (time: string) => {
     if (time === 'day') {
@@ -400,6 +400,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
           "target": selectedPiId
         });
 
+        // Publish the message to the topic
         mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
           if (error) {
             console.error('Error publishing data request:', error);
@@ -417,6 +418,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
         console.log('Stopped polling for Pi data');
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, selectedPiId]); // Re-establish polling when connection status or selected Pi changes
 
 
@@ -478,6 +480,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
         "target": "all"   // Actually this field is not being read in the RPi
       });
 
+      // Publish the message to the topic
       mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
         if (error) {
           console.error('Error broadcasting to all Pis:', error);

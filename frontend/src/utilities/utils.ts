@@ -21,7 +21,6 @@ export const resetHysteresisState = () => {
 };
 
 
-
 /**
  * Determines the music weather condition based on weather preference and temperature.
  * Uses bang-bang control with hysteresis to prevent frequent switching.
@@ -98,7 +97,7 @@ export const getMusicTime = (piTime: string, piLightLevel: string, useTime: bool
   } else {
     // Convert light level to number
     const lightLevel = parseFloat(piLightLevel);
-    
+
     // Bang-bang control with hysteresis for light level
     if (prevTime === 'night') {
       // Currently night, only switch to day if light rises above threshold + hysteresis

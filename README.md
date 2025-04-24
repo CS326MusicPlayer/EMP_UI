@@ -6,13 +6,19 @@
 ## Description
 - TBA
 
+
+---
+## How it works
+- Chooses music depending on the weather/temperature and time/brightness, based on the preference
+- 2 base music tracks (day/night) with 3 total variations (sunny, rainy, snowy)
+
 ---
 ## Running Locally
 - `git clone` this repository
 - `cd frontend`
 - `npm install`
 - `npm run dev`
-  - `npm test` to run tests
+- `npm test` to run tests
 
 ---
 ## Testing
@@ -25,6 +31,6 @@ mosquitto_pub -h <BROKER> -P <PASSWORD> -u <USERNAME> -p 8883 -t "emp/environmen
 
 ---
 ## Assets Credit
-- Icons: created by [Freepik](https://www.freepik.com), [UniconLabs](http://flaticon.com/authors/uniconlabs) - [Flaticon](https://www.flaticon.com/)
-- Cursor: created by [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
+- Icons: [Freepik](https://www.freepik.com), [UniconLabs](http://flaticon.com/authors/uniconlabs) - [Flaticon](https://www.flaticon.com/)
+- Cursor: [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
 - Music: Cobblestone5517

@@ -13,8 +13,9 @@ import {
   convertTemp
 } from '../../utilities/utils';
 
-
 // Icons
+import sunIcon from '../../assets/icons/sun.png';
+import moonIcon from '../../assets/icons/moon.png';
 import brightIcon from '../../assets/icons/bright.png';
 import darkIcon from '../../assets/icons/dark.png';
 import sunnyIcon from '../../assets/icons/brightness.png';
@@ -434,8 +435,10 @@ export default function TimeWeather({
                 }}
               >
                 {
-                  getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={brightIcon} alt="AM" className={classes.sunIcon} /> :
-                  getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={darkIcon} alt="PM" className={classes.sunIcon} /> :
+                  getMusicTime(piTime, piLightLevel, useTime) === 'day' ?
+                    <img src={ useTime ? sunIcon : brightIcon } alt="AM" className={classes.sunIcon} /> :
+                  getMusicTime(piTime, piLightLevel, useTime) === 'night' ?
+                    <img src={ useTime ? moonIcon : darkIcon} alt="PM" className={ useTime ? classes.moonIcono : classes.sunIcon } /> :
                   <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
                 }
               </span>

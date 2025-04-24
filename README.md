@@ -21,9 +21,10 @@
   - Note that it should match with [RPi's mqtt broker](https://github.com/CS326MusicPlayer/MusicPlayer/blob/main/sensor/get_environment.py)
 ```sh
 mosquitto_pub -h <BROKER> -P <PASSWORD> -u <USERNAME> -p 8883 -t "emp/environment" -m '{"pid": "0", "precipitation_status": "snow", "sunrise": "07:23", "sunset": "20:14", "timezone": "America/Detroit", "temperature": "25", "light_level": 0.5}'
-```   
+```
 
 ---
 ## Assets Credit
-- Icons, cursor: created by [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
+- Icons: created by [Freepik](https://www.freepik.com), [UniconLabs](http://flaticon.com/authors/uniconlabs) - [Flaticon](https://www.flaticon.com/)
+- Cursor: created by [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
 - Music: Cobblestone5517

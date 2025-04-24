@@ -13,8 +13,10 @@ import {
   convertTemp
 } from '../../utilities/utils';
 
-import sunIcon from '../../assets/icons/sun.png';
-import moonIcon from '../../assets/icons/moon.png';
+
+// Icons
+import brightIcon from '../../assets/icons/bright.png';
+import darkIcon from '../../assets/icons/dark.png';
 import sunnyIcon from '../../assets/icons/brightness.png';
 import rainyIcon from '../../assets/icons/storm.png';
 import snowyIcon from '../../assets/icons/snowflakes.png';
@@ -248,7 +250,7 @@ export default function TimeWeather({
             content={
               <p style={{ 'color': 'var(--black)' }}>
                 {
-                  isAuto ? 
+                  isAuto ?
                     <>You are using "{useWeather ? 'weather' : 'temperature'}"<br />for playing music</> :
                     'Click to toggle sunny/rainy/snowy'
                 }
@@ -340,7 +342,7 @@ export default function TimeWeather({
             !isAuto ? 'var(--lightgray2)' : (
               dayOrNightValue === 'day' ? 'var(--day0)' :
               dayOrNightValue === 'night' ? 'var(--night0)' : 'var(--white)'
-            ) 
+            )
           }}
         >
           {/* Toggle Chip */}
@@ -432,8 +434,8 @@ export default function TimeWeather({
                 }}
               >
                 {
-                  getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={sunIcon} alt="AM" className={classes.sunIcon} /> :
-                  getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={moonIcon} alt="PM" className={classes.moonIcon} /> :
+                  getMusicTime(piTime, piLightLevel, useTime) === 'day' ? <img src={brightIcon} alt="AM" className={classes.sunIcon} /> :
+                  getMusicTime(piTime, piLightLevel, useTime) === 'night' ? <img src={darkIcon} alt="PM" className={classes.sunIcon} /> :
                   <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
                 }
               </span>

@@ -438,7 +438,7 @@ export default function TimeWeather({
                   getMusicTime(piTime, piLightLevel, useTime) === 'day' ?
                     <img src={ useTime ? sunIcon : brightIcon } alt="AM" className={classes.sunIcon} /> :
                   getMusicTime(piTime, piLightLevel, useTime) === 'night' ?
-                    <img src={ useTime ? moonIcon : darkIcon} alt="PM" className={ useTime ? classes.moonIcono : classes.sunIcon } /> :
+                    <img src={ useTime ? moonIcon : darkIcon} alt="PM" className={ useTime ? classes.moonIcon : classes.sunIcon } /> :
                   <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} />
                 }
               </span>

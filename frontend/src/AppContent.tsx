@@ -179,7 +179,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
             <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
           }
         </div>,
-        duration: 5,
+        duration: 3,
       });
     }
 
@@ -211,7 +211,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
             { currentPiData.light_level || 'Unknown' }
           </p>
         </div>,
-        duration: 5,
+        duration: 3,
       });
     }
 

@@ -25,7 +25,7 @@ import night_rainy from '../../assets/music/night_rainy.mp3';
 import night_snowy from '../../assets/music/night_snowy.mp3';
 
 // Constants for music fade in/out times
-const FADE_OUT_TIME = 5; // seconds
+const FADE_OUT_TIME = 4; // seconds
 const FADE_IN_TIME = 1; // seconds
 
 

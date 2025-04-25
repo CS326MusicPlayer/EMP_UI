@@ -1,12 +1,12 @@
 // Settings modal to set up broker information
 // Daniel Kim (jk254), Jason Chew (jgc23)
 
-
 import React, { useState, useEffect, KeyboardEvent } from 'react';
 import { Modal, Form, Input } from 'antd';
 import { useBrokerAuth } from '../../contexts/BrokerAuthContext';
 import classes from './styles.module.css';
 
+// BrokerInfoModal props
 interface BrokerInfoProps {
   isOpen: boolean;
   onClose: () => void;

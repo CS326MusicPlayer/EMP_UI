@@ -85,6 +85,7 @@ function AppContainer(): React.ReactElement {
         trigger="hover"
         placement="left"
       >
+        {/* Float Button (bottom right) */}
         <FloatButton.Group
           shape="circle"
           trigger='hover'
@@ -104,7 +105,7 @@ function AppContainer(): React.ReactElement {
             // Show the badge if the broker info is not set
             badge={brokerAuth.host && brokerAuth.port ? undefined : { count: 1, color: 'var(--emerald2)' }}
           />
-      </FloatButton.Group>
+        </FloatButton.Group>
       </Popover>
     </ConfigProvider>
   );

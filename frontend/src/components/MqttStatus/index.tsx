@@ -47,6 +47,7 @@ export default function MqttStatus({
   };
 
 
+  // Content for the online status
   const onlineContent = (
     <div>
       <h3 style={{ color: '#616161' }}>Your device seems to be online!</h3>
@@ -55,18 +56,21 @@ export default function MqttStatus({
     </div>
   );
 
+  // Content for the offline status
   const offlineContent = (
     <div>
       <p style={{ color: '#616161' }}>Your device seems to be offline</p>
       <p style={{ color: 'var(--black)' }}>
         {(brokerAuth.host && brokerAuth.port) ? 'Click to connect to the MQTT server' : 'Set up your MQTT server in the settings!'}
       </p>
-      <p style={{ color: 'var(--gray)' }}>Last seen: {timeDisplay}</p>
+      <p style={{ color: 'var(--gray)' }}>Last connected: {timeDisplay}</p>
     </div>
   );
 
+
   return (
     <div className={classes.container}>
+      {/* Pi Status Icon / Conn button */}
       <span className={classes.status}>
         <Popover
           content={mqttConnected ? onlineContent : offlineContent}

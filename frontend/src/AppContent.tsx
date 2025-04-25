@@ -12,6 +12,7 @@ import { usePiSelection } from './contexts/PiSelectionContext';
 import { getTimeUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
 import { PiData, IncomingMqttMessage } from './types';
 
+// Icons
 import sunIcon from './assets/icons/sun.png';
 import moonIcon from './assets/icons/moon.png';
 import sunnyIcon from './assets/icons/brightness.png';
@@ -20,9 +21,13 @@ import snowyIcon from './assets/icons/snowflakes.png';
 import unknownIcon from './assets/icons/unknown.png';
 
 
-// Color constants
+// Color constants (for background gradient)
 const DAY_COLOR = '#b3e6ff';
 const NIGHT_COLOR = '#3a3a5c';
+
+// Constants for MQTT topics
+const MQTT_TOPIC_ENVIRONMENT = 'emp/environment';
+const MQTT_TOPIC_OPERATIONS = 'emp/operations';
 
 interface AppContentProps {
   mqttClient: MqttClient | null;
@@ -36,15 +41,15 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [currentPiData, setCurrentPiData] = useState<PiData | Record<string, any>>({});
 
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [isAuto, setIsAuto] = useState<boolean>(true);    // To track if the user has enabled auto mode
-  const [musicIsFading, setMusicIsFading] = useState<boolean>(false);
-  const [manualWeather, setManualWeather] = useState('none');
+  const [isConnected, setIsConnected] = useState<boolean>(false);     // To track if the MQTT client is connected
+  const [isAuto, setIsAuto] = useState<boolean>(true);                // To track if the user has enabled auto mode
+  const [musicIsFading, setMusicIsFading] = useState<boolean>(false); // To track if the music is fading
+  const [manualWeather, setManualWeather] = useState('none');         // To track the manual weather setting
   const [manualTime, setManualTime] = useState('day');
 
-  const { useTime } = useSensorPreferences();
+  const { useTime } = useSensorPreferences();                         // Whether to use time or light level for music selection
   const { selectedPiId, setSelectedPiId, piList, setPiList } = usePiSelection();
-  const currentHour = new Date().getHours();    // just for setting initial background color
+  const currentHour = new Date().getHours();                          // just for setting initial background color
 
   const prevManualWeatherRef = useRef(manualWeather);
   const prevManualTimeRef = useRef(manualTime);
@@ -53,6 +58,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   const hasSubscribed = useRef(false);          // To track if the subscription has been made)
   const selectedPiIdRef = useRef(selectedPiId);
   const prevMusicIsFadingRef = useRef(false);   // Track previous music fading state
+
 
   // Update the last connected time of the MQTT client and save it to local storage
   const lastConnectedTime = useRef<string | null>(
@@ -115,11 +121,11 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
           "target": selectedPiId
         });
 
-        mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+        mqttClient.publish(MQTT_TOPIC_OPERATIONS, message, { qos: 1 }, (error) => {
           if (error) {
             console.error('Error publishing Pi selection:', error);
           } else {
-            console.log(`Published Pi selection to emp/operations: ${selectedPiId}`);
+            console.log(`Published Pi selection to ${MQTT_TOPIC_OPERATIONS}: ${selectedPiId}`);
           }
         });
       }
@@ -247,9 +253,9 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
         // Subscribe to the topic
         if (!hasSubscribed.current && mqttClient) {
           hasSubscribed.current = true;
-          mqttClient.subscribe('emp/environment', (err) => {
+          mqttClient.subscribe(MQTT_TOPIC_ENVIRONMENT, (err) => {
             if (!err) {
-              console.log('Subscribed to topic: emp/environment');
+              console.log(`Subscribed to topic: ${MQTT_TOPIC_ENVIRONMENT}`);
             } else {
               console.error('Subscription error:', err);
             }
@@ -284,7 +290,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       const messageHandler = function (topic: string, message: Buffer) {
         console.log('Received message:', topic, message.toString());
 
-        if (topic === 'emp/environment') {
+        if (topic === MQTT_TOPIC_ENVIRONMENT) {
           try {
             const data = JSON.parse(message.toString());
 
@@ -401,7 +407,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
         });
 
         // Publish the message to the topic
-        mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+        mqttClient.publish(MQTT_TOPIC_OPERATIONS, message, { qos: 1 }, (error) => {
           if (error) {
             console.error('Error publishing data request:', error);
           } else {
@@ -481,7 +487,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       });
 
       // Publish the message to the topic
-      mqttClient.publish('emp/operations', message, { qos: 1 }, (error) => {
+      mqttClient.publish(MQTT_TOPIC_OPERATIONS, message, { qos: 1 }, (error) => {
         if (error) {
           console.error('Error broadcasting to all Pis:', error);
         } else {

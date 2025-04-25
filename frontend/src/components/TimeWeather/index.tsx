@@ -12,6 +12,7 @@ import {
   getDayOrNight,
   convertTemp
 } from '../../utilities/utils';
+import classes from './styles.module.css';
 
 // Icons
 import sunIcon from '../../assets/icons/sun.png';
@@ -26,7 +27,6 @@ import lightsensor from '../../assets/icons/lightsensor.png';
 import clocktime from '../../assets/icons/clocktime.png';
 import temperature from '../../assets/icons/temperature.png';
 import precipitation from '../../assets/icons/precipitation.png';
-import classes from './styles.module.css';
 
 
 // Temporary values for sunrise and sunset (on init)
@@ -63,10 +63,10 @@ export default function TimeWeather({
 }
 
 ): React.ReactElement {
-  const { useWeather, setUseWeather, useTime, setUseTime } = useSensorPreferences();
-  const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');
-  const [isHoveringWeather, setIsHoveringWeather] = useState(false);
-  const [isHoveringTime, setIsHoveringTime] = useState(false);
+  const { useWeather, setUseWeather, useTime, setUseTime } = useSensorPreferences();  // Sensor preferences context
+  const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');                           // Temperature unit state
+  const [isHoveringWeather, setIsHoveringWeather] = useState(false);                  // Weather icon hover state
+  const [isHoveringTime, setIsHoveringTime] = useState(false);                        // Time icon hover state 
 
   // Initialize with a calculated value based on temporary sunrise/sunset times
   const [sunAngle, setSunAngle] = useState(() => {
@@ -77,8 +77,10 @@ export default function TimeWeather({
 
   // Initialize time with the current date
   const [time, setTime] = useState(new Date());
+
   // Add a ref to track animation frame ID for cleanup
   const animationFrameId = React.useRef<number | undefined>(undefined);
+
   // Use ref to track last update time to optimize frame rate
   const lastUpdateRef = React.useRef<number>(0);
 
@@ -110,7 +112,6 @@ export default function TimeWeather({
 
 
   // Update the sun angle based on the current time and sunrise/sunset times
-  // Use useMemo to avoid recalculating sun angle on every render
   useEffect(() => {
     if (piSunrise && piSunset) {
       const angle = calculateSunPosition(piTimezone, piSunrise, piSunset);

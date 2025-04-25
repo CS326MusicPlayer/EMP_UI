@@ -139,7 +139,7 @@ export default function MusicPlayer({
   const prevIsAutoRef = useRef(isAuto);                   // To track mode changes
   const audioRef = useRef<HTMLAudioElement>(null);        // Audio element reference
   const progressBarRef = useRef<HTMLDivElement>(null);    // Progress bar reference
-  const fadeIntervalRef = useRef<{
+  const fadeIntervalRef = useRef<{                        // Fade interval reference  
     fadeOut: number | null,
     fadeIn: number | null
   }>({
@@ -204,6 +204,7 @@ export default function MusicPlayer({
     });
   }
 
+  // Effect to set loop mode based on auto mode (not currently used)
   useEffect(() => {
     // If auto mode is enabled, set loop mode to 'one'
     if (isAuto && loopMode !== 'one') {
@@ -321,6 +322,7 @@ export default function MusicPlayer({
     }
 
     handleSongChange();
+
 
     // Clean up function
     return () => {
@@ -496,7 +498,7 @@ export default function MusicPlayer({
   };
 
 
-  // Handle progress bar click
+  // Handle progress bar click (move to specific time)
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (progressBarRef.current && audioRef.current && !isAuto && !isFading) {
       const progressBarRect = progressBarRef.current.getBoundingClientRect();
@@ -580,6 +582,7 @@ export default function MusicPlayer({
         />
       </span>
 
+      {/* Progress Bar */}
       <div className={classes.timeControl}>
         <span className={classes.timeDisplay}>{formatTime(currentTime)}</span>
         <div

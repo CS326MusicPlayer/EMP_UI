@@ -302,23 +302,6 @@ export const formatTime = (time: number) => {
 
 
 /**
- * Returns the appropriate placement based on screen size
- * Used for components like Popover, Tooltip, etc. that have placement props
- *
- * @param defaultPlacement - The placement to use for smaller screens
- * @param largePlacement - The placement to use for screens larger than 768px
- * @returns The appropriate placement based on current screen size
- */
-export const getResponsivePlacement = (defaultPlacement: string, largePlacement: string = 'right'): string => {
-  // Check if window is defined (for SSR)
-  if (typeof window !== 'undefined') {
-    return window.innerWidth > 768 ? largePlacement : defaultPlacement;
-  }
-  return defaultPlacement;
-};
-
-
-/**
  * Returns the next Pi ID in the list, wrapping around to the start if necessary.
  *
  * @param currentPiId - The current Pi ID

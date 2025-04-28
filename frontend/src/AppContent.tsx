@@ -29,6 +29,12 @@ const NIGHT_COLOR = '#3a3a5c';
 const MQTT_TOPIC_ENVIRONMENT = 'emp/environment';
 const MQTT_TOPIC_OPERATIONS = 'emp/operations';
 
+
+const MIN_FETCH_INTERVAL = 15000; // Minimum fetch interval for Pi data (15 seconds)
+const RANDOM_DELAY = Math.floor(Math.random() * 5000); // Random delay between 0 and 5 seconds
+const POLL_INTERVAL = 10000; // Polling interval for Pi data (10 seconds)
+
+
 interface AppContentProps {
   mqttClient: MqttClient | null;
 }
@@ -400,18 +406,16 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       // Set up regular polling interval
       pollInterval = setInterval(() => {
         requestPiData();
-      }, 5000); // Poll every 10 seconds
+      }, POLL_INTERVAL);
     }
 
     // Function to request data from the selected Pi
     function requestPiData() {
-      const minFetchInterval = 10000;
       const currentTime = getUnixTimestampUsingTimezone(currentPiData.timezone);
-      const randomDelay = Math.floor(Math.random() * 5000);
 
       // Use the ref value here instead
       const timeSinceLast = currentTime - lastMsgTimeRef.current;
-      const waitTime = (minFetchInterval + randomDelay) / 1000;
+      const waitTime = (MIN_FETCH_INTERVAL + RANDOM_DELAY) / 1000;
       console.log(`Time since last message: ${timeSinceLast}, Wait time: ${waitTime}`);
       console.log(`Current time: ${currentTime}, Last message time: ${lastMsgTimeRef.current}`);
 

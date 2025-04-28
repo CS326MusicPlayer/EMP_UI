@@ -62,6 +62,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
   };
 
 
+  // Handle save button click (Written with the help of Copilot)
   const handleSave = async () => {
     if (!formValues.host || !formValues.port) {
       setWarningMsg('Host and port are required!');

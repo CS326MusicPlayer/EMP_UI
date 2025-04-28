@@ -31,16 +31,16 @@ describe('getMusicWeather', () => {
   it('determines weather based on temperature when useWeather is false', () => {
     // Below 0°C should be snow
     expect(getMusicWeather('none', -5, false)).toBe('snow');
-    
+
     // Reset state for next test
     resetHysteresisState();
-    
+
     // Between 0°C and 20°C should be rain
     expect(getMusicWeather('none', 15, false)).toBe('rain');
-    
+
     // Reset state for next test
     resetHysteresisState();
-    
+
     // Above 20°C should be none (sunny)
     expect(getMusicWeather('none', 25, false)).toBe('none');
   });
@@ -49,50 +49,50 @@ describe('getMusicWeather', () => {
     // Exactly at threshold values
     resetHysteresisState();
     expect(getMusicWeather('none', 0, false)).toBe('snow');
-    
+
     // Reset and set to moderate temperature
     resetHysteresisState();
     expect(getMusicWeather('none', 20, false)).toBe('rain');
-    
+
     // Invalid input should be handled gracefully
     resetHysteresisState();
     expect(getMusicWeather('none', NaN, false)).toBe('none');
   });
-  
+
   it('implements hysteresis correctly for snow-rain transition', () => {
     // First call establishes state as snow (temperature below 0°C)
     expect(getMusicWeather('none', -1, false)).toBe('snow');
-    
+
     // Should stay snow even when temperature rises just above threshold (0°C)
     // due to hysteresis (2°C band)
     expect(getMusicWeather('none', 1, false)).toBe('snow');
-    
+
     // Should switch to rain when temperature exceeds threshold + hysteresis (0°C + 2°C)
     expect(getMusicWeather('none', 3, false)).toBe('rain');
-    
+
     // Should stay rain even when temperature drops just below threshold (0°C)
     // due to hysteresis (2°C band)
     expect(getMusicWeather('none', -1, false)).toBe('rain');
-    
+
     // Should switch back to snow when temperature drops below threshold - hysteresis (0°C - 2°C)
     expect(getMusicWeather('none', -3, false)).toBe('snow');
   });
-  
+
   it('implements hysteresis correctly for rain-none transition', () => {
     // First call establishes state as rain
     expect(getMusicWeather('none', 15, false)).toBe('rain');
-    
+
     // Should stay rain even when temperature rises just above threshold (20°C)
     // due to hysteresis (2°C band)
     expect(getMusicWeather('none', 21, false)).toBe('rain');
-    
+
     // Should switch to none when temperature exceeds threshold + hysteresis (20°C + 2°C)
     expect(getMusicWeather('none', 23, false)).toBe('none');
-    
+
     // Should stay none even when temperature drops just below threshold (20°C)
     // due to hysteresis (2°C band)
     expect(getMusicWeather('none', 19, false)).toBe('none');
-    
+
     // Should switch back to rain when temperature drops below threshold - hysteresis (20°C - 2°C)
     expect(getMusicWeather('none', 17, false)).toBe('rain');
   });
@@ -101,49 +101,50 @@ describe('getMusicWeather', () => {
 // Test for getMusicTime function
 describe('getMusicTime', () => {
   it('returns the actual time when useTime is true', () => {
-    expect(getMusicTime('day', '0.5', true)).toBe('day');
-    expect(getMusicTime('night', '0.3', true)).toBe('night');
+    expect(getMusicTime('day', '120', true)).toBe('day');
+    expect(getMusicTime('night', '80', true)).toBe('night');
   });
 
   it('determines time based on light level when useTime is false', () => {
-    // Light level <= 0.4 should be night
     resetHysteresisState();
-    expect(getMusicTime('day', '0.3', false)).toBe('night');
-    expect(getMusicTime('day', '0.4', false)).toBe('night');
-    
-    // Light level > 0.4 should be day
+    // Below the threshold (100), should be night
+    expect(getMusicTime('day', '80', false)).toBe('night');
+    expect(getMusicTime('day', '90', false)).toBe('night');
+
     resetHysteresisState();
-    expect(getMusicTime('night', '0.41', false)).toBe('day');
-    expect(getMusicTime('night', '0.8', false)).toBe('day');
+    // Above the threshold (100), should be day
+    expect(getMusicTime('night', '120', false)).toBe('day');
+    expect(getMusicTime('night', '300', false)).toBe('day');
   });
 
   it('handles edge cases', () => {
-    // Exactly at threshold value
+    // Exactly at threshold value (100)
     resetHysteresisState();
-    expect(getMusicTime('day', '0.4', false)).toBe('night');
-    
+    expect(getMusicTime('day', '100', false)).toBe('night');
+
     // Invalid light level
     resetHysteresisState();
     expect(getMusicTime('night', 'invalid', false)).toBe('day');
   });
-  
+
   it('implements hysteresis correctly for night-day transition', () => {
-    // First call establishes state as night
-    expect(getMusicTime('night', '0.35', false)).toBe('night');
-    
-    // Should stay night even when light level rises just above threshold (0.4)
-    // due to hysteresis (0.1 unit band)
-    expect(getMusicTime('night', '0.45', false)).toBe('night');
-    
-    // Should switch to day when light level exceeds threshold + hysteresis (0.4 + 0.1)
-    expect(getMusicTime('night', '0.51', false)).toBe('day');
-    
-    // Should stay day even when light level drops just below threshold (0.4)
-    // due to hysteresis (0.1 unit band)
-    expect(getMusicTime('day', '0.35', false)).toBe('day');
-    
-    // Should switch back to night when light level drops below threshold - hysteresis (0.4 - 0.1)
-    expect(getMusicTime('day', '0.29', false)).toBe('night');
+    // Initialize state as night with a value below threshold
+    resetHysteresisState();
+    expect(getMusicTime('night', '90', false)).toBe('night');
+
+    // Still night even when light level rises slightly above threshold
+    // due to hysteresis (needs to go above 100 + 20 = 120)
+    expect(getMusicTime('night', '110', false)).toBe('night');
+
+    // Should switch to day when above threshold + hysteresis (100 + 20 = 120)
+    expect(getMusicTime('night', '121', false)).toBe('day');
+
+    // Should stay day even when light level falls slightly below threshold
+    // due to hysteresis (needs to go below 100 - 20 = 80)
+    expect(getMusicTime('day', '90', false)).toBe('day');
+
+    // Should switch to night when below threshold - hysteresis (100 - 20 = 80)
+    expect(getMusicTime('day', '79', false)).toBe('night');
   });
 });
 
@@ -171,7 +172,7 @@ describe('getDayOrNight', () => {
     // At sunrise
     const atSunrise = new Date('2023-04-13T06:00:00');
     expect(getDayOrNight(atSunrise, '06:00', '18:00')).toBe('day');
-    
+
     // At sunset
     const atSunset = new Date('2023-04-13T18:00:00');
     expect(getDayOrNight(atSunset, '06:00', '18:00')).toBe('night');
@@ -186,7 +187,7 @@ describe('getTimeUsingTimezone', () => {
     // Mock the Date.prototype.toLocaleString to return a fixed value
     const originalToLocaleString = Date.prototype.toLocaleString;
     Date.prototype.toLocaleString = vi.fn().mockReturnValue('4/13/2023, 12:00:00 PM');
-    
+
     try {
       const result = getTimeUsingTimezone('America/New_York');
       expect(result).toBeInstanceOf(Date);
@@ -217,17 +218,17 @@ describe('calculateSunPosition', () => {
       { getTimeUsingTimezone },
       'getTimeUsingTimezone'
     );
-    
+
     // Mock the return value - a noon date
     const mockNoonDate = new Date('2023-04-13T12:00:00');
     getTimeUsingTimezoneSpy.mockReturnValue(mockNoonDate);
 
     // Call the function - this should now use our mocked getTimeUsingTimezone
     const position = calculateSunPosition('America/New_York', '06:00', '18:00');
-    
+
     // Don't know the exact value but it should be a number
     expect(typeof position).toBe('number');
-    
+
     // Clean up
     getTimeUsingTimezoneSpy.mockRestore();
   });
@@ -252,11 +253,11 @@ describe('convertTemp', () => {
     // Zero is treated as falsy and returns '--'
     expect(convertTemp(0, 'C')).toBe('--');
     expect(convertTemp(0, 'F')).toBe('--');
-    
+
     // Null or undefined input
     expect(convertTemp(null as any, 'C')).toBe('--');
     expect(convertTemp(undefined as any, 'F')).toBe('--');
-    
+
     // Invalid number format
     expect(convertTemp(NaN, 'C')).toBe('--');
   });

@@ -26,11 +26,11 @@
 - Example message: (replace `<BROKER>`, `<PASSWORD>`, and `<USERNAME>` with your broker credentials)
   - Note that it should match with [RPi's mqtt broker](https://github.com/CS326MusicPlayer/MusicPlayer/blob/main/sensor/get_environment.py)
 ```sh
-mosquitto_pub -h <BROKER> -P <PASSWORD> -u <USERNAME> -p 8883 -t "emp/environment" -m '{"pid": "0", "precipitation_status": "snow", "sunrise": "07:23", "sunset": "20:14", "timezone": "America/Detroit", "temperature": "25", "light_level": 0.5}'
+mosquitto_pub -h <BROKER> -P <PASSWORD> -u <USERNAME> -p 8883 -t "emp/environment" -m '{"pid": "0", "precipitation_status": "snow", "sunrise": "07:23", "sunset": "20:14", "timezone": "America/Detroit", "temperature": "25", "light_level": 0.5, "timestamp": "129403493423"}'
 ```
 
 ---
 ## Assets Credit
-- Icons: [Freepik](https://www.freepik.com), [UniconLabs](http://flaticon.com/authors/uniconlabs) - [Flaticon](https://www.flaticon.com/)
-- Cursor: [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
-- Music: Cobblestone5517
+- **Icons**: [Freepik](https://www.freepik.com), [UniconLabs](http://flaticon.com/authors/uniconlabs) - [Flaticon](https://www.flaticon.com/)
+- **Cursor**: [Freepik](https://www.freepik.com) - [Flaticon](https://www.flaticon.com/)
+- **Music**: Cobblestone5517

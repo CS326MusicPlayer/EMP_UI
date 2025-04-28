@@ -603,19 +603,19 @@ export default function MusicPlayer({
       {/* Music Controls */}
       <div className={classes.controller}>
         <div className={classes.controls}>
-          <button onClick={playPrevious} className={classes.controlButton} disabled={isFading}>
+          <button onClick={playPrevious} className={classes.controlButton} disabled={isFading || (!piWeather && !piTime)}>
             <LuSkipBack />
           </button>
 
-          <button onClick={togglePlay} className={classes.controlButton} disabled={isFading}>
+          <button onClick={togglePlay} className={classes.controlButton} disabled={isFading || (!piWeather && !piTime)}>
             {isPlaying ? <LuSquare /> : <LuPlay />}
           </button>
 
-          <button onClick={playNext} className={classes.controlButton} disabled={isFading}>
+          <button onClick={playNext} className={classes.controlButton} disabled={isFading || (!piWeather && !piTime)}>
             <LuSkipForward />
           </button>
 
-          {/* <button onClick={cycleLoopMode} className={classes.loopButton} disabled={isFading}>
+          {/* <button onClick={cycleLoopMode} className={classes.loopButton} disabled={isFading || (!piWeather && !piTime)}>}>
             {loopMode === 'all' ? <LuRepeat /> : <LuRepeat1 />}
           </button> */}
         </div>

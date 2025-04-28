@@ -163,6 +163,7 @@
   background-color: var(--lightgray1);
   border-radius: 4px;
   position: relative;
+  cursor: url(../../assets/cursors/pointer.png), pointer !important;
 }
 
 .progressBar {

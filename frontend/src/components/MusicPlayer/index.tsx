@@ -4,7 +4,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
-import { LuPlay, LuPause, /* LuRepeat, LuRepeat1,*/ LuSkipForward, LuSkipBack, LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
+import { LuPlay, LuSquare, /* LuRepeat, LuRepeat1,*/ LuSkipForward, LuSkipBack, LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
 import { getMusicWeather, getMusicTime, formatTime } from '../../utilities/utils';
 import classes from './styles.module.css';
@@ -608,7 +608,7 @@ export default function MusicPlayer({
           </button>
 
           <button onClick={togglePlay} className={classes.controlButton} disabled={isFading}>
-            {isPlaying ? <LuPause /> : <LuPlay />}
+            {isPlaying ? <LuSquare /> : <LuPlay />}
           </button>
 
           <button onClick={playNext} className={classes.controlButton} disabled={isFading}>

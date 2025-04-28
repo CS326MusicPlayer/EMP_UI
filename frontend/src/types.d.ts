@@ -26,4 +26,5 @@ export interface IncomingMqttMessage {
   precipitation_status: string;
   temperature: string | number;
   light_level: string;
+  timestamp: number;
 }

@@ -9,7 +9,7 @@ import MusicPlayer from './components/MusicPlayer';
 import type { MqttClient } from 'mqtt';
 import { useSensorPreferences } from './contexts/SensorPreferencesContext';
 import { usePiSelection } from './contexts/PiSelectionContext';
-import { getTimeUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
+import { getTimeUsingTimezone, getUnixTimestampUsingTimezone, getMusicTime, getDayOrNight } from './utilities/utils';
 import { PiData, IncomingMqttMessage } from './types';
 
 // Icons
@@ -58,6 +58,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
   const hasSubscribed = useRef(false);          // To track if the subscription has been made)
   const selectedPiIdRef = useRef(selectedPiId);
   const prevMusicIsFadingRef = useRef(false);   // Track previous music fading state
+  const lastMsgTimeRef = useRef<number>(0);
 
 
   // Update the last connected time of the MQTT client and save it to local storage
@@ -359,6 +360,9 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
         if (data.pid === selectedPiIdRef.current) {
           setCurrentPiData(newData);
         }
+
+        // Update the last message time
+        lastMsgTimeRef.current = data.timestamp;
       }
 
       mqttClient.on('message', messageHandler);
@@ -396,11 +400,27 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
       // Set up regular polling interval
       pollInterval = setInterval(() => {
         requestPiData();
-      }, 10000); // Poll every 10 seconds
+      }, 5000); // Poll every 10 seconds
     }
 
     // Function to request data from the selected Pi
     function requestPiData() {
+      const minFetchInterval = 10000;
+      const currentTime = getUnixTimestampUsingTimezone(currentPiData.timezone);
+      const randomDelay = Math.floor(Math.random() * 5000);
+
+      // Use the ref value here instead
+      const timeSinceLast = currentTime - lastMsgTimeRef.current;
+      const waitTime = (minFetchInterval + randomDelay) / 1000;
+      console.log(`Time since last message: ${timeSinceLast}, Wait time: ${waitTime}`);
+      console.log(`Current time: ${currentTime}, Last message time: ${lastMsgTimeRef.current}`);
+
+      // Early return if the last message was received within the fetch interval
+      if (timeSinceLast < waitTime) {
+        console.log('Skipping data request: last message received recently');
+        return;
+      }
+
       if (mqttClient && mqttClient.connected && selectedPiId) {
         const message = JSON.stringify({
           "target": selectedPiId

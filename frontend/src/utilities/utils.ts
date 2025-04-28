@@ -153,6 +153,18 @@ export const getTimeUsingTimezone = (timezone: string) => {
 
 
 /**
+ * Get date.now (unix timeestamp) in the given timezone
+ *
+ * @param timestamp - The timestamp string to convert
+ * @returns A unix timestamp in milliseconds
+ */
+export const getUnixTimestampUsingTimezone = (timezone: string) => {
+  const date = new Date(new Date().toLocaleString('en-US', { timeZone: timezone }));
+  return Math.floor(date.getTime() / 1000);
+}
+
+
+/**
  * Formats a timestamp to a human-readable "time ago" format.
  *
  * @param timestamp - The timestamp string to format

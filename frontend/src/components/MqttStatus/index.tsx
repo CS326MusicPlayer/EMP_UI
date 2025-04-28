@@ -104,7 +104,7 @@ export default function MqttStatus({
               <div>
                 <h3 style={{ color: 'var(--black)' }}>Pi Discovery</h3>
                 <p style={{ color: 'var(--black)' }}>Click to discover all available Pis!</p>
-                <p style={{ color: 'var(--gray)' }}>Current Pi: {selectedPiId}</p>
+                <p style={{ color: 'var(--gray)' }}>Current Pi: "{selectedPiId}"</p>
                 <p style={{ color: 'var(--gray)' }}>Available Pis: {piList.join(', ')}</p>
               </div>
             }

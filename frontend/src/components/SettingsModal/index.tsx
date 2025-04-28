@@ -30,6 +30,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
 
 
   // When the modal opens, initialize form values with current brokerAuth values
+  // Written with the help of Copilot
   useEffect(() => {
     if (isOpen) {
       setFormValues({
@@ -99,7 +100,7 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
     onClose();
   };
 
-  
+
   return (
     <Modal
       title={<h3 style={{ textAlign: 'center', marginBottom: '1rem', color: 'var(--black)' }}>Broker Settings</h3>}

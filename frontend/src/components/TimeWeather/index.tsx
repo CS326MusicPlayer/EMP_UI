@@ -66,7 +66,7 @@ export default function TimeWeather({
   const { useWeather, setUseWeather, useTime, setUseTime } = useSensorPreferences();  // Sensor preferences context
   const [tempUnit, setTempUnit] = useState<'C' | 'F'>('C');                           // Temperature unit state
   const [isHoveringWeather, setIsHoveringWeather] = useState(false);                  // Weather icon hover state
-  const [isHoveringTime, setIsHoveringTime] = useState(false);                        // Time icon hover state 
+  const [isHoveringTime, setIsHoveringTime] = useState(false);                        // Time icon hover state
 
   // Initialize with a calculated value based on temporary sunrise/sunset times
   const [sunAngle, setSunAngle] = useState(() => {
@@ -86,6 +86,7 @@ export default function TimeWeather({
 
 
   // Update time using requestAnimationFrame
+  // Written with the help of Copilot
   useEffect(() => {
     const updateClock = (timestamp: number) => {
       // Only update every 1000ms (1 second) to match previous behavior
@@ -121,6 +122,7 @@ export default function TimeWeather({
 
 
   // Update the sun angle when the time changes
+  // Written with the help of Copilot
   const timeDisplayValues = React.useMemo(() => {
     const currentTime = time;
     const seconds = currentTime.getSeconds();

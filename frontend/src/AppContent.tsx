@@ -400,6 +400,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
 
 
   // Add polling interval to request data from selected Pi every 10 seconds
+  // Written with the help of Copilot
   useEffect(() => {
     let pollInterval: NodeJS.Timeout | null = null;
 
@@ -460,6 +461,7 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
 
 
   // Change the background color based on the time or light level
+  // Written with the help of Copilot
   useEffect(() => {
     if (Object.keys(currentPiData).length > 0 && isAuto) {
       const calculatedTime = getMusicTime(currentPiData.time, currentPiData.light_level, useTime);

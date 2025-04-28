@@ -346,7 +346,6 @@ export default function MusicPlayer({
   // Event handlers
   const togglePlay = () => {
     if (!audioRef.current) return;
-    if (isAuto) return; // Disable play/pause in auto mode
 
     if (isPlaying) {
       audioRef.current.pause();

@@ -15,6 +15,8 @@ import { PiData, IncomingMqttMessage } from './types';
 // Icons
 import sunIcon from './assets/icons/sun.png';
 import moonIcon from './assets/icons/moon.png';
+import brightIcon from './assets/icons/bright.png';
+import darkIcon from './assets/icons/dark.png';
 import sunnyIcon from './assets/icons/brightness.png';
 import rainyIcon from './assets/icons/storm.png';
 import snowyIcon from './assets/icons/snowflakes.png';
@@ -207,23 +209,28 @@ function AppContent({ mqttClient }: AppContentProps): React.ReactElement {
     // Only show notification when music starts fading (transition begins)
     if (musicIsFading && !prevMusicIsFadingRef.current && isAuto && Object.keys(currentPiData).length > 0) {
       messageApi.info({
-        content: <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{currentPiData.temperature}°C</p>
-          {
-            currentPiData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            currentPiData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            currentPiData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          }
-          {
-            currentPiData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            currentPiData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
-            <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
-          }
-          <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>
-            { currentPiData.light_level || 'Unknown' }
-          </p>
-        </div>,
+        content:
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <p style={{ fontSize: '1.4rem', color: 'var(--black)' }}>{currentPiData.temperature}°C</p>
+            {
+              currentPiData.weather === 'none' ? <img src={sunnyIcon} alt="Sunny" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              currentPiData.weather === 'rain' ? <img src={rainyIcon} alt="Rainy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              currentPiData.weather === 'snow' ? <img src={snowyIcon} alt="Snowy" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+            }
+            {
+              currentPiData.time === 'day' ? <img src={sunIcon} alt="Day" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              currentPiData.time === 'night' ? <img src={moonIcon} alt="Night" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+            }
+            {
+              getMusicTime(currentPiData.time, currentPiData.light_level, false) === 'day' ?
+                <img src={brightIcon} alt="Bright" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              getMusicTime(currentPiData.time, currentPiData.light_level, false) === 'night' ?
+                <img src={darkIcon} alt="Dark" style={{ 'width': '2rem', 'height': '2rem' }} /> :
+              <img src={unknownIcon} alt="Unknown" style={{ 'width': '2rem', 'height': '2rem' }} />
+            }
+          </div>,
         duration: 3,
       });
     }

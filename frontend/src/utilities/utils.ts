@@ -24,6 +24,7 @@ export const resetHysteresisState = () => {
 /**
  * Determines the music weather condition based on weather preference and temperature.
  * Uses bang-bang control with hysteresis to prevent frequent switching.
+ * Written with the help of Copilot
  *
  * @param piWeather - Current weather condition string from Pi device
  * @param piTemperature - Temperature number from Pi device
@@ -83,6 +84,7 @@ export const getMusicWeather = (piWeather: string, piTemperature: number, useWea
 /**
  * Determines the music time condition based on light level and time preference.
  * Uses bang-bang control with hysteresis to prevent frequent switching.
+ * Written with the help of Copilot
  *
  * @param piTime - Current time from Pi device
  * @param piLightLevel - Light level from Pi device
@@ -154,6 +156,7 @@ export const getTimeUsingTimezone = (timezone: string) => {
 
 /**
  * Get date.now (unix timeestamp) in the given timezone
+ * Written with the help of Copilot
  *
  * @param timestamp - The timestamp string to convert
  * @returns A unix timestamp in milliseconds
@@ -166,6 +169,7 @@ export const getUnixTimestampUsingTimezone = (timezone: string) => {
 
 /**
  * Formats a timestamp to a human-readable "time ago" format.
+ * Written with the help of Copilot
  *
  * @param timestamp - The timestamp string to format
  * @returns A formatted string representing the time elapsed since the timestamp

@@ -1,4 +1,4 @@
-// Context for managing sensor preferences in the application
+// Context for managing sensor preferences in the application (written with the help of Copilot)
 // Daniel Kim (jk254), Jason Chew (jgc23)
 
 import { createContext, useContext, useState, ReactNode } from 'react';

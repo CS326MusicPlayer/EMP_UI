@@ -1,4 +1,5 @@
 // Context for managing the selected Raspberry Pi and the list of available Pis
+// Written with the help of Copilot
 // Daniel Kim (jk254), Jason Chew (jgc23)
 
 import React, { createContext, useState, useContext, ReactNode } from 'react';

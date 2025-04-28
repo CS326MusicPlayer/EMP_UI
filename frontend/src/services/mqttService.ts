@@ -1,3 +1,5 @@
+// MQTT client service
+// Daniel Kim (jk254), Jason Chew (jgc23)
 // Based on: https://github.com/riotu-lab/react-mqtt/blob/main/src/config/mqtt.js
 
 import mqtt from 'mqtt';

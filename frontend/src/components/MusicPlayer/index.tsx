@@ -504,7 +504,7 @@ export default function MusicPlayer({
 
   // Handle progress bar click (move to specific time)
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (progressBarRef.current && audioRef.current && !isAuto && !isFading) {
+    if (progressBarRef.current && audioRef.current && !isFading) {
       const progressBarRect = progressBarRef.current.getBoundingClientRect();
       const clickPosition = e.clientX - progressBarRect.left;
       const progressBarWidth = progressBarRect.width;

@@ -4,7 +4,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Popover } from 'antd';
-import { /*LuPlay, LuPause, LuRepeat, LuRepeat1, LuSkipForward, LuSkipBack, LuRotateCcw,*/ LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
+import { LuPlay, LuPause, /* LuRepeat, LuRepeat1,*/ LuSkipForward, LuSkipBack, LuVolume1, LuVolume2, LuVolumeOff } from "react-icons/lu";
 import { useSensorPreferences } from '../../contexts/SensorPreferencesContext';
 import { getMusicWeather, getMusicTime, formatTime } from '../../utilities/utils';
 import classes from './styles.module.css';
@@ -344,24 +344,24 @@ export default function MusicPlayer({
 
 
   // Event handlers
-  // const togglePlay = () => {
-  //   if (!audioRef.current) return;
-  //   if (isAuto) return; // Disable play/pause in auto mode
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isAuto) return; // Disable play/pause in auto mode
 
-  //   if (isPlaying) {
-  //     audioRef.current.pause();
-  //   } else {
-  //     const playPromise = audioRef.current.play();
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      const playPromise = audioRef.current.play();
 
-  //     if (playPromise !== undefined) {
-  //       playPromise.catch(error => {
-  //         console.warn('Play was prevented:', error);
-  //         setIsPlaying(false);
-  //       });
-  //     }
-  //   }
-  //   setIsPlaying(!isPlaying);
-  // };
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.warn('Play was prevented:', error);
+          setIsPlaying(false);
+        });
+      }
+    }
+    setIsPlaying(!isPlaying);
+  };
 
 
   // Volume control
@@ -405,7 +405,7 @@ export default function MusicPlayer({
   }, []);
 
 
-  // Loop mode control
+  // // Loop mode control
   // const cycleLoopMode = () => {
   //   if (isAuto) return; // Disable loop mode in auto mode (it should be always 'one')
   //   if (loopMode === 'all') {
@@ -416,20 +416,47 @@ export default function MusicPlayer({
   // };
 
 
-  // // Play previous song
-  // const playPrevious = () => {
-  //   if (isAuto || isFading) return; // Disable previous song in auto mode or during fade
-  //   let newIndex = currentSongIndex - 1;
-  //   if (newIndex < 0) {
-  //     newIndex = musicList.length - 1;
-  //   }
-  //   setCurrentSongIndex(newIndex);
-  // };
+  // Play previous song
+  const playPrevious = () => {
+    if (isFading) return; // Disable during fade
+
+    // If loop mode is 'one', restart the same song
+    if (loopMode === 'one') {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(error => {
+          console.warn('Auto-replay prevented:', error);
+          setIsPlaying(false);
+        });
+      }
+      return;
+    }
+
+    // If loop mode is 'all', play the previous song
+    let newIndex = currentSongIndex - 1;
+    if (newIndex < 0) {
+      newIndex = musicList.length - 1;
+    }
+    setCurrentSongIndex(newIndex);
+  };
 
 
   // Play next song
   const playNext = () => {
-    if (isAuto || isFading) return; // Disable next song in auto mode or during fade
+    if (isFading) return; // Disable during fade
+    // If loop mode is 'one', restart the same song
+    if (loopMode === 'one') {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(error => {
+          console.warn('Auto-replay prevented:', error);
+          setIsPlaying(false);
+        });
+      }
+      return;
+    }
+
+    // If loop mode is 'all', play the next song
     let newIndex = currentSongIndex + 1;
     if (newIndex >= musicList.length) {
       newIndex = 0;
@@ -437,30 +464,6 @@ export default function MusicPlayer({
     setCurrentSongIndex(newIndex);
   };
 
-
-  // Reset Player
-  // const resetPlayer = () => {
-  //   if (audioRef.current) {
-  //     audioRef.current.pause();
-  //     audioRef.current.currentTime = 0;
-  //     setIsPlaying(false);
-  //     setCurrentTime(0);
-  //     // setDuration(0);
-  //     setVolume(1);
-  //     setIsFading(false);
-  //     if (fadeIntervalRef.current.fadeOut) {
-  //       clearInterval(fadeIntervalRef.current.fadeOut);
-  //       fadeIntervalRef.current.fadeOut = null;
-  //     }
-  //     if (fadeIntervalRef.current.fadeIn) {
-  //       clearInterval(fadeIntervalRef.current.fadeIn);
-  //       fadeIntervalRef.current.fadeIn = null;
-  //     }
-  //     if (onFadingChange) {
-  //       onFadingChange(false);
-  //     }
-  //   }
-  // }
 
 
   // Progress bar control
@@ -558,12 +561,6 @@ export default function MusicPlayer({
 
   return (
     <div className={classes.musicPlayer}>
-      {/* <Popover content={<p style={{ 'color': 'var(--black)' }}>Click to reset the player</p>} placement="top" mouseEnterDelay={0.5}>
-        <LuRotateCcw
-          onClick={resetPlayer}
-          className={classes.resetMusicButton}
-        />
-      </Popover> */}
       <span className={classes.musicTitleContainer}>
         <img
           src={currentSong.weatherIcon}
@@ -604,24 +601,25 @@ export default function MusicPlayer({
         <span className={classes.timeDisplay}>{formatTime(duration)}</span>
       </div>
 
+      {/* Music Controls */}
       <div className={classes.controller}>
-        {/* <div className={classes.controls}>
-          <button onClick={playPrevious} className={classes.controlButton} disabled={isAuto || isFading}>
-            <LuSkipBack style={{opacity: isAuto || isFading ? 0.5 : 1}} />
+        <div className={classes.controls}>
+          <button onClick={playPrevious} className={classes.controlButton} disabled={isFading}>
+            <LuSkipBack />
           </button>
 
-          <button onClick={togglePlay} className={classes.controlButton} disabled={isAuto || isFading}>
-            {isPlaying ? <LuPause style={{opacity: isAuto || isFading ? 0.5 : 1}} /> : <LuPlay style={{opacity: isAuto || isFading ? 0.5 : 1}} />}
+          <button onClick={togglePlay} className={classes.controlButton} disabled={isFading}>
+            {isPlaying ? <LuPause /> : <LuPlay />}
           </button>
 
-          <button onClick={playNext} className={classes.controlButton} disabled={isAuto || isFading}>
-            <LuSkipForward style={{opacity: isAuto || isFading ? 0.5 : 1}} />
+          <button onClick={playNext} className={classes.controlButton} disabled={isFading}>
+            <LuSkipForward />
           </button>
 
-          <button onClick={cycleLoopMode} className={classes.loopButton} disabled={isAuto || isFading}>
-            {loopMode === 'all' ? <LuRepeat style={{opacity: isAuto || isFading ? 0.5 : 1}} /> : <LuRepeat1 style={{opacity: isAuto || isFading ? 0.5 : 1}} />}
-          </button>
-        </div> */}
+          {/* <button onClick={cycleLoopMode} className={classes.loopButton} disabled={isFading}>
+            {loopMode === 'all' ? <LuRepeat /> : <LuRepeat1 />}
+          </button> */}
+        </div>
 
         <div className={classes.volumeControl}>
           <Popover content={<p style={{ 'color': 'var(--black)' }}>Press "m" to toggle mute</p>} placement="left">

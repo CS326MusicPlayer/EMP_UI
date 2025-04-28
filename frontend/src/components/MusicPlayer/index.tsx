@@ -124,7 +124,7 @@ export default function MusicPlayer({
   const { useWeather, useTime } = useSensorPreferences();   // Sensor preferences
 
   const [currentSongIndex, setCurrentSongIndex] = useState(0);  // Current song index
-  const [isPlaying, setIsPlaying] = useState(false);            // Is the music playing  
+  const [isPlaying, setIsPlaying] = useState(false);            // Is the music playing
   const [volume, setVolume] = useState(() => {
     // Try to get saved volume from localStorage, default to 1 if not found
     const savedVolume = localStorage.getItem('musicPlayerVolume');
@@ -139,7 +139,7 @@ export default function MusicPlayer({
   const prevIsAutoRef = useRef(isAuto);                   // To track mode changes
   const audioRef = useRef<HTMLAudioElement>(null);        // Audio element reference
   const progressBarRef = useRef<HTMLDivElement>(null);    // Progress bar reference
-  const fadeIntervalRef = useRef<{                        // Fade interval reference  
+  const fadeIntervalRef = useRef<{                        // Fade interval reference
     fadeOut: number | null,
     fadeIn: number | null
   }>({
@@ -222,6 +222,8 @@ export default function MusicPlayer({
     // Function to handle song change based on weather and time
     async function handleSongChange() {
       // Safe returns if necessary data is not available
+      if (!piWeather && !piTemperature) return;
+
       if (!isAuto && ((useWeather && !piWeather) || (!useWeather && !piTemperature))) {
         console.warn('No weather or temperature data available');
         return;
@@ -553,7 +555,7 @@ export default function MusicPlayer({
     }
   }, [loopMode]);
 
-  
+
   return (
     <div className={classes.musicPlayer}>
       {/* <Popover content={<p style={{ 'color': 'var(--black)' }}>Click to reset the player</p>} placement="top" mouseEnterDelay={0.5}>

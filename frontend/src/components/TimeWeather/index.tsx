@@ -281,6 +281,7 @@ export default function TimeWeather({
                 }}
               >
                 {
+                  !piWeather && !piTemperature ? <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} /> :
                   getMusicWeather(piWeather, piTemperature, useWeather) === 'none' ? <img src={sunnyIcon} alt="Sunny" className={classes.weatherIcon} /> :
                   getMusicWeather(piWeather, piTemperature, useWeather) === 'rain' ? <img src={rainyIcon} alt="Rainy" className={classes.weatherIcon} /> :
                   getMusicWeather(piWeather, piTemperature, useWeather) === 'snow' ? <img src={snowyIcon} alt="Snowy" className={classes.weatherIcon} /> :
@@ -438,6 +439,7 @@ export default function TimeWeather({
                 }}
               >
                 {
+                  !piTime && !piLightLevel ? <img src={unknownIcon} alt="Unknown" className={classes.weatherIcon} /> :
                   getMusicTime(piTime, piLightLevel, useTime) === 'day' ?
                     <img src={ useTime ? sunIcon : brightIcon } alt="AM" className={classes.sunIcon} /> :
                   getMusicTime(piTime, piLightLevel, useTime) === 'night' ?

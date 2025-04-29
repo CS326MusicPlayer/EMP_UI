@@ -1,16 +1,19 @@
 # [EMP_UI](https://emp-webui.web.app/)
 > CS326 Final Project
 - Daniel Kim, Jason Chew
+- [Set up your Rasberry Pi](https://github.com/CS326MusicPlayer/MusicPlayer)
 
 ---
 ## Description
-- TBA
+This project adaptively plays different soundtracks depending on the current state of precipitation, sunrise/sunset times, lighting conditions, and/or temperature, based on a Raspberry Pi’s location. The music plays in a web frontend, through which the user can also specify what environmental factors should play a role in the tracks played.
 
+Our system has two base tracks, one for “daytime” and one for “nighttime.” The base tracks are chosen based on time or light level. Each track has three variations: one for clear weather, one for rainy weather, and one for snowy weather. The variations are chosen based on local weather conditions or temperature.
 
 ---
-## How it works
-- Chooses music depending on the weather/temperature and time/brightness, based on the preference
-- 2 base music tracks (day/night) with 3 total variations (sunny, rainy, snowy)
+## Diagrams
+![Data Flow Diagram](/diagrams/Data%20Flow%20Diagram.png)
+![State Diagram](/diagrams/state_diagram.png)
+
 
 ---
 ## Running Locally

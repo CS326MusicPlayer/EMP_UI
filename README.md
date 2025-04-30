@@ -1,7 +1,7 @@
 # [EMP_UI](https://emp-webui.web.app/)
 > CS326 Final Project
 - Daniel Kim, Jason Chew
-- [Set up your Rasberry Pi](https://github.com/CS326MusicPlayer/MusicPlayer)
+- [Set up your Raspberry Pi](https://github.com/CS326MusicPlayer/MusicPlayer)
 
 ---
 ## Description

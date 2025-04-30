@@ -119,6 +119,13 @@ const BrokerInfoModal: React.FC<BrokerInfoProps> = ({
         </div>
       }
     >
+      <p style={{ textAlign: 'center', color: 'var(--black)' }}>
+        Enter the broker information to connect to the MQTT broker
+      </p>
+      <p style={{ textAlign: 'center', color: 'var(--black)' }}>
+        Also set up your <a href="https://github.com/CS326MusicPlayer/MusicPlayer" target="_blank" rel="noopener noreferrer">Raspberry Pi</a> MQTT broker
+      </p>
+      <br />
       <Form layout="vertical" onKeyDown={handleKeyDown}>
         <Form.Item
           label={<p style={{ color: 'var(--black)' }}>Host</p>}

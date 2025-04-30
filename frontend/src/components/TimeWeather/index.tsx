@@ -298,8 +298,8 @@ export default function TimeWeather({
         <Popover
           content={
             <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#616161' }}>Click to switch to "{isAuto ? 'Manual' : 'Auto'}" mode</p>
-              <p style={{ color: '#8e8e8e' }}>"{isAuto ? 'Auto' : 'Manual'}" mode enabled</p>
+              <p style={{ color: '#616161' }}>Music played {isAuto ? 'based on RPi weather' : 'manually'}</p>
+              <p style={{ color: '#8e8e8e' }}>Click to switch to "{isAuto ? 'Manual' : 'Auto'}" mode</p>
             </div>
           }
           trigger="hover"
